@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FENRAX — The Community Response Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #000508;
+    --white: #e0eeff;
+    --muted: rgba(200,220,255,0.48);
+    --faint: rgba(200,220,255,0.14);
+    --blue-bright: #4da8ff;
+    --blue-border: rgba(77,168,255,0.28);
+  }
+  html, body { height: 100%; overflow: hidden; background: var(--black); }
+  body { font-family: 'Inter', sans-serif; color: var(--white); }
+
+  #scene { position: fixed; inset: 0; width: 100%; height: 100%; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.4rem 3.5rem;
+  }
+  .nav-logo { display: inline-flex; align-items: center; text-decoration: none; }
+  .nav-logo img { height: 26px; width: auto; display: block; }
+  .nav-logo-text {
+    font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.25rem;
+    letter-spacing: 0.14em; color: var(--white); display: none;
+  }
+  .nav-links { display: flex; list-style: none; }
+  .nav-links a {
+    color: rgba(200,220,255,0.4); text-decoration: none;
+    font-size: 0.72rem; font-weight: 400; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 0.35rem 1rem; transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--white); }
+  .nav-cta {
+    font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em;
+    color: var(--blue-bright); text-decoration: none;
+    border: 1px solid var(--blue-border); padding: 0.42rem 1rem; transition: background 0.2s;
+  }
+  .nav-cta:hover { background: rgba(77,168,255,0.1); }
+
+  .hero-content {
+    position: fixed; top: 50%; left: 3.5rem;
+    transform: translateY(-52%); z-index: 10; max-width: 480px;
+  }
+  .hero-tag {
+    font-size: 0.67rem; font-weight: 500; letter-spacing: 0.18em;
+    color: var(--blue-bright); text-transform: uppercase;
+    margin-bottom: 1.75rem; display: flex; align-items: center; gap: 0.75rem;
+    opacity: 0; animation: rise 0.9s ease 0.2s forwards;
+  }
+  .hero-tag::before { content: ''; width: 22px; height: 1px; background: var(--blue-bright); display: inline-block; }
+  .hero-headline {
+    font-size: clamp(2.8rem, 4.5vw, 5rem); font-weight: 600;
+    line-height: 1.08; letter-spacing: -0.02em; margin-bottom: 1.5rem;
+    opacity: 0; animation: rise 0.9s ease 0.4s forwards;
+  }
+  .hero-headline span { color: var(--blue-bright); }
+  .hero-divider {
+    width: 44px; height: 1px;
+    background: linear-gradient(90deg, var(--blue-bright), transparent);
+    margin-bottom: 1.4rem;
+    opacity: 0; animation: rise 0.9s ease 0.58s forwards;
+  }
+  .hero-sub {
+    font-size: 0.95rem; font-weight: 300; color: var(--muted);
+    line-height: 1.8; margin-bottom: 2.5rem;
+    opacity: 0; animation: rise 0.9s ease 0.72s forwards;
+  }
+  .hero-actions {
+    display: flex; gap: 1rem;
+    opacity: 0; animation: rise 0.9s ease 0.88s forwards;
+  }
+  .btn-primary {
+    font-size: 0.74rem; font-weight: 500; letter-spacing: 0.06em;
+    text-transform: uppercase; color: #000508;
+    background: var(--blue-bright); padding: 0.75rem 1.75rem;
+    text-decoration: none; transition: background 0.2s, transform 0.15s; display: inline-block;
+  }
+  .btn-primary:hover { background: #6bbeff; transform: translateY(-1px); }
+  .btn-ghost {
+    font-size: 0.74rem; font-weight: 400; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted); background: none;
+    border: 1px solid rgba(200,220,255,0.2); padding: 0.75rem 1.75rem;
+    text-decoration: none; transition: color 0.2s, border-color 0.2s; display: inline-block;
+  }
+  .btn-ghost:hover { color: var(--white); border-color: rgba(200,220,255,0.42); }
+
+  .status-bar {
+    position: fixed; bottom: 2rem; left: 3.5rem; z-index: 10;
+    display: flex; flex-direction: column; gap: 0.35rem;
+    opacity: 0; animation: rise 0.9s ease 1.1s forwards;
+  }
+  .status-line {
+    font-size: 0.6rem; font-weight: 400; letter-spacing: 0.16em;
+    color: rgba(200,220,255,0.2); text-transform: uppercase;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .status-dot { width: 4px; height: 4px; background: var(--blue-bright); border-radius: 50%; animation: blink 2.5s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.15;} }
+
+  .page-nav {
+    position: fixed; bottom: 2rem; right: 3.5rem; z-index: 10;
+    display: flex; gap: 2rem;
+    opacity: 0; animation: rise 0.9s ease 1.1s forwards;
+  }
+  .page-nav a {
+    font-size: 0.62rem; font-weight: 400; letter-spacing: 0.14em;
+    color: rgba(200,220,255,0.22); text-decoration: none;
+    text-transform: uppercase; transition: color 0.2s;
+  }
+  .page-nav a:hover { color: rgba(200,220,255,0.65); }
+
+  @keyframes rise { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: none; } }
+
+  #loading {
+    position: fixed; bottom: 2rem; right: 3.5rem; z-index: 200;
+    font-family: 'DM Mono', monospace; font-size: 0.6rem;
+    letter-spacing: 0.15em; color: rgba(200,220,255,0.3); text-transform: uppercase;
+  }
+
+  @media (max-width: 700px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero-content { left: 1.5rem; right: 1.5rem; max-width: none; }
+    .status-bar, .page-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="scene"></canvas>
+<div id="loading">Loading globe data...</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="fenrax-logo.png" alt="FENRAX"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span class="nav-logo-text">FENRAX</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="model.html">The Model</a></li>
+    <li><a href="fenrax1.html">FENRAX-1</a></li>
+    <li><a href="team.html">Team</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <a href="mailto:james@fenrax.com" class="nav-cta">Contact</a>
+</nav>
+
+<div class="hero-content">
+  <div class="hero-tag">Community Disaster Response — AI Aggregated</div>
+  <h1 class="hero-headline">The Community<br><span>Response</span><br>Platform.</h1>
+  <div class="hero-divider"></div>
+  <p class="hero-sub">Every community has the resources to respond<br>to disaster. Fenrax identifies them, organizes them,<br>and keeps them ready — 24/7.</p>
+  <div class="hero-actions">
+    <a href="model.html" class="btn-primary">The Model</a>
+    <a href="fenrax1.html" class="btn-ghost">FENRAX-1</a>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="status-line"><div class="status-dot"></div>FENRAX-1 — In Development</div>
+  <div class="status-line">Community Response. AI Aggregated.</div>
+</div>
+<div class="page-nav">
+  <a href="model.html">The Model</a>
+  <a href="fenrax1.html">FENRAX-1</a>
+  <a href="team.html">Team</a>
+</div>
+
+<!-- Load D3 + topojson from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+
+<script>
+const canvas = document.getElementById('scene');
+const ctx    = canvas.getContext('2d');
+let W, H, worldData = null;
+
+// Globe center: pushed far bottom-right so only upper-left arc is visible
+// Low-orbit satellite look
+function getGlobe() {
+  const R = Math.min(W, H) * 1.3;
+  return { cx: W * 1.16, cy: H * 1.18, R };
+}
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// D3 orthographic projection — centered on Americas (-80 lng, 20 lat)
+// Tilt slightly for satellite look
+let projection, pathGenerator;
+
+function buildProjection() {
+  const { cx, cy, R } = getGlobe();
+  projection = d3.geoOrthographic()
+    .scale(R)
+    .translate([cx, cy])
+    .rotate([80, -15, 0])   // [lng, lat, roll] — shows Americas
+    .clipAngle(90);
+
+  pathGenerator = d3.geoPath(projection, ctx);
+}
+
+// Stars
+const STARS = Array.from({length: 200}, () => ({
+  x: Math.random() * 0.72,
+  y: Math.random() * 0.68,
+  r: Math.random() * 1.1 + 0.15,
+  a: Math.random() * 0.5 + 0.07,
+  tw: Math.random() * Math.PI * 2
+}));
+
+function drawStars(t) {
+  STARS.forEach(s => {
+    const a = s.a * (0.75 + 0.25 * Math.sin(t * 0.0007 + s.tw));
+    ctx.beginPath();
+    ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(180,210,255,${a})`;
+    ctx.fill();
+  });
+}
+
+function drawSphere() {
+  const { cx, cy, R } = getGlobe();
+  // Dark sphere fill
+  const base = ctx.createRadialGradient(cx - R*0.15, cy - R*0.1, 0, cx, cy, R);
+  base.addColorStop(0, 'rgba(4,14,52,0.97)');
+  base.addColorStop(0.65, 'rgba(2,7,28,0.98)');
+  base.addColorStop(1, 'rgba(0,2,12,1)');
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fillStyle = base;
+  ctx.fill();
+
+  // Outer glow
+  const halo = ctx.createRadialGradient(cx, cy, R * 0.88, cx, cy, R * 1.22);
+  halo.addColorStop(0,    'rgba(10,50,200,0)');
+  halo.addColorStop(0.35, 'rgba(20,80,220,0.07)');
+  halo.addColorStop(0.72, 'rgba(40,120,255,0.24)');
+  halo.addColorStop(1,    'rgba(10,40,160,0)');
+  ctx.beginPath();
+  ctx.arc(cx, cy, R * 1.22, 0, Math.PI * 2);
+  ctx.fillStyle = halo;
+  ctx.fill();
+}
+
+function drawGraticule() {
+  const graticule = d3.geoGraticule()();
+  ctx.beginPath();
+  pathGenerator(graticule);
+  ctx.strokeStyle = 'rgba(20,70,180,0.13)';
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+}
+
+function drawLand() {
+  if (!worldData) return;
+
+  // Glow pass — thick blurred stroke
+  ctx.save();
+  ctx.shadowBlur = 18;
+  ctx.shadowColor = '#1a6fff';
+  ctx.strokeStyle = 'rgba(40,120,255,0.30)';
+  ctx.lineWidth = 3.5;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  pathGenerator(worldData);
+  ctx.stroke();
+  ctx.restore();
+
+  // Crisp bright line on top
+  ctx.save();
+  ctx.shadowBlur = 8;
+  ctx.shadowColor = '#88d4ff';
+  ctx.strokeStyle = '#7dcfff';
+  ctx.lineWidth = 1.0;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  pathGenerator(worldData);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Asset pings
+const ASSETS = [
+  { lng:-122.4, lat:37.7,  label:'N823AH', type:'heli',  delay:0    },
+  { lng:-118.2, lat:34.0,  label:'N441RX', type:'heli',  delay:1.4  },
+  { lng: -97.7, lat:30.3,  label:'N774TK', type:'heli',  delay:0.7  },
+  { lng: -80.2, lat:25.8,  label:'N102MR', type:'boat',  delay:2.1  },
+  { lng: -74.0, lat:40.7,  label:'N558NY', type:'heli',  delay:0.3  },
+  { lng: -80.8, lat:35.2,  label:'N339NC', type:'equip', delay:1.8  },
+  { lng: -90.1, lat:29.9,  label:'N661LA', type:'boat',  delay:1.1  },
+  { lng:-122.3, lat:47.6,  label:'N297WA', type:'heli',  delay:2.5  },
+  { lng: -87.6, lat:41.9,  label:'N409IL', type:'equip', delay:0.9  },
+  { lng:-104.9, lat:39.7,  label:'N512CO', type:'heli',  delay:3.2  },
+];
+const TCOL = {
+  heli:  ['#4dccff','#1a8fff','rgba(77,200,255,'],
+  boat:  ['#4dffb8','#00cc88','rgba(77,255,180,'],
+  equip: ['#ffcc44','#cc8800','rgba(255,200,60,'],
+};
+
+function drawAssets(t) {
+  ASSETS.forEach(a => {
+    const [sx, sy] = projection([a.lng, a.lat]) || [];
+    if (sx == null) return;
+    if (sx < -30 || sx > W+30 || sy < -30 || sy > H+30) return;
+
+    // Check it's on the visible hemisphere
+    const visible = d3.geoContains({type:'Sphere'}, [a.lng, a.lat]);
+
+    const [dot, glow, ring] = TCOL[a.type];
+    const ph  = (t * 0.0005 + a.delay) % 1;
+    const ph2 = (ph + 0.5) % 1;
+
+    ctx.beginPath();
+    ctx.arc(sx, sy, ph * 30, 0, Math.PI * 2);
+    ctx.strokeStyle = `${ring}${(1-ph)*0.7})`;
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(sx, sy, ph2 * 20, 0, Math.PI * 2);
+    ctx.strokeStyle = `${ring}${(1-ph2)*0.4})`;
+    ctx.lineWidth = 0.7;
+    ctx.stroke();
+
+    ctx.save();
+    ctx.shadowBlur = 14; ctx.shadowColor = glow;
+    ctx.beginPath(); ctx.arc(sx, sy, 2.8, 0, Math.PI * 2);
+    ctx.fillStyle = dot; ctx.fill();
+    ctx.restore();
+
+    ctx.font = '500 8.5px DM Mono, monospace';
+    ctx.fillStyle = `${ring}0.65)`;
+    ctx.fillText(a.label, sx + 6, sy - 4);
+  });
+}
+
+// Dashed data connections
+const CONNS = [[0,1],[0,2],[3,6],[4,5],[7,9]];
+function drawConnections(t) {
+  CONNS.forEach(([ai, bi]) => {
+    const [ax,ay] = projection([ASSETS[ai].lng, ASSETS[ai].lat]) || [];
+    const [bx,by] = projection([ASSETS[bi].lng, ASSETS[bi].lat]) || [];
+    if (!ax||!bx) return;
+    if (ax<-30||bx<-30||ax>W+30||bx>W+30) return;
+
+    ctx.save();
+    ctx.setLineDash([4, 9]);
+    ctx.lineDashOffset = -(t * 0.045) % 13;
+    ctx.strokeStyle = `rgba(50,120,255,${0.1 + 0.06*Math.sin(t*0.002)})`;
+    ctx.lineWidth = 0.75;
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
+    ctx.stroke();
+    ctx.restore();
+  });
+}
+
+function drawAtmosphere() {
+  const { cx, cy, R } = getGlobe();
+  const rim = ctx.createRadialGradient(cx, cy, R * 0.93, cx, cy, R * 1.065);
+  rim.addColorStop(0,    'rgba(30,100,255,0)');
+  rim.addColorStop(0.5,  'rgba(60,140,255,0.18)');
+  rim.addColorStop(0.82, 'rgba(80,170,255,0.42)');
+  rim.addColorStop(1,    'rgba(20,80,220,0)');
+  ctx.beginPath(); ctx.arc(cx, cy, R * 1.065, 0, Math.PI * 2);
+  ctx.fillStyle = rim; ctx.fill();
+}
+
+function drawFade() {
+  const g = ctx.createRadialGradient(W, H, 0, W*0.5, H*0.5, W*0.85);
+  g.addColorStop(0,   'rgba(0,0,0,0)');
+  g.addColorStop(0.5, 'rgba(0,0,0,0)');
+  g.addColorStop(1,   'rgba(0,4,14,0.7)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+
+function draw(t) {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#000508'; ctx.fillRect(0, 0, W, H);
+
+  buildProjection(); // rebuild each frame so resize works
+
+  drawStars(t);
+  drawSphere();
+
+  // Clip everything to the sphere
+  const { cx, cy, R } = getGlobe();
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R * 1.002, 0, Math.PI * 2); ctx.clip();
+  drawGraticule();
+  drawLand();
+  drawConnections(t);
+  drawAssets(t);
+  ctx.restore();
+
+  drawAtmosphere();
+  drawFade();
+
+  requestAnimationFrame(draw);
+}
+
+// Fetch real world atlas data
+fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-50m.json')
+  .then(r => r.json())
+  .then(topo => {
+    worldData = topojson.feature(topo, topo.objects.land);
+    document.getElementById('loading').style.display = 'none';
+  })
+  .catch(() => {
+    document.getElementById('loading').textContent = 'Globe offline';
+  });
+
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>

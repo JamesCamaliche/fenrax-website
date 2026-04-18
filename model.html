@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FENRAX — The Model</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #000508;
+    --dark: #040810;
+    --surface: #080d1a;
+    --border: rgba(255,255,255,0.07);
+    --border-accent: rgba(255,255,255,0.14);
+    --white: #e0eeff;
+    --muted: rgba(200,220,255,0.48);
+    --faint: rgba(200,220,255,0.14);
+    --accent: #1a6fff;
+    --accent-bright: #4da8ff;
+    --accent-dim: rgba(77,168,255,0.08);
+    --accent-border: rgba(77,168,255,0.28);
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: 'Inter', sans-serif; font-weight: 300; line-height: 1.6; overflow-x: hidden; }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 3rem; border-bottom: 1px solid var(--border); background: rgba(7,9,15,0.88); backdrop-filter: blur(20px); }
+  .nav-logo { display: inline-flex; align-items: center; text-decoration: none; }
+  .nav-logo img { height: 26px; width: auto; }
+  .nav-links { display: flex; gap: 0; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.4rem 1.2rem; border: 1px solid transparent; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a.active { color: var(--white); border-color: var(--border); }
+  .nav-cta { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--accent-bright); text-decoration: none; border: 1px solid var(--accent-border); padding: 0.45rem 1.1rem; transition: background 0.2s; }
+  .nav-cta:hover { background: var(--accent); color: var(--white); }
+
+  .btn-primary { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); background: var(--accent-bright); border: none; padding: 0.8rem 1.8rem; text-decoration: none; transition: background 0.2s; display: inline-block; }
+  .btn-primary:hover { background: #7b8ef8; }
+  .btn-ghost { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--border-accent); padding: 0.8rem 1.8rem; text-decoration: none; transition: color 0.2s, border-color 0.2s; display: inline-block; }
+  .btn-ghost:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+
+  .section-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.2em; color: var(--accent-bright); text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+  .section-label::before { content: ''; display: inline-block; width: 20px; height: 1px; background: var(--accent-bright); }
+  .section-title { font-weight: 600; font-size: clamp(2.5rem, 5vw, 4.5rem); line-height: 1; letter-spacing: -0.02em; margin-bottom: 1rem; }
+
+  /* PAGE HEADER */
+  .page-header { padding: 9rem 3rem 5rem; border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+  .page-header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(42,63,168,0.12) 0%, transparent 70%); }
+  .page-header-inner { position: relative; max-width: 720px; }
+  .page-tag { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.2em; color: var(--accent-bright); text-transform: uppercase; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+  .page-tag::before { content: ''; display: inline-block; width: 24px; height: 1px; background: var(--accent-bright); }
+  .page-headline { font-family: \'Inter\', sans-serif; font-size: clamp(4rem, 8vw, 7rem); line-height: 0.92; letter-spacing: 0.04em; margin-bottom: 1.75rem; }
+  .page-headline span { color: var(--accent-bright); }
+  .page-sub { font-size: 1.05rem; color: var(--muted); max-width: 540px; line-height: 1.8; }
+
+  /* PROBLEM SECTION */
+  .section { padding: 5rem 3rem; border-bottom: 1px solid var(--border); }
+
+  .problem-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; margin-bottom: 4rem; }
+  .problem-text p { font-size: 1rem; color: var(--muted); line-height: 1.85; margin-bottom: 1.25rem; }
+  .problem-text p strong { color: var(--white); font-weight: 500; }
+  .problem-stat-big { font-family: 'Inter', sans-serif; font-size: clamp(4rem, 8vw, 7rem); line-height: 1; letter-spacing: 0.03em; color: rgba(238,238,242,0.07); }
+  .problem-stat-big span { color: var(--accent-bright); font-size: inherit; }
+
+  /* ASSET TYPES — the invisible inventory */
+  .asset-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    border: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+  .asset-item {
+    padding: 2rem 1.5rem;
+    border-right: 1px solid var(--border);
+    transition: background 0.3s;
+    text-align: center;
+  }
+  .asset-item:last-child { border-right: none; }
+  .asset-item:hover { background: var(--accent-dim); }
+  .asset-icon { font-size: 1.6rem; margin-bottom: 0.75rem; display: block; }
+  .asset-name { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
+
+  /* PROBLEM STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--border); }
+  .stat-block { padding: 3.5rem 3rem; border-right: 1px solid var(--border); position: relative; }
+  .stat-block:last-child { border-right: none; }
+  .stat-block::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.4s; }
+  .stat-block:hover::after { transform: scaleX(1); }
+  .stat-num { font-family: 'Inter', sans-serif; font-size: 4rem; line-height: 1; color: var(--accent-bright); letter-spacing: 0.03em; margin-bottom: 0.5rem; }
+  .stat-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.65; max-width: 240px; }
+
+  /* THE FENRAX MODEL */
+  .model-section { padding: 5rem 3rem; background: var(--dark); border-bottom: 1px solid var(--border); }
+  .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; margin-top: 3rem; }
+  .model-copy p { font-size: 0.98rem; color: var(--muted); line-height: 1.9; margin-bottom: 1.25rem; }
+  .model-copy p strong { color: var(--white); font-weight: 500; }
+
+  /* PIPELINE VISUAL */
+  .pipeline { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); }
+  .pipe-step { padding: 1.75rem 2rem; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 2.5rem 1fr; gap: 1.25rem; align-items: start; transition: background 0.3s; position: relative; }
+  .pipe-step:last-child { border-bottom: none; }
+  .pipe-step:hover { background: var(--accent-dim); }
+  .pipe-step::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent); transform: scaleY(0); transform-origin: top; transition: transform 0.4s; }
+  .pipe-step:hover::before { transform: scaleY(1); }
+  .pipe-num { font-family: 'Inter', sans-serif; font-size: 2rem; color: rgba(91,110,245,0.3); line-height: 1; margin-top: 0.1rem; }
+  .pipe-title { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; color: var(--accent-bright); text-transform: uppercase; margin-bottom: 0.4rem; }
+  .pipe-body { font-size: 0.86rem; color: var(--muted); line-height: 1.65; }
+
+  /* 24/7 READINESS */
+  .readiness-section { padding: 5rem 3rem; border-bottom: 1px solid var(--border); }
+  .readiness-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 3rem; }
+  .readiness-item { background: var(--black); padding: 2.5rem 2rem; transition: background 0.3s; }
+  .readiness-item:hover { background: var(--surface); }
+  .readiness-icon { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--accent-bright); margin-bottom: 0.75rem; text-transform: uppercase; }
+  .readiness-title { font-family: 'Inter', sans-serif; font-size: 1.5rem; letter-spacing: 0.04em; margin-bottom: 0.6rem; line-height: 1.1; }
+  .readiness-body { font-size: 0.86rem; color: var(--muted); line-height: 1.7; }
+
+  /* INCENTIVES */
+  .incentives-section { padding: 5rem 3rem; background: var(--dark); border-bottom: 1px solid var(--border); }
+  .incentives-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; margin-top: 3rem; }
+  .incentive-group h3 { font-family: 'Inter', sans-serif; font-size: 1.8rem; letter-spacing: 0.04em; margin-bottom: 1.5rem; color: var(--accent-bright); }
+  .incentive-list { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); }
+  .incentive-item { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 1rem; transition: background 0.25s; }
+  .incentive-item:last-child { border-bottom: none; }
+  .incentive-item:hover { background: var(--accent-dim); }
+  .incentive-dot { width: 5px; height: 5px; background: var(--accent-bright); border-radius: 50%; margin-top: 0.45rem; flex-shrink: 0; }
+  .incentive-text { font-size: 0.88rem; color: var(--muted); line-height: 1.65; }
+  .incentive-text strong { color: var(--white); font-weight: 500; }
+
+  /* CTA BAND */
+  .cta-band { padding: 4rem 3rem; display: flex; justify-content: space-between; align-items: center; gap: 3rem; }
+  .cta-band-text h3 { font-family: 'Inter', sans-serif; font-size: 2.5rem; letter-spacing: 0.04em; line-height: 1; margin-bottom: 0.5rem; }
+  .cta-band-text p { font-size: 0.92rem; color: var(--muted); max-width: 440px; line-height: 1.7; }
+  .cta-actions { display: flex; gap: 1rem; flex-shrink: 0; }
+
+  footer { padding: 1.75rem 3rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .footer-copy { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; color: var(--faint); text-transform: uppercase; }
+  .footer-links { display: flex; gap: 2rem; }
+  .footer-links a { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; color: var(--faint); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--muted); }
+
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.25rem; }
+    .nav-links { display: none; }
+    .page-header { padding: 7rem 1.5rem 3rem; }
+    .section, .model-section, .readiness-section, .incentives-section { padding: 3.5rem 1.5rem; }
+    .problem-intro { grid-template-columns: 1fr; gap: 2rem; }
+    .asset-row { grid-template-columns: repeat(3, 1fr); }
+    .stats-row { grid-template-columns: 1fr; }
+    .stat-block { border-right: none; border-bottom: 1px solid var(--border); }
+    .model-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .readiness-grid { grid-template-columns: 1fr; }
+    .incentives-grid { grid-template-columns: 1fr; }
+    .cta-band { flex-direction: column; align-items: flex-start; padding: 3rem 1.5rem; }
+    footer { padding: 1.5rem; flex-direction: column; gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo"><img src="fenrax-logo.png" alt="FENRAX"></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="model.html" class="active">The Model</a></li>
+    <li><a href="fenrax1.html">FENRAX-1</a></li>
+    <li><a href="team.html">Team</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <a href="mailto:team@fenrax.com" class="nav-cta">Contact</a>
+</nav>
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+  <div class="page-header-inner reveal">
+    <div class="page-tag">The Fenrax Model</div>
+    <h1 class="page-headline">The Assets<br>Already <span>Exist.</span></h1>
+    <p class="page-sub">Every community is surrounded by helicopters, heavy equipment, boats, and skilled personnel that go completely unmapped in a disaster — sitting idle while first responders are overwhelmed. Fenrax changes that.</p>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="section">
+  <div class="problem-intro reveal">
+    <div class="problem-text">
+      <div class="section-label">The Problem</div>
+      <h2 class="section-title">An Invisible Inventory.</h2>
+      <p>When disaster strikes, communities rely almost entirely on government-owned assets. But those assets are <strong>expensive to acquire, maintain, and staff</strong> — and there are never enough of them.</p>
+      <p>Meanwhile, the resources needed for an effective response already exist in the community. Private aircraft. Construction equipment. Rescue boats. Doctors and engineers and licensed operators. <strong>They're just not in the plan.</strong></p>
+      <p>No one has mapped them. No one has verified them. No one has connected them to the people who need them. Until a crisis hits — and by then it's too late.</p>
+    </div>
+    <div>
+      <div class="problem-stat-big"><span>$50B</span><br>Annual US disaster spend.</div>
+      <div style="margin-top:1.5rem;font-size:0.9rem;color:var(--muted);line-height:1.8;">Despite this investment, Katrina, Camp Fire, and Helene each collapsed local response capacity entirely. The bottleneck isn't money — it's the invisible inventory that no one has organized.</div>
+    </div>
+  </div>
+
+  <!-- ASSET TYPES -->
+  <div class="reveal">
+    <div class="section-label">What's Already in Every Community</div>
+    <div class="asset-row">
+      <div class="asset-item">
+        <span class="asset-icon">✈️</span>
+        <div class="asset-name">Aviation</div>
+      </div>
+      <div class="asset-item">
+        <span class="asset-icon">🚛</span>
+        <div class="asset-name">Vehicles</div>
+      </div>
+      <div class="asset-item">
+        <span class="asset-icon">⚙️</span>
+        <div class="asset-name">Equipment</div>
+      </div>
+      <div class="asset-item">
+        <span class="asset-icon">🚤</span>
+        <div class="asset-name">Marine</div>
+      </div>
+      <div class="asset-item">
+        <span class="asset-icon">🧑‍⚕️</span>
+        <div class="asset-name">Personnel</div>
+      </div>
+      <div class="asset-item">
+        <span class="asset-icon">🏗️</span>
+        <div class="asset-name">Facilities</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-row reveal">
+  <div class="stat-block">
+    <div class="stat-num">$50B+</div>
+    <div class="stat-desc">Annual US spend on disaster preparation and response — yet communities remain critically under-resourced at the local level.</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-num">100%</div>
+    <div class="stat-desc">Of required response assets already exist inside communities. The bottleneck is visibility, coordination, and integration — not acquisition.</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-num">0</div>
+    <div class="stat-desc">Municipalities currently have a live, verified inventory of privately-owned community assets integrated into their emergency plans.</div>
+  </div>
+</div>
+
+<!-- THE MODEL -->
+<div class="model-section">
+  <div class="model-grid reveal">
+    <div>
+      <div class="section-label">The Fenrax Model</div>
+      <h2 class="section-title">Integrate. Activate.<br>Respond.</h2>
+      <div class="model-copy">
+        <p>Fenrax's goal is simple: <strong>take the assets that already exist in a community and integrate them into the local disaster response plan</strong> — so they're live, verified, and available for community response 24/7.</p>
+        <p>We identify privately-owned assets across every category. We verify them. We build them into real municipal emergency plans. And when a disaster hits, the right assets reach the right place — with the right people operating them.</p>
+        <p><strong>This isn't about building new government capacity.</strong> It's about unlocking what every community already has, and making it count when it matters most.</p>
+      </div>
+    </div>
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-num">01</div>
+        <div>
+          <div class="pipe-title">Identify</div>
+          <p class="pipe-body">AI-powered discovery of underutilized local assets — helicopters, trucks, equipment, boats, personnel — building a verified, living inventory across the community.</p>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">02</div>
+        <div>
+          <div class="pipe-title">Verify</div>
+          <p class="pipe-body">Every asset is confirmed. Every operator is credentialed. Capabilities, certifications, and availability are matched to specific disaster response scenarios.</p>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">03</div>
+        <div>
+          <div class="pipe-title">Integrate</div>
+          <p class="pipe-body">Assets are embedded directly into municipal Emergency Operations Plans — live, current, and ready to be called on the moment a disaster is declared.</p>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">04</div>
+        <div>
+          <div class="pipe-title">Mobilize</div>
+          <p class="pipe-body">When disaster strikes, FENRAX dispatches the right assets to the right place. Verified operators are matched to equipment — ownership doesn't limit response.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 24/7 READINESS -->
+<div class="readiness-section">
+  <div class="reveal">
+    <div class="section-label">Always On</div>
+    <h2 class="section-title">Live. Verified.<br>Available 24/7.</h2>
+    <p style="font-size:0.95rem;color:var(--muted);max-width:560px;line-height:1.8;margin-top:0.5rem;">The Fenrax platform isn't activated at the moment of disaster — it's live before it ever happens. Response plans are always current. Assets are always tracked. Operators are always verified.</p>
+  </div>
+  <div class="readiness-grid reveal">
+    <div class="readiness-item">
+      <div class="readiness-icon">Pre-Event</div>
+      <div class="readiness-title">Built Before the Crisis</div>
+      <p class="readiness-body">Asset databases, operator registries, and response plans are built, tested, and exercised before any disaster occurs. Annual training keeps participants ready.</p>
+    </div>
+    <div class="readiness-item">
+      <div class="readiness-icon">During Event</div>
+      <div class="readiness-title">Instant Activation</div>
+      <p class="readiness-body">When a disaster is declared, FENRAX activates the pre-built plan. Assets are dispatched, operators are notified, and insurance coverage engages automatically.</p>
+    </div>
+    <div class="readiness-item">
+      <div class="readiness-icon">Continuous</div>
+      <div class="readiness-title">Always Updating</div>
+      <p class="readiness-body">The platform continuously monitors asset availability, operator status, and community conditions — so the response plan always reflects current ground truth.</p>
+    </div>
+  </div>
+</div>
+
+<!-- INCENTIVES -->
+<div class="incentives-section">
+  <div class="reveal">
+    <div class="section-label">How Participation Works</div>
+    <h2 class="section-title">Structured to<br>Unlock Participation.</h2>
+  </div>
+  <div class="incentives-grid reveal">
+    <div class="incentive-group">
+      <h3>For Asset Owners</h3>
+      <div class="incentive-list">
+        <div class="incentive-item">
+          <div class="incentive-dot"></div>
+          <div class="incentive-text"><strong>Tax incentive</strong> for registering assets in the Fenrax platform</div>
+        </div>
+        <div class="incentive-item">
+          <div class="incentive-dot"></div>
+          <div class="incentive-text"><strong>Annual training</strong> at no cost — keeping owners and operators ready</div>
+        </div>
+        <div class="incentive-item">
+          <div class="incentive-dot"></div>
+          <div class="incentive-text"><strong>Insurance coverage activates</strong> automatically when an asset is deployed in a declared emergency</div>
+        </div>
+        <div class="incentive-item">
+          <div class="incentive-dot"></div>
+          <div class="incentive-text">Owners <strong>don't need to be present</strong> — verified operators can be matched to their asset</div>
+        </div>
+        <div class="incentive-item">
+          <div class="incentive-dot"></div>
+          <div class="incentive-text">Non-registered assets are still <strong>identified and mapped</strong> — registration unlocks full participation and protection</div>
+        </div>
+      </div>
+    </div>
+    <div class="incentive-group">
+      <h3>For Municipalities</h3>
+      <div class="incentive-list">
+        <div class="incentive-item">
+          <div class="incentive-dot"></div>
+          <div class="incentive-text"><strong>Orders of magnitude more capacity</strong> without building or maintaining government-owned fleets</div>
+        </div>
+        <div class="incentive-item">
+          <div class="incentive-dot"></div>
+          <div class="incentive-text"><strong>Live integration</strong> into existing Emergency Operations Plans — no replacement, just augmentation</div>
+        </div>
+        <div class="incentive-item">
+          <div class="incentive-dot"></div>
+          <div class="incentive-text"><strong>$0.10 per resident per month</strong> — a cost any municipality can justify politically and fiscally</div>
+        </div>
+        <div class="incentive-item">
+          <div class="incentive-dot"></div>
+          <div class="incentive-text">Response plans that <strong>adapt in real time</strong> as conditions change — not static documents updated annually</div>
+        </div>
+        <div class="incentive-item">
+          <div class="incentive-dot"></div>
+          <div class="incentive-text">Aligns with the growing <strong>local-first response movement</strong> and FEMA community resilience initiatives</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-band reveal">
+  <div class="cta-band-text">
+    <h3>See It Applied to Aviation.</h3>
+    <p>FENRAX-1 is the first product in the platform — focused on aviation assets and using San Francisco Bay as the proof of concept.</p>
+  </div>
+  <div class="cta-actions">
+    <a href="fenrax1.html" class="btn-primary">FENRAX-1</a>
+    <a href="team.html" class="btn-ghost">Meet the Team</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-copy">© 2026 Fenrax — Community Disaster Response. AI Aggregated.</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="fenrax1.html">FENRAX-1</a>
+    <a href="team.html">Team</a>
+  </div>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var reveals = document.querySelectorAll('.reveal');
+    function check() { reveals.forEach(function(el) { if (el.getBoundingClientRect().top < window.innerHeight - 40) el.classList.add('visible'); }); }
+    check();
+    window.addEventListener('scroll', check, {passive: true});
+  });
+</script>
+</body>
+</html>
