@@ -259,7 +259,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
         <div class="lbar"><div class="lprog" id="lProg"></div></div>
         <div class="lsub" id="lSub">Connecting to data sources...</div>
       </div>
-    </div>
+    
 
     <!-- RIGHT PANEL -->
     <div class="rpanel">
@@ -281,13 +281,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
       </div>
       <div class="rhdr">
         <div class="rtitle">AI Response Plan</div>
-        <div class="rstatus" id="rStatus">Awaiting scenario</div>
+        <div style="display:flex;align-items:center;gap:.6rem">
+          <button id="openPlanBtn" onclick="openFullPlan()" style="display:none;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.35);color:#00e676;font-family:inherit;font-size:.55rem;letter-spacing:.1em;padding:.18rem .55rem;cursor:pointer;text-transform:uppercase">&#9654; Full Plan</button>
+          <div class="rstatus" id="rStatus">Awaiting scenario</div>
+        </div>
       </div>
       <div class="rbody">
         <div class="rph" id="rPh"><div style="font-size:1.5rem;opacity:.4">&#9672;</div><div class="rph-txt">Enter a scenario above<br>and generate a response plan<br>using live available aircraft</div></div>
         <div id="rContent"></div>
       </div>
     </div>
+  </div>
   </div>
 </div>
 
@@ -1339,15 +1343,36 @@ function generatePlan(scenario) {
     +'COUNTY EMERGENCY OPERATIONS PLANS - AVIATION RELEVANT PROTOCOLS:\n'
     +eopCtx;
 
-  var prompt = 'You are FENRAX-1, an AI emergency aviation response planner integrated with official Bay Area county Emergency Operations Plans.\n\n'
-    +ctx+'\n\nDISASTER SCENARIO: '+scenario+'\n\n'
-    +'Generate a structured plan with these exact sections:\n\n'
-    +'SITUATION ASSESSMENT\n2-3 sentences on scenario and aviation challenges.\n\n'
-    +'ASSET DEPLOYMENT\n6-10 specific aircraft with real N-numbers from above. Format: - [N-number] ([type]): [mission] — Priority: [CRITICAL/HIGH/STANDARD]\n\n'
-    +'AERIAL CORRIDORS\n2-3 specific routes with real Bay Area geography, origin airport, destination, altitude, purpose.\n\n'
-    +'ESTIMATED IMPACT\nSpecific numbers: evacuations/hr, daily capacity, area covered.\n\n'
-    +'COORDINATION\nCounty OES, FAA, weather constraints.\n\n'
-    +'FENRAX VALUE\n1-2 sentences on how FENRAX pre-integration vs ad-hoc mobilization changes response time. Reference specific county EOP protocols, designated LZs, EOC locations, and mutual aid procedures from the data above. Use real N-numbers from the FAA fleet.';
+  var prompt = 'You are FENRAX-1, an AI emergency aviation response system with access to real FAA aircraft data and official Bay Area County Emergency Operations Plans.\n\n'
+    +'CRITICAL: Base ALL numbers and assignments on the EXACT scenario described. Do not give generic responses. Calculate specific evacuation figures, tonnage, and timelines from the inputs given.\n\n'
+    +ctx
+    +'\n\nDISASTER SCENARIO (respond SPECIFICALLY to this):\n'+scenario+'\n\n'
+    +'Generate a detailed operational plan. Every number must be calculated from the scenario. Use real N-numbers. Use real county EOP protocols.\n\n'
+    +'SITUATION ASSESSMENT\n'
+    +'Analyze the specific scenario. Identify exact affected areas, population at risk (use real SF Bay Area population data), primary aviation challenges, and time-critical elements.\n\n'
+    +'ASSET DEPLOYMENT\n'
+    +'List 8-12 specific aircraft assigned to this scenario using real N-numbers from the database. For each:\n'
+    +'- [N-number] ([aircraft type], [operator]): [specific mission for THIS scenario] | Priority: [CRITICAL/HIGH/STANDARD] | ETA: [realistic time]\n\n'
+    +'AERIAL CORRIDORS\n'
+    +'Define 2-4 specific flight corridors using real Bay Area geography and airports from the data. Include:\n'
+    +'- Route: [origin airport ICAO] → [destination/LZ], Altitude: [AGL], Purpose: [specific to this scenario]\n\n'
+    +'EVACUATION CAPACITY\n'
+    +'Calculate using the actual aircraft assigned:\n'
+    +'- Evacuees per hour: [calculate from aircraft pax capacity × sortie rate]\n'
+    +'- Evacuees per 12-hour operational period: [total]\n'
+    +'- Supplies/cargo per hour: [calculate in lbs and convert to tons]\n'
+    +'- Supplies per 12-hour period: [total tons]\n'
+    +'- Priority populations served: [mobility impaired, medical, general]\n'
+    +'- Estimated completion time for full evacuation: [hours]\n\n'
+    +'EXECUTION TIMELINE\n'
+    +'Hour-by-hour plan for first 12 hours:\n'
+    +'H+0 to H+2: [immediate actions]\n'
+    +'H+2 to H+6: [escalation phase]\n'
+    +'H+6 to H+12: [sustained operations]\n\n'
+    +'COORDINATION\n'
+    +'Specific county EOC contacts, FAA NOTAM requirements, airspace coordination, weather constraints from current KSFO data.\n\n'
+    +'FENRAX INTEGRATION VALUE\n'
+    +'Quantify: How many hours faster is this response with FENRAX pre-integration vs ad-hoc mobilization (reference Operation Helo Hurricane Helene: 4 days to organize). What is the life-safety delta?';
 
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
@@ -1358,7 +1383,10 @@ function generatePlan(scenario) {
     if(!r.ok) return r.json().then(function(e){throw new Error(e.error&&e.error.message||'HTTP '+r.status);});
     return r.json();
   }).then(function(d){
-    renderPlan(d.content&&d.content[0]&&d.content[0].text||'No response.', avail.length, helis.length);
+    var planText = d.content&&d.content[0]&&d.content[0].text||'No response.';
+    lastPlanData = {scenario: scenario, planText: planText, aircraft: avail, weather: weatherData};
+    renderPlan(planText, avail.length, helis.length);
+    document.getElementById('openPlanBtn').style.display = 'block';
     document.getElementById('rStatus').textContent='Generated '+new Date().toLocaleTimeString();
   }).catch(function(e){
     var isCors = e.message.indexOf('Failed to fetch')>=0||e.message.indexOf('NetworkError')>=0||e.message.indexOf('Load failed')>=0||e.message.indexOf('Content Security')>=0;
@@ -1382,8 +1410,8 @@ function generatePlan(scenario) {
 
 // ── RENDER PLAN ───────────────────────────────────────────────────────────
 function renderPlan(text, availCount, heliCount) {
-  var sections = ['SITUATION ASSESSMENT','ASSET DEPLOYMENT','AERIAL CORRIDORS','ESTIMATED IMPACT','COORDINATION','FENRAX VALUE'];
-  var icons = {'SITUATION ASSESSMENT':'◈','ASSET DEPLOYMENT':'✦','AERIAL CORRIDORS':'▶','ESTIMATED IMPACT':'◉','COORDINATION':'◆','FENRAX VALUE':'★'};
+  var sections = ['SITUATION ASSESSMENT','ASSET DEPLOYMENT','AERIAL CORRIDORS','EVACUATION CAPACITY','EXECUTION TIMELINE','COORDINATION','FENRAX INTEGRATION VALUE','FENRAX VALUE'];
+  var icons = {'SITUATION ASSESSMENT':'◈','ASSET DEPLOYMENT':'✦','AERIAL CORRIDORS':'▶','EVACUATION CAPACITY':'◉','EXECUTION TIMELINE':'⏱','COORDINATION':'◆','FENRAX INTEGRATION VALUE':'★','FENRAX VALUE':'★'};
   var parsed = {}; var cur = null;
   text.split('\n').forEach(function(line){
     var t = line.trim().toUpperCase();
@@ -1444,6 +1472,134 @@ async function initialize() {
   document.getElementById('lOverlay').style.display='none';
 
   setInterval(async function(){liveAircraft=await fetchLive();renderList();placeMarkers();},60000);
+}
+
+
+var lastPlanData = null;
+
+function openFullPlan() {
+  if (!lastPlanData) return;
+  var d = lastPlanData;
+  var w = window.open('', '_blank');
+  w.document.write(buildFullPlanPage(d.scenario, d.planText, d.aircraft, d.weather));
+  w.document.close();
+}
+
+function buildFullPlanPage(scenario, planText, aircraft, weather) {
+  var avail = aircraft.filter(function(a){return !a.airborne;});
+  var helis = avail.filter(function(a){return a.cat==='heli';});
+  
+  // Parse sections from plan text
+  var sections = ['SITUATION ASSESSMENT','ASSET DEPLOYMENT','AERIAL CORRIDORS','EVACUATION CAPACITY','EXECUTION TIMELINE','COORDINATION','FENRAX INTEGRATION VALUE','FENRAX VALUE'];
+  var parsed = {};
+  var cur = null;
+  planText.split('\n').forEach(function(line){
+    var t = line.trim().toUpperCase();
+    var match = sections.find(function(s){return t.indexOf(s)>=0;});
+    if(match){cur=match;parsed[cur]='';}
+    else if(cur&&line.trim()) parsed[cur]+=(parsed[cur]?'\n':'')+line;
+  });
+
+  function sec(name, icon, color) {
+    if (!parsed[name]) return '';
+    var body = parsed[name]
+      .replace(/\n/g,'<br>')
+      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+      .replace(/CRITICAL/g,'<span style="color:#ff4444;font-weight:600">CRITICAL</span>')
+      .replace(/\bHIGH\b/g,'<span style="color:#ffaa00;font-weight:600">HIGH</span>')
+      .replace(/STANDARD/g,'<span style="color:#00b4ff">STANDARD</span>')
+      .replace(/H\+(\d+)/g,'<strong style="color:#00b4ff">H+$1</strong>');
+    return '<div class="psec">'
+      +'<div class="psec-title" style="color:'+(color||'#00b4ff')+'">'+(icon||'◈')+' '+name+'</div>'
+      +'<div class="psec-body">'+body+'</div>'
+      +'</div>';
+  }
+
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  var timeStr = now.toUTCString().match(/(\d+:\d+:\d+)/)[1]+' UTC';
+
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    +'<title>FENRAX-1 Emergency Response Plan</title>'
+    +'<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">'
+    +'<style>'
+    +'*{box-sizing:border-box;margin:0;padding:0}'
+    +':root{--bg:#02040a;--panel:#050c14;--blue:#00b4ff;--green:#00e676;--red:#ff4444;--amber:#ffaa00;--white:#c8e8ff;--muted:rgba(200,232,255,.5);--faint:rgba(200,232,255,.15);--border:rgba(0,180,255,.12)}'
+    +'body{background:var(--bg);color:var(--white);font-family:"DM Mono",monospace;padding:0;line-height:1.6}'
+    +'.page{max-width:960px;margin:0 auto;padding:2rem 2.5rem}'
+    +'.header{border-bottom:2px solid var(--border);padding-bottom:1.5rem;margin-bottom:2rem}'
+    +'.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}'
+    +'.logo{font-size:.75rem;font-weight:500;letter-spacing:.25em;color:var(--blue)}'
+    +'.timestamp{font-size:.62rem;color:var(--faint)}'
+    +'.doc-title{font-family:"Inter",sans-serif;font-size:2rem;font-weight:700;color:var(--white);letter-spacing:-.02em;margin-bottom:.5rem}'
+    +'.doc-sub{font-size:.72rem;color:var(--muted);margin-bottom:1rem}'
+    +'.scenario-box{background:var(--panel);border:1px solid rgba(255,170,0,.3);border-left:3px solid var(--amber);padding:.85rem 1.25rem}'
+    +'.scenario-label{font-size:.55rem;letter-spacing:.2em;color:var(--amber);margin-bottom:.35rem}'
+    +'.scenario-text{font-size:.78rem;color:var(--white);line-height:1.7;font-family:"Inter",sans-serif;font-weight:300}'
+    +'.meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2rem}'
+    +'.meta-cell{background:var(--panel);padding:.65rem 1rem}'
+    +'.meta-label{font-size:.5rem;letter-spacing:.15em;color:var(--faint);text-transform:uppercase}'
+    +'.meta-val{font-size:.82rem;font-weight:500;color:var(--blue);margin-top:.2rem}'
+    +'.meta-val.g{color:var(--green)}.meta-val.a{color:var(--amber)}.meta-val.r{color:var(--red)}'
+    +'.psec{margin-bottom:1.75rem;padding-bottom:1.75rem;border-bottom:1px solid var(--border)}'
+    +'.psec:last-child{border-bottom:none}'
+    +'.psec-title{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:.85rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}'
+    +'.psec-body{font-size:.72rem;color:var(--muted);line-height:1.9}'
+    +'.psec-body strong{color:var(--white);font-weight:500}'
+    +'.cap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem}'
+    +'.cap-box{background:var(--panel);border:1px solid var(--border);padding:.85rem 1rem}'
+    +'.cap-val{font-size:1.5rem;font-weight:600;color:var(--green);font-family:"Inter",sans-serif;line-height:1}'
+    +'.cap-unit{font-size:.58rem;color:var(--muted);margin-top:.15rem}'
+    +'.cap-label{font-size:.55rem;letter-spacing:.1em;color:var(--faint);margin-top:.25rem;text-transform:uppercase}'
+    +'.timeline{margin-top:.75rem}'
+    +'.tl-item{display:grid;grid-template-columns:90px 1fr;gap:.75rem;margin-bottom:.65rem;align-items:start}'
+    +'.tl-time{font-size:.65rem;font-weight:500;color:var(--blue);padding-top:.08rem}'
+    +'.tl-body{font-size:.7rem;color:var(--muted)}'
+    +'.asset-table{width:100%;border-collapse:collapse;margin-top:.75rem;font-size:.65rem}'
+    +'.asset-table th{text-align:left;font-size:.52rem;letter-spacing:.12em;color:var(--faint);padding:.4rem .6rem;border-bottom:1px solid var(--border);font-weight:400;text-transform:uppercase}'
+    +'.asset-table td{padding:.45rem .6rem;border-bottom:1px solid rgba(0,180,255,.06)}'
+    +'.asset-table tr:hover td{background:rgba(0,180,255,.04)}'
+    +'.fenrax-box{background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.25);border-left:3px solid var(--green);padding:1rem 1.25rem;margin-top:.75rem}'
+    +'.footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:.58rem;color:var(--faint)}'
+    +'@media print{body{background:#fff;color:#000}.page{max-width:100%}.doc-title{color:#000}.meta-val{color:#1a5276}.psec-title{color:#1a5276}}'
+    +'</style></head><body>'
+    +'<div class="page">'
+
+    +'<div class="header">'
+    +'<div class="header-top">'
+    +'<div class="logo">FENRAX-1 // SF BAY AREA AVIATION ASSET RESPONSE</div>'
+    +'<div class="timestamp">'+dateStr+' &nbsp;·&nbsp; '+timeStr+'</div>'
+    +'</div>'
+    +'<div class="doc-title">Emergency Aviation Response Plan</div>'
+    +'<div class="doc-sub">Generated by FENRAX-1 AI &nbsp;·&nbsp; Real FAA aircraft data &nbsp;·&nbsp; County EOP integrated</div>'
+    +'<div class="scenario-box">'
+    +'<div class="scenario-label">Scenario Input</div>'
+    +'<div class="scenario-text">'+scenario+'</div>'
+    +'</div>'
+    +'</div>'
+
+    +'<div class="meta-grid">'
+    +'<div class="meta-cell"><div class="meta-label">Weather</div><div class="meta-val">'+(weather.rules||'VFR')+'</div></div>'
+    +'<div class="meta-cell"><div class="meta-label">Wind</div><div class="meta-val a">'+(weather.dir||'--')+' @ '+(weather.wind||'--')+'</div></div>'
+    +'<div class="meta-cell"><div class="meta-label">Helis Available</div><div class="meta-val g">'+helis.length+'</div></div>'
+    +'<div class="meta-cell"><div class="meta-label">Total Assets</div><div class="meta-val">'+avail.length+'</div></div>'
+    +'</div>'
+
+    +sec('SITUATION ASSESSMENT','◈','#00b4ff')
+    +sec('ASSET DEPLOYMENT','✦','#00b4ff')
+    +sec('AERIAL CORRIDORS','▶','#00b4ff')
+    +sec('EVACUATION CAPACITY','◉','#00e676')
+    +sec('EXECUTION TIMELINE','⏱','#ffaa00')
+    +sec('COORDINATION','◆','#00b4ff')
+    +sec('FENRAX INTEGRATION VALUE','★','#00e676')
+    +sec('FENRAX VALUE','★','#00e676')
+
+    +'<div class="footer">'
+    +'<div>FENRAX-1 &nbsp;·&nbsp; fenrax.com &nbsp;·&nbsp; Community Disaster Response, AI Aggregated</div>'
+    +'<div>CONFIDENTIAL &nbsp;·&nbsp; For emergency planning use only</div>'
+    +'</div>'
+    +'</div>'
+    +'</body></html>';
 }
 
 initialize();
