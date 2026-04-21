@@ -153,16 +153,33 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
 .cors-body{font-size:.63rem;color:var(--muted);line-height:1.85}
 .cors-body strong{color:var(--white)}
 .cors-body span{color:var(--blue)}
+
+/* Airport markers and popup */
+.apt-popup { font-family: 'DM Mono', monospace; min-width: 260px; }
+.apt-popup-hdr { background:#050c14; border-bottom:1px solid rgba(255,204,0,.3); padding:.5rem .75rem; display:flex; align-items:center; justify-content:space-between; }
+.apt-popup-icao { font-size:.8rem; font-weight:500; color:#ffcc00; letter-spacing:.1em; }
+.apt-popup-name { font-size:.58rem; color:rgba(200,232,255,.5); margin-top:.1rem; }
+.apt-popup-county { font-size:.55rem; color:rgba(200,232,255,.3); }
+.apt-popup-list { background:#02040a; max-height:220px; overflow-y:auto; }
+.apt-popup-item { display:grid; grid-template-columns:70px 1fr auto; gap:.3rem; align-items:center; padding:.35rem .75rem; border-bottom:1px solid rgba(0,180,255,.05); cursor:pointer; }
+.apt-popup-item:hover { background:rgba(0,180,255,.08); }
+.apt-popup-reg { font-size:.68rem; font-weight:500; color:#00b4ff; }
+.apt-popup-type { font-size:.57rem; color:rgba(200,232,255,.5); }
+.apt-popup-cat { font-size:.5rem; padding:.1rem .3rem; border-radius:2px; }
+.apt-popup-footer { padding:.35rem .75rem; font-size:.55rem; color:rgba(200,232,255,.3); background:#050c14; border-top:1px solid rgba(0,180,255,.08); }
+.leaflet-popup-content-wrapper { background:transparent !important; border:1px solid rgba(255,204,0,.35) !important; border-radius:0 !important; padding:0 !important; box-shadow:0 0 20px rgba(255,204,0,.1) !important; }
+.leaflet-popup-content { margin:0 !important; }
+.leaflet-popup-tip { background:#ffcc00 !important; }
 </style>
 </head>
 <body>
 
 <!-- API KEY MODAL -->
-<div id="keyModal">
+<div id="keyModal" style="display:flex">
   <div class="kbox">
     <div class="ktop">FENRAX-1 // CONFIGURATION</div>
     <div class="ktitle">Anthropic API Key</div>
-    <div class="knote">Required to generate AI response plans.<br>Get one at <strong>console.anthropic.com</strong> &rarr; API Keys<br><br><em style="color:rgba(200,232,255,.3)">Open this file directly in Chrome (Cmd+O) for best results.</em></div>
+    <div class="knote">Required to generate AI response plans.<br>Get one at <strong>console.anthropic.com</strong> &rarr; API Keys<br><br><em style="color:rgba(0,180,255,.4)">Running on fenrax.com ✓ &mdash; API calls are enabled.</em></div>
     <input id="apiKeyInput" type="password" placeholder="Paste your Anthropic API key here..." onkeydown="if(event.key==='Enter')saveKey()">
     <div id="keyStatus"></div>
     <div class="kbtns">
@@ -182,7 +199,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
     </div>
     <div class="tr">
       <div class="tlive"><div class="dot"></div>LIVE DATA</div>
-      <button id="keyBtn">&#9881; API KEY</button>
+      <button id="viewToggle" style="background:transparent;border:1px solid rgba(0,255,136,.3);color:rgba(0,255,136,.7);font-family:inherit;font-size:.6rem;letter-spacing:.1em;padding:.22rem .65rem;cursor:pointer">&#9679; LIVE ONLY</button> <button id="keyBtn">&#9881; API KEY</button>
       <div id="clock">--:--:-- UTC</div>
     </div>
   </div>
@@ -232,6 +249,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
   <div class="mli"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="transparent" stroke="#ff4444" stroke-width="1.5"/></svg>&nbsp;Fire/Police Gnd</div>
   <div class="mli"><svg width="13" height="13"><polygon points="6.5,1.5 12,11.5 1,11.5" fill="#ff4444"/></svg>&nbsp;Fire Heli Air</div>
   <div class="mli"><svg width="13" height="13"><polygon points="6.5,1.5 12,11.5 1,11.5" fill="transparent" stroke="#ff4444" stroke-width="1.8" stroke-linejoin="round"/></svg>&nbsp;Fire Heli Gnd</div>
+  <div class="mli"><svg width="11" height="11" viewBox="0 0 14 14"><polygon points="7,1 8.5,5 13,5 9.5,7.5 11,12 7,9.5 3,12 4.5,7.5 1,5 5.5,5" fill="rgba(255,200,0,0.75)" stroke="rgba(255,170,0,0.5)" stroke-width="0.5"/></svg>&nbsp;Airport (click for fleet)</div>
 </div>
         <div class="mli"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="transparent" stroke="#00b4ff" stroke-width="1.5"/></svg>Civ fixed (gnd)</div>
       </div>
@@ -1037,10 +1055,121 @@ async function fetchWx() {
 }
 
 // ── MARKERS ───────────────────────────────────────────────────────────────
+
+function makeAirportIcon(icao) {
+  // Small subdued star - 14px, muted yellow, ICAO label below
+  var svg = '<svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">'
+    +'<polygon points="7,1 8.5,5 13,5 9.5,7.5 11,12 7,9.5 3,12 4.5,7.5 1,5 5.5,5" '
+    +'fill="rgba(255,200,0,0.75)" stroke="rgba(255,170,0,0.5)" stroke-width="0.5"/>'
+    +'</svg>';
+  return L.divIcon({
+    html: '<div style="position:relative;text-align:center;line-height:1">'
+      + svg
+      + '<div style="margin-top:2px;color:rgba(255,200,0,0.7);'
+      + 'font-family:DM Mono,monospace;font-size:8px;letter-spacing:.04em;'
+      + 'white-space:nowrap;text-shadow:0 0 4px rgba(0,0,0,0.8)">' + icao + '</div>'
+      + '</div>',
+    className: 'aircraft-marker',
+    iconSize: [30, 26],
+    iconAnchor: [15, 7]
+  });
+}
+
+var airportMarkers = {};
+
+function buildAirportPopup(icao, apt, aircraft) {
+  var helis = aircraft.filter(function(a){return a.cat==='heli';});
+  var fixed = aircraft.filter(function(a){return a.cat==='fixed';});
+  var rows = aircraft.slice(0,30).map(function(a) {
+    var col = a.govColor==='mil'?'#00e676':(a.govColor==='le'||a.govColor==='fire')?'#ff4444':'#00b4ff';
+    var cat = a.cat==='heli'?'HELI':'FIXED';
+    var bcol = a.cat==='heli'?'rgba(0,180,255,.15)':'rgba(0,180,255,.08)';
+    return '<div class="apt-popup-item" onclick="selectAc('+JSON.stringify(a).replace(/"/g,'&quot;')+')">'
+      +'<span class="apt-popup-reg" style="color:'+col+'">'+a.reg+'</span>'
+      +'<span class="apt-popup-type">'+a.type.slice(0,22)+'</span>'
+      +'<span class="apt-popup-cat" style="background:'+bcol+';color:'+col+';border:1px solid '+col+'44">'+cat+'</span>'
+      +'</div>';
+  }).join('');
+  var more = aircraft.length > 30 ? '<div class="apt-popup-footer">+' + (aircraft.length-30) + ' more aircraft registered</div>' : '';
+  return '<div class="apt-popup">'
+    +'<div class="apt-popup-hdr">'
+    +'<div><div class="apt-popup-icao">'+icao+'</div><div class="apt-popup-name">'+apt.name+'</div></div>'
+    +'<div><div class="apt-popup-county">'+apt.county+'</div>'
+    +'<div style="font-size:.55rem;color:rgba(200,232,255,.4);margin-top:.15rem">'+helis.length+' heli &nbsp; '+fixed.length+' fixed</div></div>'
+    +'</div>'
+    +'<div class="apt-popup-list">'+rows+'</div>'
+    + more
+    +'</div>';
+}
+
+function placeAirportMarkers() {
+  // Remove existing airport markers
+  Object.values(airportMarkers).forEach(function(m){map.removeLayer(m);});
+  airportMarkers = {};
+
+  // Group registered aircraft by airport
+  var byAirport = {};
+  allAircraft.forEach(function(ac) {
+    if (!byAirport[ac.airport]) byAirport[ac.airport] = [];
+    byAirport[ac.airport].push(ac);
+  });
+
+  // Also group gov fleet
+  govFleet.forEach(function(ac) {
+    var key = ac.airport || ac.airportName;
+    if (!byAirport[key]) byAirport[key] = [];
+    byAirport[key].push(ac);
+  });
+
+  Object.keys(AIRPORTS).forEach(function(icao) {
+    var apt = AIRPORTS[icao];
+    var aircraft = byAirport[icao] || [];
+    if (aircraft.length === 0) return;
+
+    var m = L.marker([apt.lat, apt.lng], {
+      icon: makeAirportIcon(icao),
+      zIndexOffset: 1000,
+      title: icao + ' - ' + apt.name
+    }).addTo(map);
+
+    m.bindPopup(buildAirportPopup(icao, apt, aircraft), {
+      maxWidth: 300,
+      minWidth: 260,
+      className: 'apt-popup-wrapper'
+    });
+
+    airportMarkers[icao] = m;
+  });
+}
+
+var VIEW_MODE = 'live';
+
+function toggleView() {
+  VIEW_MODE = VIEW_MODE === 'live' ? 'all' : 'live';
+  var btn = document.getElementById('viewToggle');
+  if (VIEW_MODE === 'live') {
+    btn.innerHTML = '&#9679; LIVE ONLY';
+    btn.style.color = 'rgba(0,255,136,.7)';
+    btn.style.borderColor = 'rgba(0,255,136,.3)';
+  } else {
+    btn.innerHTML = '&#9675; ALL ASSETS';
+    btn.style.color = 'rgba(0,180,255,.7)';
+    btn.style.borderColor = 'rgba(0,180,255,.3)';
+  }
+  placeMarkers();
+  updateStats();
+}
+
+document.getElementById('viewToggle').addEventListener('click', toggleView);
+
 function placeMarkers() {
   Object.values(markers).forEach(function(m){map.removeLayer(m);});
   markers = {};
-  var all = getFiltered();
+  // In LIVE mode: only show airborne aircraft
+  // In ALL mode: show everything
+  var all = VIEW_MODE === 'live'
+    ? getFiltered().filter(function(a){return a.airborne;})
+    : getFiltered();
   all.forEach(function(ac) {
     var gc = ac.govColor || 'civ';
     var m = L.marker([ac.lat,ac.lng],{icon:makeIcon(ac.cat,ac.airborne,gc,selected&&selected.reg===ac.reg),title:ac.reg}).addTo(map);
@@ -1234,13 +1363,18 @@ function generatePlan(scenario) {
   }).catch(function(e){
     var isCors = e.message.indexOf('Failed to fetch')>=0||e.message.indexOf('NetworkError')>=0||e.message.indexOf('Load failed')>=0||e.message.indexOf('Content Security')>=0;
     rc.innerHTML = '<div class="cors-err">'
-      +'<div class="cors-title">'+(isCors?'⚠ CORS RESTRICTION':'✗ API ERROR')+'</div>'
+      +'<div class="cors-title">'+(isCors?'&#9888; NETWORK ERROR':'&#10007; API ERROR')+'</div>'
       +'<div class="cors-body">'
       +(isCors
-        ? '<strong>Browser blocked the API call.</strong><br>Open this file directly in Chrome:<br><span>1.</span> Download demo.html<br><span>2.</span> Press Cmd+O (Mac) or Ctrl+O (Win)<br><span>3.</span> Open the file — URL should show file:///'
-        : '<strong>Error:</strong> '+e.message+'<br>Check your API key is valid at console.anthropic.com')
+        ? '<strong>Network blocked.</strong><br>You are on fenrax.com (HTTPS) so CSP should be fine.<br><br>Most likely cause: Invalid or expired API key.<br>Check your key at <span>console.anthropic.com</span> &rarr; API Keys<br><br>Raw: '+e.message
+        : '<strong>Error:</strong> '+e.message+'<br><br>'
+          +(e.message.indexOf('invalid')>=0||e.message.indexOf('401')>=0
+            ? 'Your API key was rejected. Copy the full key from <span>console.anthropic.com</span>'
+            : e.message.indexOf('credit')>=0||e.message.indexOf('quota')>=0
+              ? 'Account has no credits. Add billing at <span>console.anthropic.com</span>'
+              : 'Check your account status at <span>console.anthropic.com</span>'))
       +'</div></div>';
-    document.getElementById('rStatus').textContent=isCors?'Open locally':'API error';
+    document.getElementById('rStatus').textContent = isCors ? 'Network error - check key' : 'API error';
   }).finally(function(){
     btn.disabled=false; btn.textContent='Generate Response Plan';
   });
@@ -1303,7 +1437,7 @@ async function initialize() {
   document.getElementById('wbar').innerHTML='<span style="color:var(--blue);letter-spacing:.14em">KSFO</span><span class="wv">'+weatherData.temp+'</span><span>Wind <span class="wv">'+weatherData.dir+' @ '+weatherData.wind+'</span></span><span>Vis <span class="wv">'+weatherData.vis+'</span></span><span>Ceil <span class="wv">'+weatherData.ceil+'</span></span><span style="color:'+col2+';font-weight:500">'+rc2+'</span><span style="color:var(--faint)">'+weatherData.cond+'</span>';
 
   prog.style.width='90%'; sub.textContent='Building asset registry...';
-  renderList(); updateStats(); placeMarkers();
+  renderList(); updateStats(); placeMarkers(); placeAirportMarkers();
   await new Promise(function(r){setTimeout(r,300);});
   prog.style.width='100%';
   await new Promise(function(r){setTimeout(r,200);});
