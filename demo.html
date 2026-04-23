@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; connect-src *;">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FENRAX-1 // SF Bay Area Aviation Response Demo</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>FENRAX-1 // Emergency Response Planning System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -14,160 +13,172 @@
 :root{
   --bg:#02040a;--panel:#050c14;--surface:#071220;
   --border:rgba(0,180,255,.12);--bb:rgba(0,180,255,.28);
-  --blue:#00b4ff;--bdim:rgba(0,180,255,.08);
-  --green:#00e676;--red:#ff4444;--amber:#ffaa00;
+  --blue:#00b4ff;--green:#00e676;--red:#ff4444;--amber:#ffaa00;
   --white:#c8e8ff;--muted:rgba(200,232,255,.45);--faint:rgba(200,232,255,.15)
 }
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);font-family:"DM Mono",monospace}
+
 /* MODAL */
-#keyModal{position:fixed;inset:0;background:rgba(2,4,10,.96);z-index:9999;display:flex;align-items:center;justify-content:center}
-.kbox{background:#050c14;border:1px solid var(--bb);padding:2rem;width:400px;max-width:92vw}
-.ktop{font-size:.6rem;letter-spacing:.2em;color:var(--blue);margin-bottom:.4rem}
-.ktitle{font-size:1rem;color:var(--white);margin-bottom:.6rem;font-weight:500}
-.knote{font-size:.62rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.7}
-#apiKeyInput{width:100%;background:#071220;border:1px solid rgba(0,180,255,.25);color:var(--white);font-family:inherit;font-size:.72rem;padding:.65rem .85rem;outline:none;display:block;margin-bottom:.5rem}
+#keyModal{position:fixed;inset:0;background:rgba(2,4,10,.97);z-index:9999;display:flex;align-items:center;justify-content:center}
+.kbox{background:#050c14;border:1px solid var(--bb);padding:2rem;width:420px;max-width:92vw}
+.ktop{font-size:.58rem;letter-spacing:.22em;color:var(--blue);margin-bottom:.35rem}
+.ktitle{font-size:1.05rem;color:var(--white);margin-bottom:.5rem;font-weight:500;font-family:"Inter",sans-serif}
+.knote{font-size:.62rem;color:var(--muted);margin-bottom:1.1rem;line-height:1.75}
+#apiKeyInput{width:100%;background:#071220;border:1px solid rgba(0,180,255,.25);color:var(--white);font-family:inherit;font-size:.72rem;padding:.65rem .85rem;outline:none;display:block;margin-bottom:.4rem}
 #apiKeyInput:focus{border-color:var(--blue)}
-#keyStatus{font-size:.6rem;margin-bottom:.8rem;min-height:1.2rem}
-.kbtns{display:flex;gap:.6rem}
-#saveKeyBtn{flex:1;background:var(--blue);color:#02040a;font-family:inherit;font-size:.7rem;font-weight:500;letter-spacing:.1em;border:none;padding:.65rem;cursor:pointer;text-transform:uppercase}
+#keyStatus{font-size:.6rem;margin-bottom:.75rem;min-height:1.1rem;color:var(--red)}
+.kbtns{display:flex;gap:.5rem}
+#saveKeyBtn{flex:1;background:var(--blue);color:#02040a;font-family:inherit;font-size:.7rem;font-weight:500;letter-spacing:.1em;border:none;padding:.65rem;cursor:pointer}
 #saveKeyBtn:hover{background:#33c4ff}
-#cancelKeyBtn{background:transparent;color:var(--muted);font-family:inherit;font-size:.7rem;letter-spacing:.1em;border:1px solid var(--border);padding:.65rem 1rem;cursor:pointer;display:none}
+#cancelKeyBtn{background:transparent;color:var(--muted);font-family:inherit;font-size:.7rem;border:1px solid var(--border);padding:.65rem 1rem;cursor:pointer;display:none}
+
 /* LAYOUT */
 .app{display:grid;grid-template-rows:44px 1fr;height:100vh}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 1rem;border-bottom:1px solid var(--border);background:var(--panel);z-index:100;flex-shrink:0}
-.tl{display:flex;align-items:center;gap:.75rem}
-.tlogo{font-size:.78rem;font-weight:500;letter-spacing:.2em;color:var(--blue)}
-.tsep{color:var(--bb)}
-.ttitle{font-size:.65rem;color:var(--muted)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 1.2rem;border-bottom:1px solid var(--border);background:var(--panel);z-index:100}
+.tl{display:flex;align-items:center;gap:.8rem}
+.tlogo{font-size:.8rem;font-weight:500;letter-spacing:.2em;color:var(--blue)}
+.tsep{color:rgba(0,180,255,.3);font-size:.8rem}
+.ttitle{font-size:.62rem;color:var(--muted)}
 .tr{display:flex;align-items:center;gap:.75rem}
-.tlive{display:flex;align-items:center;gap:.4rem;font-size:.6rem;color:var(--green)}
-.dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
-.topbtn{background:transparent;font-family:inherit;font-size:.6rem;letter-spacing:.1em;padding:.22rem .65rem;cursor:pointer;border:1px solid var(--bb);color:var(--muted)}
-.topbtn:hover{color:var(--blue);border-color:var(--blue)}
-#clock{font-size:.62rem;color:var(--muted)}
-.main{display:grid;grid-template-columns:280px 1fr 340px;height:calc(100vh - 44px);overflow:hidden}
-/* LEFT */
+.topbtn{background:transparent;font-family:inherit;font-size:.58rem;letter-spacing:.1em;padding:.22rem .65rem;cursor:pointer;border:1px solid var(--bb);color:var(--muted);transition:all .15s}
+.topbtn:hover,.topbtn.active{color:var(--blue);border-color:var(--blue);background:rgba(0,180,255,.06)}
+#clock{font-size:.6rem;color:var(--faint)}
+
+/* THREE COLUMN */
+.main{display:grid;grid-template-columns:300px 1fr 360px;height:calc(100vh - 44px);overflow:hidden}
+
+/* LEFT — ASSET SUMMARY */
 .lpanel{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
-.phdr{padding:.65rem .9rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.ptitle{font-size:.6rem;letter-spacing:.18em;color:var(--blue);text-transform:uppercase}
-.pcount{font-size:.6rem;color:var(--muted)}
-.cfilter{padding:.65rem .9rem;border-bottom:1px solid var(--border);flex-shrink:0}
-.clabel{font-size:.55rem;letter-spacing:.14em;color:var(--muted);margin-bottom:.4rem}
-.chips{display:flex;flex-wrap:wrap;gap:.3rem}
-.chip{font-size:.54rem;letter-spacing:.06em;padding:.16rem .42rem;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:transparent;font-family:inherit;transition:all .15s}
-.chip.active{border-color:var(--blue);color:var(--blue);background:var(--bdim)}
-.tfilter{padding:.45rem .9rem;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;flex-wrap:wrap;gap:.3rem}
-.tc{font-size:.54rem;padding:.16rem .42rem;border:1px solid var(--border);cursor:pointer;background:transparent;font-family:inherit;transition:all .15s}
-.tc.civ{color:var(--blue)}.tc.civ.on{border-color:var(--blue);background:var(--bdim)}
-.tc.mil{color:var(--green)}.tc.mil.on{border-color:var(--green);background:rgba(0,230,118,.08)}
-.tc.le{color:var(--red)}.tc.le.on{border-color:var(--red);background:rgba(255,68,68,.08)}
-.tc.fire{color:var(--red)}.tc.fire.on{border-color:var(--red);background:rgba(255,68,68,.08)}
-.alist{flex:1;overflow-y:auto}
-.alist::-webkit-scrollbar{width:2px}
-.alist::-webkit-scrollbar-thumb{background:var(--bb)}
-.aitem{padding:.55rem .9rem;border-bottom:1px solid rgba(0,180,255,.05);cursor:pointer;transition:background .15s;display:grid;grid-template-columns:1fr auto;gap:.2rem}
-.aitem:hover{background:var(--bdim)}
-.aitem.sel{background:rgba(0,180,255,.15);border-left:2px solid var(--blue)}
-.aitem.air{border-left:2px solid var(--amber)}
-.areg{font-size:.68rem;font-weight:500}
-.atype{font-size:.57rem;color:var(--muted);margin-top:.1rem}
-.aloc{font-size:.54rem;color:var(--faint)}
-.abadge{font-size:.5rem;letter-spacing:.08em;padding:.1rem .32rem;align-self:center;height:fit-content}
-.bmil{background:rgba(0,230,118,.1);color:var(--green);border:1px solid rgba(0,230,118,.3)}
-.ble{background:rgba(255,68,68,.1);color:var(--red);border:1px solid rgba(255,68,68,.3)}
-.bfire{background:rgba(255,68,68,.1);color:var(--red);border:1px solid rgba(255,68,68,.3)}
-.bciv{background:var(--bdim);color:var(--blue);border:1px solid var(--border)}
-.bair{background:rgba(255,170,0,.1);color:var(--amber);border:1px solid rgba(255,170,0,.3)}
-.sdiv{padding:.3rem .9rem;font-size:.5rem;letter-spacing:.16em;color:var(--faint);background:rgba(0,0,0,.2);border-bottom:1px solid rgba(0,180,255,.04)}
-.sbar{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);flex-shrink:0}
-.sstat{padding:.5rem .5rem;text-align:center;border-right:1px solid var(--border)}
-.sstat:last-child{border-right:none}
-.sval{font-size:.95rem;font-weight:500;color:var(--blue);line-height:1}
-.sval.g{color:var(--green)}.sval.a{color:var(--amber)}
-.slbl{font-size:.5rem;letter-spacing:.1em;color:var(--faint);margin-top:.15rem;text-transform:uppercase}
+.phdr{padding:.65rem .9rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.ptitle{font-size:.58rem;letter-spacing:.18em;color:var(--blue);text-transform:uppercase;margin-bottom:.1rem}
+.psub{font-size:.55rem;color:var(--faint)}
+.asset-summary{flex:1;overflow-y:auto;padding:.75rem .9rem}
+.asset-summary::-webkit-scrollbar{width:2px}
+.asset-summary::-webkit-scrollbar-thumb{background:var(--bb)}
+.county-block{margin-bottom:1rem}
+.cb-name{font-size:.58rem;font-weight:500;color:var(--white);letter-spacing:.08em;margin-bottom:.35rem;display:flex;justify-content:space-between;align-items:center}
+.cb-name span{font-size:.52rem;color:var(--faint)}
+.cb-bars{display:flex;flex-direction:column;gap:.22rem}
+.bar-row{display:grid;grid-template-columns:55px 1fr 28px;gap:.4rem;align-items:center}
+.bar-label{font-size:.52rem;color:var(--muted)}
+.bar-track{height:4px;background:rgba(0,180,255,.08);border-radius:2px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;transition:width .4s}
+.bar-val{font-size:.52rem;color:var(--faint);text-align:right}
+.totals-box{flex-shrink:0;border-top:1px solid var(--border);padding:.65rem .9rem;display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem}
+.tstat{text-align:center}
+.tstat-val{font-size:.9rem;font-weight:500;color:var(--blue);line-height:1}
+.tstat-val.g{color:var(--green)}.tstat-val.a{color:var(--amber)}.tstat-val.r{color:var(--red)}
+.tstat-lbl{font-size:.47rem;letter-spacing:.08em;color:var(--faint);margin-top:.1rem;text-transform:uppercase}
+
 /* MAP */
 .mapa{position:relative}
 #map{width:100%;height:100%}
-.leaflet-tile-pane{filter:brightness(.22) saturate(.25) hue-rotate(185deg)}
 .leaflet-control-attribution{display:none}
-.mapleg{position:absolute;bottom:.6rem;right:.6rem;background:rgba(2,4,10,.9);border:1px solid var(--border);padding:.5rem .75rem;font-size:.54rem;letter-spacing:.07em;color:var(--muted);z-index:500;display:grid;grid-template-columns:1fr 1fr;gap:.3rem .9rem}
-.mli{display:flex;align-items:center;gap:.35rem}
-.wbar{position:absolute;bottom:.6rem;left:50%;transform:translateX(-50%);background:rgba(2,4,10,.9);border:1px solid var(--border);padding:.35rem .9rem;font-size:.56rem;letter-spacing:.08em;color:var(--muted);z-index:500;display:flex;gap:1rem;align-items:center;white-space:nowrap}
+.map-overlay-btns{position:absolute;top:.6rem;left:.6rem;z-index:500;display:flex;gap:.4rem;flex-direction:column}
+.maptoggle{font-family:"DM Mono",monospace;font-size:.55rem;letter-spacing:.08em;padding:.28rem .6rem;cursor:pointer;border:1px solid var(--bb);background:rgba(2,4,10,.85);color:var(--muted);transition:all .15s}
+.maptoggle:hover,.maptoggle.on{color:var(--blue);border-color:var(--blue);background:rgba(0,180,255,.08)}
+.map-legend{position:absolute;bottom:.6rem;left:.6rem;background:rgba(2,4,10,.9);border:1px solid var(--border);padding:.5rem .75rem;font-size:.54rem;z-index:500;display:none}
+.map-legend.visible{display:block}
+.ml-title{font-size:.52rem;letter-spacing:.15em;color:var(--blue);margin-bottom:.4rem;text-transform:uppercase}
+.ml-item{display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem;color:var(--muted)}
+.wbar{position:absolute;bottom:.6rem;left:50%;transform:translateX(-50%);background:rgba(2,4,10,.9);border:1px solid var(--border);padding:.32rem .9rem;font-size:.55rem;letter-spacing:.07em;color:var(--muted);z-index:500;display:flex;gap:.9rem;white-space:nowrap}
 .wv{color:var(--white)}
-.loverlay{position:absolute;inset:0;background:rgba(2,4,10,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:600;gap:.8rem}
-.ltxt{font-size:.7rem;letter-spacing:.2em;color:var(--blue)}
-.lbar{width:200px;height:1px;background:var(--border)}
+.loverlay{position:absolute;inset:0;background:rgba(2,4,10,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:600;gap:.8rem}
+.ltxt{font-size:.7rem;letter-spacing:.22em;color:var(--blue)}
+.lbar{width:220px;height:1px;background:var(--border)}
 .lprog{height:100%;background:var(--blue);width:0%;transition:width .4s}
 .lsub{font-size:.57rem;color:var(--muted)}
-.aircraft-marker{cursor:pointer}
-/* AIRPORT POPUP */
-.leaflet-popup-content-wrapper{background:transparent!important;border:1px solid rgba(255,200,0,.35)!important;border-radius:0!important;padding:0!important;box-shadow:0 0 20px rgba(255,200,0,.1)!important}
-.leaflet-popup-content{margin:0!important}
-.leaflet-popup-tip{background:#ffcc00!important}
-/* RIGHT */
+
+/* RIGHT — PLAN */
 .rpanel{background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
-.detail{padding:.65rem .9rem;border-bottom:1px solid var(--border);flex-shrink:0;display:none}
-.detail.on{display:block}
-.dreg{font-size:.8rem;font-weight:500;margin-bottom:.4rem}
-.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:.3rem}
-.dlbl{font-size:.5rem;letter-spacing:.1em;color:var(--faint);text-transform:uppercase}
-.dval{font-size:.62rem;color:var(--white);margin-top:.08rem}
-.scenebox{padding:.65rem .9rem;border-bottom:1px solid var(--border);flex-shrink:0}
-.slbl2{font-size:.56rem;letter-spacing:.15em;color:var(--blue);margin-bottom:.4rem;text-transform:uppercase}
+.scenebox{padding:.75rem .9rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.slbl{font-size:.55rem;letter-spacing:.16em;color:var(--blue);margin-bottom:.4rem;text-transform:uppercase}
 #sceneInput{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--white);font-family:inherit;font-size:.67rem;padding:.55rem .7rem;resize:none;line-height:1.6;outline:none}
 #sceneInput:focus{border-color:var(--blue)}
 #sceneInput::placeholder{color:var(--faint)}
-.presets{display:flex;flex-wrap:wrap;gap:.28rem;margin-top:.4rem}
-.pb{font-size:.53rem;letter-spacing:.06em;padding:.16rem .42rem;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:transparent;font-family:inherit;transition:all .15s}
-.pb:hover{border-color:var(--blue);color:var(--blue);background:var(--bdim)}
-#genBtn{width:100%;margin-top:.55rem;padding:.6rem;background:var(--blue);color:#02040a;font-family:inherit;font-size:.7rem;font-weight:500;letter-spacing:.12em;border:none;cursor:pointer;text-transform:uppercase}
+.presets{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.4rem}
+.pb{font-size:.52rem;letter-spacing:.06em;padding:.15rem .4rem;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:transparent;font-family:inherit;transition:all .15s}
+.pb:hover{border-color:var(--blue);color:var(--blue)}
+#genBtn{width:100%;margin-top:.5rem;padding:.6rem;background:var(--blue);color:#02040a;font-family:inherit;font-size:.68rem;font-weight:500;letter-spacing:.12em;border:none;cursor:pointer;text-transform:uppercase;transition:background .15s}
 #genBtn:hover{background:#33c4ff}
-#genBtn:disabled{background:var(--bb);color:var(--muted);cursor:not-allowed}
-/* CHARTS */
-.charts-panel{display:none;background:var(--surface);border-top:1px solid var(--border);padding:.65rem .9rem;flex-shrink:0}
-.charts-panel.visible{display:block}
-.charts-hdr{font-size:.56rem;letter-spacing:.18em;color:var(--blue);text-transform:uppercase;margin-bottom:.55rem;display:flex;justify-content:space-between}
-.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
-.cbox{background:var(--panel);border:1px solid var(--border);padding:.5rem}
-.cbox-lbl{font-size:.5rem;letter-spacing:.1em;color:var(--faint);margin-bottom:.3rem;text-transform:uppercase}
-.cbox canvas{max-height:100px}
-.cstat{text-align:center;padding:.4rem .2rem}
-.cstat-val{font-size:1.3rem;font-weight:500;color:var(--green);line-height:1}
-.cstat-unit{font-size:.52rem;color:var(--muted);margin-top:.15rem}
-.cstat-lbl{font-size:.48rem;letter-spacing:.1em;color:var(--faint);margin-top:.1rem;text-transform:uppercase}
-/* RESPONSE */
-.rhdr{padding:.65rem .9rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.rtitle{font-size:.6rem;letter-spacing:.18em;color:var(--blue);text-transform:uppercase}
-.rstatus{font-size:.56rem;color:var(--muted)}
-#openPlanBtn{display:none;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.35);color:var(--green);font-family:inherit;font-size:.55rem;letter-spacing:.1em;padding:.18rem .55rem;cursor:pointer;text-transform:uppercase}
-.rbody{flex:1;overflow-y:auto;padding:.9rem}
+#genBtn:disabled{background:rgba(0,180,255,.25);color:var(--muted);cursor:not-allowed}
+.charts-strip{display:none;border-bottom:1px solid var(--border);padding:.6rem .9rem;flex-shrink:0}
+.charts-strip.visible{display:block}
+.cs-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.5rem;margin-bottom:.5rem}
+.cs-stat{text-align:center;background:var(--surface);border:1px solid var(--border);padding:.4rem .3rem}
+.cs-val{font-size:1.1rem;font-weight:500;line-height:1;color:var(--green)}
+.cs-val.a{color:var(--amber)}.cs-val.b{color:var(--blue)}.cs-val.r{color:var(--red)}
+.cs-unit{font-size:.5rem;color:var(--muted);margin-top:.1rem}
+.cs-lbl{font-size:.47rem;letter-spacing:.08em;color:var(--faint);text-transform:uppercase}
+.cs-chart-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.cs-chart{background:var(--surface);border:1px solid var(--border);padding:.4rem}
+.cs-chart canvas{max-height:80px}
+.cs-chart-lbl{font-size:.48rem;letter-spacing:.1em;color:var(--faint);margin-bottom:.25rem;text-transform:uppercase}
+.rhdr{padding:.5rem .9rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.rtitle{font-size:.58rem;letter-spacing:.16em;color:var(--blue);text-transform:uppercase}
+#openPlanBtn{display:none;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:var(--green);font-family:inherit;font-size:.53rem;letter-spacing:.1em;padding:.18rem .5rem;cursor:pointer}
+#rStatus{font-size:.54rem;color:var(--muted)}
+.rbody{flex:1;overflow-y:auto;padding:.75rem .9rem}
 .rbody::-webkit-scrollbar{width:2px}
 .rbody::-webkit-scrollbar-thumb{background:var(--bb)}
-.rph{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:.6rem;opacity:.35}
-.rph-txt{font-size:.6rem;color:var(--muted);text-align:center;line-height:1.8}
+.rph{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;opacity:.4}
+.rph-icon{font-size:2rem}
+.rph-txt{font-size:.62rem;color:var(--muted);text-align:center;line-height:1.9}
 #rContent{display:none}
-.thinking{display:flex;align-items:center;gap:.6rem;padding:1.2rem 0}
+.thinking{display:flex;align-items:center;gap:.6rem;padding:1rem 0}
 .dots span{display:inline-block;width:4px;height:4px;background:var(--blue);border-radius:50%;animation:pulse 1.2s ease-in-out infinite;margin:0 2px}
-.dots span:nth-child(2){animation-delay:.2s}
-.dots span:nth-child(3){animation-delay:.4s}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
 @keyframes pulse{0%,60%,100%{transform:scale(1);opacity:.3}30%{transform:scale(1.4);opacity:1}}
 .ttxt{font-size:.62rem;color:var(--muted)}
-.err-box{border:1px solid rgba(255,68,68,.3);padding:.9rem;background:rgba(255,68,68,.05)}
-.err-title{color:var(--red);font-size:.63rem;letter-spacing:.12em;margin-bottom:.5rem}
-.err-body{font-size:.63rem;color:var(--muted);line-height:1.85}
+.err-box{border:1px solid rgba(255,68,68,.3);padding:.9rem;background:rgba(255,68,68,.04)}
+.err-title{color:var(--red);font-size:.62rem;letter-spacing:.12em;margin-bottom:.5rem}
+.err-body{font-size:.62rem;color:var(--muted);line-height:1.85}
 .err-body strong{color:var(--white)}
-.err-body span{color:var(--blue)}
+.err-body code{color:var(--blue);font-size:.9em}
+/* IAP sections */
+.iap-hdr{background:rgba(0,180,255,.05);border:1px solid rgba(0,180,255,.18);border-left:3px solid var(--blue);padding:.65rem .85rem;margin-bottom:.75rem}
+.iap-hdr-label{font-size:.5rem;letter-spacing:.2em;color:var(--blue);margin-bottom:.2rem}
+.iap-hdr-txt{font-size:.64rem;color:rgba(200,232,255,.55);line-height:1.65}
+.iap-sec{margin-bottom:.75rem;padding-bottom:.75rem;border-bottom:1px solid rgba(0,180,255,.07)}
+.iap-sec:last-child{border-bottom:none}
+.iap-sec-title{font-size:.55rem;letter-spacing:.18em;color:var(--blue);text-transform:uppercase;margin-bottom:.45rem;display:flex;align-items:center;gap:.35rem}
+.iap-sec-body{font-size:.65rem;color:rgba(200,232,255,.52);line-height:1.85}
+.iap-sec-body strong{color:var(--white);font-weight:500}
+/* Aircraft cards */
+.ac-card{background:rgba(0,0,0,.2);border:1px solid rgba(0,180,255,.1);border-left:2px solid var(--green);padding:.4rem .65rem;margin-bottom:.3rem;display:grid;grid-template-columns:72px 1fr auto;gap:.4rem;align-items:start}
+.ac-reg{font-size:.68rem;font-weight:500;color:var(--green)}
+.ac-type{font-size:.6rem;color:#c8e8ff}
+.ac-mission{font-size:.56rem;color:rgba(200,232,255,.4);margin-top:.08rem}
+.ac-detail{font-size:.52rem;color:rgba(200,232,255,.25);margin-top:.06rem}
+.pri-badge{font-size:.5rem;padding:.1rem .28rem;border-width:1px;border-style:solid;height:fit-content;white-space:nowrap}
+/* PZ cards */
+.pz-card{background:rgba(255,170,0,.03);border:1px solid rgba(255,170,0,.12);padding:.4rem .65rem;margin-bottom:.3rem}
+.pz-hdr{display:flex;justify-content:space-between;margin-bottom:.18rem}
+.pz-name{font-size:.65rem;font-weight:500;color:var(--amber)}
+.pz-status{font-size:.52rem}
+.pz-body{font-size:.6rem;color:#c8e8ff;margin-bottom:.12rem}
+.pz-detail{display:grid;grid-template-columns:1fr 1fr;gap:.08rem .5rem}
+.pz-item{font-size:.52rem;color:rgba(200,232,255,.35)}
+.pz-item span{color:rgba(200,232,255,.6)}
+/* Timeline */
+.tl-item{display:grid;grid-template-columns:100px 1fr;gap:.5rem;margin-bottom:.38rem;align-items:start}
+.tl-time{font-size:.6rem;font-weight:500;color:var(--amber)}
+.tl-body{font-size:.63rem;color:rgba(200,232,255,.55);line-height:1.6}
 </style>
 </head>
 <body>
 
+<!-- API KEY MODAL -->
 <div id="keyModal" style="display:flex">
   <div class="kbox">
     <div class="ktop">FENRAX-1 // CONFIGURATION</div>
     <div class="ktitle">Anthropic API Key</div>
-    <div class="knote">Required to generate AI response plans.<br>Get one at <strong>console.anthropic.com</strong> &rarr; API Keys<br><br><em style="color:rgba(0,180,255,.5)">Running on fenrax.com &mdash; API calls enabled.</em></div>
-    <input id="apiKeyInput" type="password" placeholder="Paste your Anthropic API key here..." autocomplete="off">
+    <div class="knote">
+      Required to generate AI emergency response plans.<br>
+      Get one at <strong style="color:var(--blue)">console.anthropic.com</strong> &rarr; API Keys<br><br>
+      <em style="color:rgba(0,180,255,.5)">Running on fenrax.com &mdash; direct API calls enabled.</em>
+    </div>
+    <input id="apiKeyInput" type="password" placeholder="sk-ant-..." autocomplete="off">
     <div id="keyStatus"></div>
     <div class="kbtns">
       <button id="saveKeyBtn" onclick="saveKey()">Save &amp; Continue</button>
@@ -181,104 +192,100 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
     <div class="tl">
       <div class="tlogo">FENRAX-1</div>
       <div class="tsep">//</div>
-      <div class="ttitle">SF Bay Area &middot; Aviation Asset Response Demo</div>
+      <div class="ttitle">SF Bay Area &middot; Emergency Response Planning System</div>
     </div>
     <div class="tr">
-      <div class="tlive"><div class="dot"></div>LIVE DATA</div>
-      <button class="topbtn" id="viewToggle" onclick="toggleView()">&#9679; LIVE ONLY</button>
+      <button class="topbtn" id="satToggle" onclick="toggleSat()">&#9632; SATELLITE</button>
+      <button class="topbtn" id="lzToggle" onclick="toggleLZ()" title="Show/hide helicopter landing zones">&#9678; LANDING ZONES</button>
       <button class="topbtn" id="keyBtn" onclick="showKeyModal()">&#9881; API KEY</button>
       <div id="clock">--:--:-- UTC</div>
     </div>
   </div>
 
   <div class="main">
-    <!-- LEFT PANEL -->
+    <!-- LEFT: ASSET REGISTRY SUMMARY -->
     <div class="lpanel">
       <div class="phdr">
-        <div class="ptitle">Registered Aircraft</div>
-        <div class="pcount" id="aCount">Loading...</div>
+        <div class="ptitle">Aviation Asset Registry</div>
+        <div class="psub">Real FAA data &middot; All 9 Bay Area counties</div>
       </div>
-      <div class="cfilter">
-        <div class="clabel">Bay Area Counties</div>
-        <div class="chips" id="countyChips"></div>
+      <div class="asset-summary" id="assetSummary">
+        <div style="color:var(--faint);font-size:.6rem;padding:.5rem 0">Loading registry...</div>
       </div>
-      <div class="tfilter" id="typeFilter">
-        <button class="tc civ on" data-type="civ">Civilian</button>
-        <button class="tc mil on" data-type="mil">Military</button>
-        <button class="tc le on" data-type="le">Law Enf.</button>
-        <button class="tc fire on" data-type="fire">Fire/EMS</button>
-      </div>
-      <div class="alist" id="aList"></div>
-      <div class="sbar">
-        <div class="sstat"><div class="sval" id="sTot">-</div><div class="slbl">Total</div></div>
-        <div class="sstat"><div class="sval a" id="sAir">-</div><div class="slbl">Airborne</div></div>
-        <div class="sstat"><div class="sval g" id="sAvail">-</div><div class="slbl">Available</div></div>
+      <div class="totals-box" id="totalsBox">
+        <div class="tstat"><div class="tstat-val" id="tTotal">-</div><div class="tstat-lbl">Total</div></div>
+        <div class="tstat"><div class="tstat-val g" id="tHeli">-</div><div class="tstat-lbl">Helis</div></div>
+        <div class="tstat"><div class="tstat-val a" id="tGov">-</div><div class="tstat-lbl">Gov</div></div>
+        <div class="tstat"><div class="tstat-val b" id="tFixed">-</div><div class="tstat-lbl">Fixed</div></div>
       </div>
     </div>
 
     <!-- MAP -->
     <div class="mapa">
       <div id="map"></div>
-      <div class="mapleg">
-        <div class="mli"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="#00b4ff"/></svg>Civ Fixed (Air)</div>
-        <div class="mli"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="transparent" stroke="#00b4ff" stroke-width="1.5"/></svg>Civ Fixed (Gnd)</div>
-        <div class="mli"><svg width="13" height="13"><polygon points="6.5,1.5 12,11.5 1,11.5" fill="#00b4ff"/></svg>Civ Heli (Air)</div>
-        <div class="mli"><svg width="13" height="13"><polygon points="6.5,1.5 12,11.5 1,11.5" fill="transparent" stroke="#00b4ff" stroke-width="1.8" stroke-linejoin="round"/></svg>Civ Heli (Gnd)</div>
-        <div class="mli"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="#00e676"/></svg>Military (Air)</div>
-        <div class="mli"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="transparent" stroke="#00e676" stroke-width="1.5"/></svg>Military (Gnd)</div>
-        <div class="mli"><svg width="13" height="13"><polygon points="6.5,1.5 12,11.5 1,11.5" fill="#00e676"/></svg>Mil Heli (Air)</div>
-        <div class="mli"><svg width="13" height="13"><polygon points="6.5,1.5 12,11.5 1,11.5" fill="transparent" stroke="#00e676" stroke-width="1.8" stroke-linejoin="round"/></svg>Mil Heli (Gnd)</div>
-        <div class="mli"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="#ff4444"/></svg>Fire/Police (Air)</div>
-        <div class="mli"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="transparent" stroke="#ff4444" stroke-width="1.5"/></svg>Fire/Police (Gnd)</div>
-        <div class="mli"><svg width="13" height="13"><polygon points="6.5,1.5 12,11.5 1,11.5" fill="#ff4444"/></svg>Fire Heli (Air)</div>
-        <div class="mli"><svg width="13" height="13"><polygon points="6.5,1.5 12,11.5 1,11.5" fill="transparent" stroke="#ff4444" stroke-width="1.8" stroke-linejoin="round"/></svg>Fire Heli (Gnd)</div>
-        <div class="mli"><svg width="13" height="13" viewBox="0 0 14 14"><polygon points="7,1 8.5,5 13,5 9.5,7.5 11,12 7,9.5 3,12 4.5,7.5 1,5 5.5,5" fill="rgba(255,200,0,.75)" stroke="rgba(255,170,0,.5)" stroke-width=".5"/></svg>Airport</div>
+      <div class="map-overlay-btns">
+        <button class="maptoggle on" id="btnHospitals" onclick="toggleLayer('hospitals')">&#43; Hospitals</button>
+        <button class="maptoggle on" id="btnAirports" onclick="toggleLayer('airports')">&#9733; Airports</button>
+        <button class="maptoggle" id="btnPlan" onclick="toggleLayer('plan')">&#9672; Response Plan</button>
       </div>
-      <div class="wbar" id="wbar"><span style="color:var(--blue);letter-spacing:.14em">KSFO</span><span>Loading weather...</span></div>
+      <div class="map-legend" id="mapLegend">
+        <div class="ml-title">Map Legend</div>
+        <div class="ml-item"><svg width="16" height="16"><circle cx="8" cy="8" r="6" fill="rgba(255,68,68,.3)" stroke="#ff4444" stroke-width="1.5"/></svg>Hospital helipad</div>
+        <div class="ml-item"><svg width="16" height="16"><polygon points="8,2 14,14 2,14" fill="rgba(255,200,0,.6)" stroke="#ffcc00" stroke-width="1"/></svg>Airport / staging</div>
+        <div class="ml-item"><svg width="16" height="16"><circle cx="8" cy="8" r="6" fill="rgba(0,230,118,.2)" stroke="#00e676" stroke-width="1.5" stroke-dasharray="3,2"/></svg>Helicopter LZ</div>
+        <div class="ml-item"><svg width="16" height="4"><line x1="0" y1="2" x2="16" y2="2" stroke="#00b4ff" stroke-width="2"/></svg>Evacuation corridor</div>
+        <div class="ml-item"><svg width="16" height="16"><rect x="2" y="2" width="12" height="12" fill="rgba(255,170,0,.2)" stroke="#ffaa00" stroke-width="1.5"/></svg>Staging area</div>
+      </div>
+      <div class="wbar" id="wbar">
+        <span style="color:var(--blue);letter-spacing:.14em;font-size:.57rem">KSFO</span>
+        <span>Loading weather...</span>
+      </div>
       <div class="loverlay" id="lOverlay">
         <div class="ltxt">FENRAX-1 INITIALIZING</div>
         <div class="lbar"><div class="lprog" id="lProg"></div></div>
-        <div class="lsub" id="lSub">Connecting to data sources...</div>
+        <div class="lsub" id="lSub">Loading...</div>
       </div>
     </div>
 
-    <!-- RIGHT PANEL -->
+    <!-- RIGHT: PLAN -->
     <div class="rpanel">
-      <div class="detail" id="detail">
-        <div class="dreg" id="dReg"></div>
-        <div class="dgrid" id="dGrid"></div>
-      </div>
       <div class="scenebox">
-        <div class="slbl2">Scenario Input</div>
-        <textarea id="sceneInput" rows="4" placeholder="Describe the emergency...&#10;e.g. 7.2 earthquake, Hayward Fault, Bay Bridge closed, Alameda Island isolated 80,000 residents need evacuation"></textarea>
+        <div class="slbl">Scenario</div>
+        <textarea id="sceneInput" rows="4" placeholder="Describe the emergency scenario...&#10;&#10;e.g. 7.2 earthquake on Hayward Fault, Bay Bridge closed, Alameda Island isolated with 80,000 residents, roads severely damaged across East Bay"></textarea>
         <div class="presets">
-          <button class="pb" data-preset="eq">Earthquake</button>
-          <button class="pb" data-preset="wf">Wildfire</button>
-          <button class="pb" data-preset="fl">Flood</button>
-          <button class="pb" data-preset="br">Bridge Failure</button>
-          <button class="pb" data-preset="ts">Tsunami</button>
-          <button class="pb" data-preset="sf">SF County</button>
+          <button class="pb" data-p="eq">Earthquake</button>
+          <button class="pb" data-p="wf">Wildfire</button>
+          <button class="pb" data-p="fl">Flood</button>
+          <button class="pb" data-p="ts">Tsunami</button>
+          <button class="pb" data-p="br">Bridge Failure</button>
+          <button class="pb" data-p="sf">SF County</button>
         </div>
-        <button id="genBtn" onclick="generatePlan()">Generate Response Plan</button>
+        <button id="genBtn" onclick="generatePlan()">&#9672; Generate Incident Action Plan</button>
       </div>
-      <div class="charts-panel" id="chartsPanel">
-        <div class="charts-hdr"><span>&#9672; Operational Data</span><span id="chartsTs" style="color:var(--faint);font-size:.5rem"></span></div>
-        <div class="charts-grid">
-          <div class="cbox cstat"><div class="cstat-val" id="cEvac">&#8212;</div><div class="cstat-unit">persons/hour</div><div class="cstat-lbl">Evacuation Rate</div></div>
-          <div class="cbox cstat"><div class="cstat-val" id="cCargo" style="color:var(--amber)">&#8212;</div><div class="cstat-unit">tons/12 hrs</div><div class="cstat-lbl">Cargo Capacity</div></div>
-          <div class="cbox"><div class="cbox-lbl">Aircraft by Mission</div><canvas id="chartM"></canvas></div>
-          <div class="cbox"><div class="cbox-lbl">Evacuation Timeline</div><canvas id="chartT"></canvas></div>
+      <div class="charts-strip" id="chartsStrip">
+        <div class="cs-row">
+          <div class="cs-stat"><div class="cs-val g" id="csEvac">—</div><div class="cs-unit">pax/hr</div><div class="cs-lbl">Evac Rate</div></div>
+          <div class="cs-stat"><div class="cs-val a" id="csCargo">—</div><div class="cs-unit">tons/12hr</div><div class="cs-lbl">Cargo Cap.</div></div>
+          <div class="cs-stat"><div class="cs-val b" id="csAcft">—</div><div class="cs-unit">aircraft</div><div class="cs-lbl">Assigned</div></div>
+          <div class="cs-stat"><div class="cs-val r" id="csTime">—</div><div class="cs-unit">hours</div><div class="cs-lbl">Completion</div></div>
+        </div>
+        <div class="cs-chart-row">
+          <div class="cs-chart"><div class="cs-chart-lbl">Mission Breakdown</div><canvas id="chartM"></canvas></div>
+          <div class="cs-chart"><div class="cs-chart-lbl">Cumulative Evacuees (12hr)</div><canvas id="chartT"></canvas></div>
         </div>
       </div>
       <div class="rhdr">
         <div class="rtitle">Incident Action Plan</div>
         <div style="display:flex;gap:.5rem;align-items:center">
           <button id="openPlanBtn" onclick="openFullPlan()">&#9654; Full Plan</button>
-          <div class="rstatus" id="rStatus">Awaiting scenario</div>
+          <div id="rStatus">Awaiting scenario</div>
         </div>
       </div>
       <div class="rbody">
-        <div class="rph" id="rPh"><div style="font-size:1.5rem;opacity:.4">&#9672;</div><div class="rph-txt">Enter a scenario above<br>and generate a response plan<br>using live available aircraft</div></div>
+        <div class="rph" id="rPh">
+          <div class="rph-icon">&#9672;</div>
+          <div class="rph-txt">Enter a scenario and generate a plan<br>FENRAX-1 identifies available assets,<br>calculates capacity, and maps the response</div>
+        </div>
         <div id="rContent"></div>
       </div>
     </div>
@@ -286,106 +293,19 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
 </div>
 
 <script>
-var COUNTIES = ['San Francisco','Alameda','Contra Costa','Marin','San Mateo','Santa Clara','Napa','Sonoma','Solano'];
-var AIRPORTS = {
-  KSFO:{lat:37.619,lng:-122.375,name:'San Francisco Intl',county:'San Mateo'},
-  KOAK:{lat:37.721,lng:-122.221,name:'Oakland Intl',county:'Alameda'},
-  KSJC:{lat:37.362,lng:-121.929,name:'San Jose Intl',county:'Santa Clara'},
-  KHAF:{lat:37.513,lng:-122.501,name:'Half Moon Bay',county:'San Mateo'},
-  KPAO:{lat:37.461,lng:-122.115,name:'Palo Alto',county:'Santa Clara'},
-  KSQL:{lat:37.519,lng:-122.250,name:'San Carlos',county:'San Mateo'},
-  KCCR:{lat:37.990,lng:-122.057,name:'Concord Buchanan',county:'Contra Costa'},
-  KLVK:{lat:37.693,lng:-121.820,name:'Livermore Muni',county:'Alameda'},
-  KAPC:{lat:38.213,lng:-122.281,name:'Napa County',county:'Napa'},
-  KSTS:{lat:38.509,lng:-122.813,name:'Santa Rosa',county:'Sonoma'},
-  KDVO:{lat:38.144,lng:-122.556,name:'Gnoss Field',county:'Marin'},
-  KHWD:{lat:37.659,lng:-122.122,name:'Hayward Exec',county:'Alameda'},
-  KVCB:{lat:38.376,lng:-121.962,name:'Nut Tree',county:'Solano'},
-  KPRY:{lat:37.828,lng:-122.283,name:'San Pablo Bay',county:'Contra Costa'},
-  KNUQ:{lat:37.415,lng:-122.049,name:'Moffett Federal',county:'Santa Clara'},
-  KSUU:{lat:38.263,lng:-121.927,name:'Travis AFB',county:'Solano'},
-  KRHV:{lat:37.333,lng:-121.819,name:'Reid-Hillview',county:'Santa Clara'},
-  KEMT:{lat:37.366,lng:-122.018,name:'Moffett Area',county:'Santa Clara'},
-  KSAN:{lat:37.721,lng:-122.221,name:'Oakland Metro',county:'Alameda'}
-};
-var PRESETS = {
-  eq:'7.2 earthquake on Hayward Fault. Bay Bridge and San Mateo Bridge closed. Alameda Island isolated, 80,000 residents need evacuation. Oakland Hills fire started. Roads severely damaged across East Bay. Mass casualties. Need aerial recon, medevac, and evacuation immediately.',
-  wf:'Fast-moving wildfire in Sonoma hills, 45mph Diablo winds. 15,000 structures threatened. Hwy 12 and 101 closed. 8,000 residents stranded. Need helicopter recon, water drops, and evacuation of mobility-impaired residents.',
-  fl:'Atmospheric river event, catastrophic flooding in South Bay. Hwy 101 submerged between San Jose and San Mateo. 20,000 residents stranded in Alviso and North San Jose. Water rising 2 inches per hour. Need aerial water rescue, medevac, supply drops.',
-  br:'Bay Bridge structural failure during morning commute. Closed indefinitely. 200,000 daily commuters affected. Ferry capacity overwhelmed. Need aerial corridors for medical personnel, emergency supplies, and critical workers.',
-  ts:'Cascadia subduction event, tsunami warning active. 45 minutes to wave arrival. Marina District, Treasure Island, Alameda waterfront, Foster City need immediate mass evacuation. Every minute counts.',
-  sf:'Generate a basic aviation evacuation response plan for San Francisco County covering all major hazard zones, available aviation assets, pickup zones, and a 12-hour execution timeline.'
+// ── DATA ──────────────────────────────────────────────────────────────────
+var COUNTY_EOP = {
+  'San Francisco':{source:'SF Dept of Emergency Management - Emergency Response Plan',url:'https://sfdem.org/plans-0',facts:'EOC at 1011 Turk Street; ESF-9 manages aerial SAR resources | ESF-13 coordinates SFPD Air Support and military aviation | Designated helicopter LZs: Marina Green, Crissy Field, Dolores Park, McLaren Park, Candlestick Point | Treasure Island evacuation: secondary aerial via SFPD/Coast Guard when Bay Bridge closed | Tsunami zones: Marina District, Fishermans Wharf, Embarcadero require aerial evacuation | SFPD Air Support Unit: Bell 206L at KOAK, available 24/7 | Coast Guard Sector San Francisco coordinates all Bay Area maritime and air SAR | Mass casualty sites: Moscone Center, Bill Graham Civic Auditorium with helipad access | Bay Area UASI coordinates regional aviation mutual aid | Primary staging airports: KOAK (Oakland), KSFO (SFO) for major incidents'},
+  'Alameda':{source:'Alameda County EOP (Feb 2025 - approved by Board of Supervisors)',url:'https://www.acgov.org/ready/documents/EmergencyOperationsPlan.pdf',facts:'Alameda County OES is Regional Mutual Aid Coordinator for Coastal Region II | Hayward Executive Airport (KHWD) designated primary aerial staging area for East Bay disasters | Alameda Island: 80,000 residents need aerial evacuation supplement when bridges fail | Hayward Fault M7.0+ is primary hazard - aerial reconnaissance critical after event | EOC at 4985 Broder Blvd Dublin; alternate at Pleasanton Fairgrounds | ESF-1 Transportation coordinates ground and air evacuation corridors | Tsunami threat: Alameda Island, San Leandro, Oakland waterfront require aerial evacuation | Livermore Municipal Airport (KLVK) serves as regional aviation staging for East Bay | Oakland Hills wildfire: pre-position aerial firefighting at KOAK/KLVK during red flag warnings | Mutual aid aviation: CHP Golden Gate, Alameda County Sheriff Aviation, REACH Air Medical'},
+  'Contra Costa':{source:'Contra Costa County EOP (2015, updated protocols 2022)',url:'https://www.cocosheriff.org',facts:'Buchanan Field (KCCR) Concord designated primary aviation staging base | CCSO Aviation provides law enforcement helicopter based at KCCR | Refinery corridor (Chevron Richmond, Marathon Martinez) requires aerial hazmat monitoring | Delta communities (Bethel Island, Discovery Bay) road-isolated during floods - aerial only access | EOC at 40 Muir Road Martinez | Coastal Region II: shares aviation mutual aid with Alameda, SF, Marin, Sonoma, Napa | Travis AFB (Solano) provides heavy-lift helicopter support under EMAC | Diablo Range wildfire: pre-position air attack at KCCR during red flag conditions | I-680/Hwy 4/Hwy 24 corridors identified as primary evacuation routes; air backup when closed | CHP Contra Costa Area coordinates road closures; CCSO Aviation provides aerial reconnaissance'},
+  'Marin':{source:'Marin County EOP / Multi-Jurisdictional Hazard Mitigation Plan 2023',url:'https://emergency.marincounty.org',facts:'Gnoss Field (KDVO) Novato primary aviation staging area for Marin disasters | West Marin (Point Reyes, Bolinas, Stinson Beach) accessible ONLY by air when Hwy 1 closes | County isolated by limited access: Golden Gate Bridge and Richmond Bridge closures trigger aerial evacuation | Marin County Sheriff Aviation: helicopter from KDVO for SAR and law enforcement | Coast Guard Station Golden Gate: maritime and air SAR for Marin coastal communities | EOC at Marin County Civic Center San Rafael | Tsunami threat: Sausalito, Mill Valley, Tiburon waterfront require aerial evacuation | Wildfire threat: Marin Municipal Water District watershed, Sir Francis Drake corridor | North Bay Hub: Marin, Sonoma, Napa, Solano coordinate aviation mutual aid | Golden Gate Ferry terminals at Sausalito/Tiburon: secondary evacuation supplemented by air'},
+  'San Mateo':{source:'San Mateo County Sheriff Homeland Security Division EOP',url:'https://hsd.smcsheriff.com',facts:'San Francisco International Airport (KSFO) dual role: aviation staging AND evacuation point | Foster City levee failure scenario: 32,000 residents require aerial evacuation | San Carlos Airport (KSQL) primary General Aviation staging for county emergencies | Half Moon Bay Airport (KHAF) serves isolated coastal communities when Hwy 1 closes | CHP Golden Gate Air Ops: Bell 407 and Bell 412 based at KSFO | Coast Guard Air Station San Francisco (KSFO): MH-65D Dolphin, MH-60T Jayhawk on 24/7 alert | REACH Air Medical dispatched from KOAK for trauma transport throughout county | Regional Operations Center: 1700 S Amphlett Blvd San Mateo - 17500 sq ft | Tsunami zones: Pacifica, Half Moon Bay, Moss Beach - road-isolated, aerial required | San Andreas Fault runs entire county length - aerial recon critical post-earthquake'},
+  'Santa Clara':{source:'Santa Clara County OES Emergency Operations Plan',url:'https://emergencymanagement.sccgov.org',facts:'Moffett Federal Airfield (KNUQ): CA National Guard and NASA - primary heavy-lift staging South Bay | CA ANG CH-47F Chinook, UH-60 Black Hawk at Moffett available under EMAC | San Jose International Airport (KSJC): commercial hub, secondary staging for mass evacuation | Palo Alto Airport (KPAO): General aviation staging, Stanford Life Flight base | Alviso and North San Jose lowlands flood in major storms - aerial water rescue required | Stanford University Medical Center Level 1 trauma: helipad, critical for mass casualty | Valley Medical Center: County trauma center with operational helipad | EOC at 55 W Younger Avenue San Jose | Bay Area UASI South Bay Hub: Santa Clara, Alameda, San Mateo coordinate aviation | Hayward Fault seismic risk: Alviso lowlands isolation requires aerial access'},
+  'Napa':{source:'Napa County Office of Emergency Services',url:'https://www.countyofnapa.org/1100/Emergency-Services',facts:'Napa County Airport (KAPC): Cal Fire Air Attack base and primary aviation staging | Cal Fire Napa Unit at KAPC: S-70 Firehawk and Air Attack OV-10 pre-positioned | Extreme wildfire history: Atlas 2017, LNU Lightning Complex 2020 - evacuation protocols established | Napa Valley road network limited: aerial evacuation critical during simultaneous fire and flood | Napa River flood: downtown Napa flooding isolates communities - aerial survey and supply drops | North Bay Hub partner: coordinates aviation with Marin, Sonoma, Solano | EOC at Napa County Public Safety Building | Neighboring heavy assets: Travis AFB Solano and Sonoma Cal Fire available under mutual aid | Wine country hospitality infrastructure: many rural properties require aerial access during evacuation | Calistoga and Pope Valley: road-isolated during wildfire, aerial only option'},
+  'Sonoma':{source:'Sonoma County Operational Area EOP (2019/updated 2022)',url:'https://sonomacounty.gov/emergency-management',facts:'Santa Rosa Airport (KSTS): Cal Fire Air Attack Base and primary aviation staging | Cal Fire Sonoma Unit at KSTS: S-70 Firehawk, Bell 205 helitack, Air Attack OV-10 | Largest private helicopter fleet in Bay Area - 54 registered helicopters in Sonoma County | Tubbs Fire 2017, Kincade Fire 2019, LNU Complex 2020 established aerial evacuation protocols | Hwy 101 primary evacuation route: when closed aerial becomes sole option for isolated communities | Russian River flood zones: Guerneville, Monte Rio, Forestville accessible ONLY by air during major floods | Bodega Bay and Jenner: coastal fog and limited roads make aerial critical year-round | Sonoma Valley narrow canyon roads: aerial evacuation required for mobility-impaired during wildfire | EOC at 2300 County Center Drive Santa Rosa | Mutual aid: North Bay Hub with Marin, Napa, Solano; Sonoma Sheriff Aviation provides sheriff helicopter'},
+  'Solano':{source:'Solano County Office of Emergency Services',url:'https://www.solanocounty.com/depts/oes',facts:'Travis Air Force Base (KSUU): C-17 Globemaster, C-5 Galaxy for mass evacuation and cargo | CA ANG 349th Air Mobility Wing at Travis: largest heavy-lift aviation asset in Bay Area | Travis available under EMAC for state disaster response - formally requested through Cal OES | HH-60G Pave Hawk at Travis: combat SAR helicopter for rescue operations | Nut Tree Airport (KVCB) Vacaville: general aviation staging and National Guard access point | Refinery hazard: Valero Benicia, NuStar - chemical incident requires aerial monitoring and evacuation | Suisun Bay industrial waterway: Coast Guard maritime/air coordination required | Fairfield and Vacaville: major population centers with direct Travis AFB support | EOC at Solano County Government Center Fairfield | North Bay Hub partner: Marin, Sonoma, Napa - regional aviation coordination'}
 };
 
-var ANTHROPIC_API_KEY = '';
-var allAircraft = [], govFleet = [], liveAircraft = [], markers = {}, airportMarkers = {};
-var selected = null, VIEW_MODE = 'live', map, weatherData = {};
-var activeCounties = new Set(COUNTIES), activeTypes = new Set(['civ','mil','le','fire']);
-var chartMInst = null, chartTInst = null, lastPlanData = null;
-
-// CLOCK
-function tick(){var n=new Date(),h=String(n.getUTCHours()).padStart(2,'0'),m=String(n.getUTCMinutes()).padStart(2,'0'),s=String(n.getUTCSeconds()).padStart(2,'0');document.getElementById('clock').textContent=h+':'+m+':'+s+' UTC';}
-setInterval(tick,1000);tick();
-
-// API KEY MODAL
-function showKeyModal(){document.getElementById('keyModal').style.display='flex';if(ANTHROPIC_API_KEY)document.getElementById('cancelKeyBtn').style.display='block';setTimeout(function(){document.getElementById('apiKeyInput').focus();},100);}
-function saveKey(){
-  var val=document.getElementById('apiKeyInput').value.trim();
-  var st=document.getElementById('keyStatus');
-  if(!val||val.length<10){st.textContent='Please enter a valid API key';st.style.color='#ff4444';return;}
-  ANTHROPIC_API_KEY=val;
-  st.textContent='Key saved!';st.style.color='#00ff88';
-  document.getElementById('keyBtn').style.color='#00ff88';
-  document.getElementById('keyBtn').style.borderColor='rgba(0,255,136,.4)';
-  document.getElementById('cancelKeyBtn').style.display='block';
-  setTimeout(function(){document.getElementById('keyModal').style.display='none';},400);
-}
-function hideModal(){document.getElementById('keyModal').style.display='none';}
-document.getElementById('apiKeyInput').addEventListener('keydown',function(e){if(e.key==='Enter')saveKey();});
-document.getElementById('keyBtn').addEventListener('click',showKeyModal);
-
-// MAP
-function initMap(){
-  map=L.map('map',{center:[37.75,-122.25],zoom:10,zoomControl:true,attributionControl:false});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
-}
-
-// ICONS
-function makeIcon(cat,airborne,govColor,sel){
-  var color=govColor==='mil'?'#00e676':(govColor==='le'||govColor==='fire')?'#ff4444':'#00b4ff';
-  if(sel)color='#ffffff';
-  var glow=airborne?'filter:drop-shadow(0 0 5px '+color+')':'';
-  var svg;
-  if(cat==='heli'){
-    var fill=airborne?color:'transparent',sw=airborne?'0':'1.8';
-    svg='<svg width="13" height="13" viewBox="0 0 13 13" xmlns="http://www.w3.org/2000/svg"><polygon points="6.5,1.5 12,11.5 1,11.5" fill="'+fill+'" stroke="'+color+'" stroke-width="'+sw+'" stroke-linejoin="round"/></svg>';
-  } else {
-    var fill=airborne?color:'transparent',sw=airborne?'0':'1.5';
-    svg='<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="4.5" fill="'+fill+'" stroke="'+color+'" stroke-width="'+sw+'"/></svg>';
-  }
-  return L.divIcon({html:'<div style="'+glow+'">'+svg+'</div>',className:'aircraft-marker',iconSize:[13,13],iconAnchor:[6,6]});
-}
-
-function makeAirportIcon(icao){
-  return L.divIcon({
-    html:'<div style="text-align:center;line-height:1">'
-      +'<svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1 8.5,5 13,5 9.5,7.5 11,12 7,9.5 3,12 4.5,7.5 1,5 5.5,5" fill="rgba(255,200,0,.75)" stroke="rgba(255,170,0,.5)" stroke-width=".5"/></svg>'
-      +'<div style="margin-top:2px;color:rgba(255,200,0,.7);font-family:DM Mono,monospace;font-size:8px;letter-spacing:.04em;white-space:nowrap;text-shadow:0 0 4px rgba(0,0,0,.9)">'+icao+'</div>'
-      +'</div>',
-    className:'aircraft-marker',iconSize:[30,26],iconAnchor:[15,7]
-  });
-}
-
-// VIEW TOGGLE
-function toggleView(){
-  VIEW_MODE=VIEW_MODE==='live'?'all':'live';
-  var btn=document.getElementById('viewToggle');
-  if(VIEW_MODE==='live'){btn.textContent='● LIVE ONLY';btn.style.color='rgba(0,255,136,.7)';btn.style.borderColor='rgba(0,255,136,.3)';}
-  else{btn.textContent='○ ALL ASSETS';btn.style.color='rgba(0,180,255,.7)';btn.style.borderColor='rgba(0,180,255,.3)';}
-  placeMarkers();updateStats();
-}
-
-// FAA FLEET
 function genFleet() {
   // Real FAA registered aircraft - all 9 Bay Area counties (Apr 21 2026)
   // Source: FAA Releasable Aircraft Database
@@ -975,7 +895,6 @@ function genFleet() {
 }
 
 
-// GOV FLEET
 function buildGovFleet() {
   return [
     // COAST GUARD
@@ -1008,32 +927,291 @@ function buildGovFleet() {
 }
 
 
-// EOP DATA
-var COUNTY_EOP = {
-  'San Francisco':{source:'SF Dept of Emergency Management - Emergency Response Plan',url:'https://sfdem.org/plans-0',facts:'EOC at 1011 Turk Street; ESF-9 manages aerial SAR resources | ESF-13 coordinates SFPD Air Support and military aviation | Designated helicopter LZs: Marina Green, Crissy Field, Dolores Park, McLaren Park, Candlestick Point | Treasure Island evacuation: secondary aerial via SFPD/Coast Guard when Bay Bridge closed | Tsunami zones: Marina District, Fishermans Wharf, Embarcadero require aerial evacuation | SFPD Air Support Unit: Bell 206L at KOAK, available 24/7 | Coast Guard Sector San Francisco coordinates all Bay Area maritime and air SAR | Mass casualty sites: Moscone Center, Bill Graham Civic Auditorium with helipad access | Bay Area UASI coordinates regional aviation mutual aid | Primary staging airports: KOAK (Oakland), KSFO (SFO) for major incidents'},
-  'Alameda':{source:'Alameda County EOP (Feb 2025 - approved by Board of Supervisors)',url:'https://www.acgov.org/ready/documents/EmergencyOperationsPlan.pdf',facts:'Alameda County OES is Regional Mutual Aid Coordinator for Coastal Region II | Hayward Executive Airport (KHWD) designated primary aerial staging area for East Bay disasters | Alameda Island: 80,000 residents need aerial evacuation supplement when bridges fail | Hayward Fault M7.0+ is primary hazard - aerial reconnaissance critical after event | EOC at 4985 Broder Blvd Dublin; alternate at Pleasanton Fairgrounds | ESF-1 Transportation coordinates ground and air evacuation corridors | Tsunami threat: Alameda Island, San Leandro, Oakland waterfront require aerial evacuation | Livermore Municipal Airport (KLVK) serves as regional aviation staging for East Bay | Oakland Hills wildfire: pre-position aerial firefighting at KOAK/KLVK during red flag warnings | Mutual aid aviation: CHP Golden Gate, Alameda County Sheriff Aviation, REACH Air Medical'},
-  'Contra Costa':{source:'Contra Costa County EOP (2015, updated protocols 2022)',url:'https://www.cocosheriff.org',facts:'Buchanan Field (KCCR) Concord designated primary aviation staging base | CCSO Aviation provides law enforcement helicopter based at KCCR | Refinery corridor (Chevron Richmond, Marathon Martinez) requires aerial hazmat monitoring | Delta communities (Bethel Island, Discovery Bay) road-isolated during floods - aerial only access | EOC at 40 Muir Road Martinez | Coastal Region II: shares aviation mutual aid with Alameda, SF, Marin, Sonoma, Napa | Travis AFB (Solano) provides heavy-lift helicopter support under EMAC | Diablo Range wildfire: pre-position air attack at KCCR during red flag conditions | I-680/Hwy 4/Hwy 24 corridors identified as primary evacuation routes; air backup when closed | CHP Contra Costa Area coordinates road closures; CCSO Aviation provides aerial reconnaissance'},
-  'Marin':{source:'Marin County EOP / Multi-Jurisdictional Hazard Mitigation Plan 2023',url:'https://emergency.marincounty.org',facts:'Gnoss Field (KDVO) Novato primary aviation staging area for Marin disasters | West Marin (Point Reyes, Bolinas, Stinson Beach) accessible ONLY by air when Hwy 1 closes | County isolated by limited access: Golden Gate Bridge and Richmond Bridge closures trigger aerial evacuation | Marin County Sheriff Aviation: helicopter from KDVO for SAR and law enforcement | Coast Guard Station Golden Gate: maritime and air SAR for Marin coastal communities | EOC at Marin County Civic Center San Rafael | Tsunami threat: Sausalito, Mill Valley, Tiburon waterfront require aerial evacuation | Wildfire threat: Marin Municipal Water District watershed, Sir Francis Drake corridor | North Bay Hub: Marin, Sonoma, Napa, Solano coordinate aviation mutual aid | Golden Gate Ferry terminals at Sausalito/Tiburon: secondary evacuation supplemented by air'},
-  'San Mateo':{source:'San Mateo County Sheriff Homeland Security Division EOP',url:'https://hsd.smcsheriff.com',facts:'San Francisco International Airport (KSFO) dual role: aviation staging AND evacuation point | Foster City levee failure scenario: 32,000 residents require aerial evacuation | San Carlos Airport (KSQL) primary General Aviation staging for county emergencies | Half Moon Bay Airport (KHAF) serves isolated coastal communities when Hwy 1 closes | CHP Golden Gate Air Ops: Bell 407 and Bell 412 based at KSFO | Coast Guard Air Station San Francisco (KSFO): MH-65D Dolphin, MH-60T Jayhawk on 24/7 alert | REACH Air Medical dispatched from KOAK for trauma transport throughout county | Regional Operations Center: 1700 S Amphlett Blvd San Mateo - 17500 sq ft | Tsunami zones: Pacifica, Half Moon Bay, Moss Beach - road-isolated, aerial required | San Andreas Fault runs entire county length - aerial recon critical post-earthquake'},
-  'Santa Clara':{source:'Santa Clara County OES Emergency Operations Plan',url:'https://emergencymanagement.sccgov.org',facts:'Moffett Federal Airfield (KNUQ): CA National Guard and NASA - primary heavy-lift staging South Bay | CA ANG CH-47F Chinook, UH-60 Black Hawk at Moffett available under EMAC | San Jose International Airport (KSJC): commercial hub, secondary staging for mass evacuation | Palo Alto Airport (KPAO): General aviation staging, Stanford Life Flight base | Alviso and North San Jose lowlands flood in major storms - aerial water rescue required | Stanford University Medical Center Level 1 trauma: helipad, critical for mass casualty | Valley Medical Center: County trauma center with operational helipad | EOC at 55 W Younger Avenue San Jose | Bay Area UASI South Bay Hub: Santa Clara, Alameda, San Mateo coordinate aviation | Hayward Fault seismic risk: Alviso lowlands isolation requires aerial access'},
-  'Napa':{source:'Napa County Office of Emergency Services',url:'https://www.countyofnapa.org/1100/Emergency-Services',facts:'Napa County Airport (KAPC): Cal Fire Air Attack base and primary aviation staging | Cal Fire Napa Unit at KAPC: S-70 Firehawk and Air Attack OV-10 pre-positioned | Extreme wildfire history: Atlas 2017, LNU Lightning Complex 2020 - evacuation protocols established | Napa Valley road network limited: aerial evacuation critical during simultaneous fire and flood | Napa River flood: downtown Napa flooding isolates communities - aerial survey and supply drops | North Bay Hub partner: coordinates aviation with Marin, Sonoma, Solano | EOC at Napa County Public Safety Building | Neighboring heavy assets: Travis AFB Solano and Sonoma Cal Fire available under mutual aid | Wine country hospitality infrastructure: many rural properties require aerial access during evacuation | Calistoga and Pope Valley: road-isolated during wildfire, aerial only option'},
-  'Sonoma':{source:'Sonoma County Operational Area EOP (2019/updated 2022)',url:'https://sonomacounty.gov/emergency-management',facts:'Santa Rosa Airport (KSTS): Cal Fire Air Attack Base and primary aviation staging | Cal Fire Sonoma Unit at KSTS: S-70 Firehawk, Bell 205 helitack, Air Attack OV-10 | Largest private helicopter fleet in Bay Area - 54 registered helicopters in Sonoma County | Tubbs Fire 2017, Kincade Fire 2019, LNU Complex 2020 established aerial evacuation protocols | Hwy 101 primary evacuation route: when closed aerial becomes sole option for isolated communities | Russian River flood zones: Guerneville, Monte Rio, Forestville accessible ONLY by air during major floods | Bodega Bay and Jenner: coastal fog and limited roads make aerial critical year-round | Sonoma Valley narrow canyon roads: aerial evacuation required for mobility-impaired during wildfire | EOC at 2300 County Center Drive Santa Rosa | Mutual aid: North Bay Hub with Marin, Napa, Solano; Sonoma Sheriff Aviation provides sheriff helicopter'},
-  'Solano':{source:'Solano County Office of Emergency Services',url:'https://www.solanocounty.com/depts/oes',facts:'Travis Air Force Base (KSUU): C-17 Globemaster, C-5 Galaxy for mass evacuation and cargo | CA ANG 349th Air Mobility Wing at Travis: largest heavy-lift aviation asset in Bay Area | Travis available under EMAC for state disaster response - formally requested through Cal OES | HH-60G Pave Hawk at Travis: combat SAR helicopter for rescue operations | Nut Tree Airport (KVCB) Vacaville: general aviation staging and National Guard access point | Refinery hazard: Valero Benicia, NuStar - chemical incident requires aerial monitoring and evacuation | Suisun Bay industrial waterway: Coast Guard maritime/air coordination required | Fairfield and Vacaville: major population centers with direct Travis AFB support | EOC at Solano County Government Center Fairfield | North Bay Hub partner: Marin, Sonoma, Napa - regional aviation coordination'}
+// ── AIRPORTS ─────────────────────────────────────────────────────────────
+var AIRPORTS = {
+  KSFO:{lat:37.6190,lng:-122.3750,name:'San Francisco Intl',county:'San Mateo',type:'major'},
+  KOAK:{lat:37.7213,lng:-122.2208,name:'Oakland Intl',county:'Alameda',type:'major'},
+  KSJC:{lat:37.3626,lng:-121.9290,name:'San Jose Intl',county:'Santa Clara',type:'major'},
+  KNUQ:{lat:37.4150,lng:-122.0490,name:'Moffett Federal Field',county:'Santa Clara',type:'military'},
+  KSUU:{lat:38.2628,lng:-121.9272,name:'Travis AFB',county:'Solano',type:'military'},
+  KCCR:{lat:37.9897,lng:-122.0569,name:'Buchanan Field (Concord)',county:'Contra Costa',type:'general'},
+  KLVK:{lat:37.6934,lng:-121.8197,name:'Livermore Municipal',county:'Alameda',type:'general'},
+  KHWD:{lat:37.6589,lng:-122.1217,name:'Hayward Executive',county:'Alameda',type:'general'},
+  KAPC:{lat:38.2132,lng:-122.2808,name:'Napa County',county:'Napa',type:'general'},
+  KSTS:{lat:38.5090,lng:-122.8128,name:'Santa Rosa (Charles M Schulz)',county:'Sonoma',type:'general'},
+  KDVO:{lat:38.1439,lng:-122.5561,name:'Gnoss Field (Novato)',county:'Marin',type:'general'},
+  KPAO:{lat:37.4611,lng:-122.1147,name:'Palo Alto',county:'Santa Clara',type:'general'},
+  KSQL:{lat:37.5193,lng:-122.2497,name:'San Carlos',county:'San Mateo',type:'general'},
+  KHAF:{lat:37.5134,lng:-122.5012,name:'Half Moon Bay',county:'San Mateo',type:'general'},
+  KVCB:{lat:38.3763,lng:-121.9622,name:'Nut Tree (Vacaville)',county:'Solano',type:'general'},
+  KRHV:{lat:37.3328,lng:-121.8197,name:'Reid-Hillview',county:'Santa Clara',type:'general'},
+  KOWW:{lat:37.6563,lng:-122.4680,name:'San Francisco Exec',county:'San Mateo',type:'general'}
 };
 
-// LIVE ADSB
-async function fetchLive(){
-  try{
-    var r=await fetch('https://opensky-network.org/api/states/all?lamin=37.1&lomin=-123.2&lamax=38.9&lomax=-121.2',{signal:AbortSignal.timeout(7000)});
-    if(!r.ok)throw new Error('not ok');
-    var d=await r.json();
-    return (d.states||[]).map(function(s){return{icao24:s[0],call:(s[1]||'').trim(),lat:s[6],lng:s[5],alt:s[7],onGnd:s[8]};}).filter(function(a){return a.lat&&a.lng&&!a.onGnd;});
-  }catch(e){
-    return [{call:'UAL342',lat:37.62,lng:-122.37,alt:8200},{call:'SWA891',lat:37.72,lng:-122.10,alt:3500},{call:'ASA445',lat:37.40,lng:-121.95,alt:6000},{call:'DAL771',lat:37.65,lng:-121.85,alt:8500},{call:'N44821',lat:37.85,lng:-122.30,alt:2200},{call:'N72341',lat:37.55,lng:-122.50,alt:1800},{call:'N88762',lat:38.10,lng:-122.25,alt:4500},{call:'N33561',lat:37.78,lng:-122.45,alt:1200}];
+// Hospital helipads (real locations)
+var HOSPITALS = [
+  {name:'UCSF Medical Center',lat:37.7631,lng:-122.4575,county:'San Francisco',trauma:1},
+  {name:'Zuckerberg SF General',lat:37.7554,lng:-122.4057,county:'San Francisco',trauma:1},
+  {name:'St. Mary\'s Medical Center',lat:37.7842,lng:-122.4381,county:'San Francisco',trauma:0},
+  {name:'Kaiser Oakland Medical',lat:37.8044,lng:-122.2416,county:'Alameda',trauma:1},
+  {name:'Highland Hospital Oakland',lat:37.7774,lng:-122.2175,county:'Alameda',trauma:1},
+  {name:'Stanford Medical Center',lat:37.4334,lng:-122.1755,county:'Santa Clara',trauma:1},
+  {name:'Valley Medical Center SJ',lat:37.3177,lng:-121.8783,county:'Santa Clara',trauma:1},
+  {name:'John Muir Medical Walnut Creek',lat:37.9035,lng:-122.0597,county:'Contra Costa',trauma:0},
+  {name:'Marin General',lat:37.9741,lng:-122.5280,county:'Marin',trauma:0},
+  {name:'UCSF Benioff Children\'s Oakland',lat:37.8306,lng:-122.2561,county:'Alameda',trauma:0}
+];
+
+// Open space LZ candidates (parks/fields suitable for helicopter ops)
+var LZ_CANDIDATES = [
+  {name:'Marina Green',lat:37.8068,lng:-122.4381,size:'large',county:'San Francisco'},
+  {name:'Crissy Field',lat:37.8034,lng:-122.4592,size:'large',county:'San Francisco'},
+  {name:'Dolores Park',lat:37.7596,lng:-122.4269,size:'medium',county:'San Francisco'},
+  {name:'McLaren Park',lat:37.7201,lng:-122.4232,size:'large',county:'San Francisco'},
+  {name:'Candlestick Point',lat:37.7122,lng:-122.3849,size:'large',county:'San Francisco'},
+  {name:'Alameda Point (former NAS)',lat:37.7891,lng:-122.3014,size:'xlarge',county:'Alameda'},
+  {name:'Cesar Chavez Park Berkeley',lat:37.8668,lng:-122.3146,size:'large',county:'Alameda'},
+  {name:'Martin Luther King Jr. Shoreline',lat:37.7785,lng:-122.1945,size:'large',county:'Alameda'},
+  {name:'Coyote Hills Regional Park',lat:37.5589,lng:-122.0598,size:'large',county:'Alameda'},
+  {name:'Shoreline Park Mountain View',lat:37.4361,lng:-122.0822,size:'large',county:'Santa Clara'},
+  {name:'Bayfront Park Menlo Park',lat:37.4782,lng:-122.1384,size:'medium',county:'San Mateo'},
+  {name:'Chrissy Field East Beach',lat:37.8060,lng:-122.4470,size:'medium',county:'San Francisco'},
+  {name:'Marin Headlands',lat:37.8329,lng:-122.5053,size:'large',county:'Marin'},
+  {name:'Hamilton Field (former USAF)',lat:38.0633,lng:-122.5022,size:'xlarge',county:'Marin'},
+  {name:'Point Molate',lat:37.9349,lng:-122.4012,size:'medium',county:'Contra Costa'},
+  {name:'Big Break Regional Shoreline',lat:37.9997,lng:-121.7310,size:'large',county:'Contra Costa'},
+  {name:'Napa Airport South Field',lat:38.1950,lng:-122.2780,size:'xlarge',county:'Napa'},
+  {name:'Petaluma Airport Area',lat:38.2570,lng:-122.6060,size:'large',county:'Sonoma'},
+  {name:'Travis AFB North Field',lat:38.2800,lng:-121.9300,size:'xlarge',county:'Solano'},
+  {name:'Benicia State Recreation Area',lat:38.0761,lng:-122.1254,size:'medium',county:'Solano'}
+];
+
+// ── PRESETS ───────────────────────────────────────────────────────────────
+var PRESETS = {
+  eq:'7.2 magnitude earthquake on the Hayward Fault. Bay Bridge and San Mateo Bridge closed. Alameda Island isolated with 80,000 residents cut off. Oakland Hills wildfire ignited. Roads severely damaged across East Bay. Mass casualties. Immediate aerial evacuation, medevac, and reconnaissance required.',
+  wf:'Fast-moving wildfire in Sonoma County hills, driven by 45mph Diablo winds. 15,000 structures threatened. Highway 12 and 101 closed. 8,000 residents stranded. Need helicopter water drops, aerial recon, and evacuation of mobility-impaired residents from Fountaingrove and Coffey Park.',
+  fl:'Catastrophic atmospheric river flooding in South Bay. Highway 101 submerged between San Jose and San Mateo. 20,000 residents stranded in Alviso and North San Jose lowlands. Water rising 2 inches per hour. Need aerial water rescue, medevac, and emergency supply drops.',
+  ts:'Cascadia subduction zone event. Tsunami warning active, 45 minutes to wave arrival. Marina District, Treasure Island, Alameda waterfront, and Foster City require immediate mass evacuation. Ground routes already gridlocked. Every minute is critical.',
+  br:'Bay Bridge catastrophic structural failure during morning commute. Bridge closed indefinitely. 200,000 daily commuters affected. Ferry capacity at 2%. Medical personnel, emergency supplies, and critical infrastructure workers need aerial transport.',
+  sf:'Complete aviation emergency response plan for San Francisco County. Cover all major hazard zones including Marina District, SOMA, Treasure Island, and Bayview. Identify all viable helicopter landing zones, evacuation corridors, staging airports, and hospital helipads. Provide full 12-hour execution timeline.'
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+var ANTHROPIC_API_KEY = '';
+var allAircraft = [], govFleet = [], weatherData = {};
+var map, satLayer, streetLayer, useSat = false;
+var planLayers = [], lzLayers = [], hospitalLayers = [], airportLayers = [];
+var showHospitals = true, showAirports = true, showPlan = false, showLZ = false;
+var chartMInst = null, chartTInst = null, lastPlanData = null;
+
+// ── CLOCK ──────────────────────────────────────────────────────────────────
+function tick(){
+  var n=new Date(),h=String(n.getUTCHours()).padStart(2,'0'),
+    m=String(n.getUTCMinutes()).padStart(2,'0'),
+    s=String(n.getUTCSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent=h+':'+m+':'+s+' UTC';
+}
+setInterval(tick,1000);tick();
+
+// ── API KEY ────────────────────────────────────────────────────────────────
+function showKeyModal(){
+  document.getElementById('keyModal').style.display='flex';
+  if(ANTHROPIC_API_KEY) document.getElementById('cancelKeyBtn').style.display='block';
+  setTimeout(function(){document.getElementById('apiKeyInput').focus();},50);
+}
+function saveKey(){
+  var val=document.getElementById('apiKeyInput').value.trim();
+  var st=document.getElementById('keyStatus');
+  if(!val||val.length<20){st.textContent='Please paste your full API key';st.style.color='#ff4444';return;}
+  ANTHROPIC_API_KEY=val;
+  st.textContent='Saved!';st.style.color='#00e676';
+  document.getElementById('keyBtn').style.color='#00e676';
+  document.getElementById('keyBtn').style.borderColor='rgba(0,230,118,.4)';
+  document.getElementById('cancelKeyBtn').style.display='block';
+  setTimeout(function(){document.getElementById('keyModal').style.display='none';},350);
+}
+function hideModal(){document.getElementById('keyModal').style.display='none';}
+document.getElementById('apiKeyInput').addEventListener('keydown',function(e){if(e.key==='Enter')saveKey();});
+
+// ── MAP ────────────────────────────────────────────────────────────────────
+function initMap(){
+  map=L.map('map',{center:[37.75,-122.25],zoom:10,zoomControl:true,attributionControl:false});
+  streetLayer=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+  satLayer=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19});
+}
+
+function toggleSat(){
+  useSat=!useSat;
+  var btn=document.getElementById('satToggle');
+  if(useSat){
+    map.removeLayer(streetLayer);
+    satLayer.addTo(map);
+    btn.textContent='\u25A0 STREET';
+    btn.classList.add('active');
+  } else {
+    map.removeLayer(satLayer);
+    streetLayer.addTo(map);
+    btn.textContent='\u25A0 SATELLITE';
+    btn.classList.remove('active');
   }
 }
 
-// WEATHER
+function toggleLZ(){
+  showLZ=!showLZ;
+  document.getElementById('lzToggle').classList.toggle('active',showLZ);
+  document.getElementById('mapLegend').classList.toggle('visible',showLZ||showPlan);
+  if(showLZ) drawLZMarkers(); else clearLZMarkers();
+}
+
+function toggleLayer(name){
+  if(name==='hospitals'){showHospitals=!showHospitals;document.getElementById('btnHospitals').classList.toggle('on',showHospitals);if(showHospitals)drawHospitals();else clearLayer(hospitalLayers);}
+  if(name==='airports'){showAirports=!showAirports;document.getElementById('btnAirports').classList.toggle('on',showAirports);if(showAirports)drawAirports();else clearLayer(airportLayers);}
+  if(name==='plan'){showPlan=!showPlan;document.getElementById('btnPlan').classList.toggle('on',showPlan);document.getElementById('mapLegend').classList.toggle('visible',showLZ||showPlan);if(showPlan&&lastPlanData)drawPlanOnMap(lastPlanData.parsedPlan,lastPlanData.scenario);else clearLayer(planLayers);}
+}
+
+function clearLayer(arr){arr.forEach(function(l){map.removeLayer(l);});arr.length=0;}
+
+// ── DRAW HOSPITALS ─────────────────────────────────────────────────────────
+function drawHospitals(){
+  clearLayer(hospitalLayers);
+  HOSPITALS.forEach(function(h){
+    var col=h.trauma?'#ff4444':'#ff8844';
+    var m=L.circleMarker([h.lat,h.lng],{radius:6,fillColor:col,fillOpacity:.6,color:col,weight:1.5}).addTo(map);
+    m.bindTooltip('<div style="font-family:DM Mono,monospace;font-size:11px;background:#050c14;border:1px solid rgba(255,68,68,.4);padding:5px 9px;color:#c8e8ff"><strong style="color:#ff4444">'+h.name+'</strong><br>'+h.county+' County<br>'+(h.trauma?'<span style="color:#ff4444">Level I Trauma</span>':'Regional Medical Center')+'</div>',{permanent:false,opacity:1});
+    var plus=L.divIcon({html:'<div style="color:#ff4444;font-size:10px;font-weight:700;text-shadow:0 0 4px rgba(0,0,0,.9);line-height:1;margin-top:-4px;margin-left:-4px">+</div>',className:'',iconSize:[8,8],iconAnchor:[4,4]});
+    var lm=L.marker([h.lat,h.lng],{icon:plus,interactive:false}).addTo(map);
+    hospitalLayers.push(m);hospitalLayers.push(lm);
+  });
+}
+
+// ── DRAW AIRPORTS ──────────────────────────────────────────────────────────
+function drawAirports(){
+  clearLayer(airportLayers);
+  Object.keys(AIRPORTS).forEach(function(icao){
+    var apt=AIRPORTS[icao];
+    var col=apt.type==='military'?'#00e676':apt.type==='major'?'#ffcc00':'rgba(255,200,0,.75)';
+    var icon=L.divIcon({
+      html:'<div style="text-align:center;line-height:1">'
+        +'<svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1 8.5,5 13,5 9.5,7.5 11,12 7,9.5 3,12 4.5,7.5 1,5 5.5,5" fill="'+col+'" stroke="rgba(255,170,0,.5)" stroke-width=".5" opacity=".85"/></svg>'
+        +'<div style="margin-top:1px;color:'+col+';font-family:DM Mono,monospace;font-size:8px;letter-spacing:.04em;white-space:nowrap;text-shadow:0 0 4px rgba(0,0,0,.95);opacity:.85">'+icao+'</div>'
+        +'</div>',
+      className:'',iconSize:[32,22],iconAnchor:[16,7]
+    });
+    var m=L.marker([apt.lat,apt.lng],{icon:icon,zIndexOffset:500}).addTo(map);
+    // Count aircraft here
+    var acCount=allAircraft.filter(function(a){return a.airport===icao;}).length;
+    var govCount=govFleet.filter(function(a){return a.airport===icao;}).length;
+    m.bindTooltip('<div style="font-family:DM Mono,monospace;font-size:11px;background:#050c14;border:1px solid rgba(255,200,0,.35);padding:5px 9px;color:#c8e8ff"><strong style="color:#ffcc00">'+icao+'</strong><br>'+apt.name+'<br>'+apt.county+' County<br><span style="color:rgba(200,232,255,.5)">'+acCount+' civilian &middot; '+govCount+' government</span></div>',{permanent:false,opacity:1});
+    airportLayers.push(m);
+  });
+}
+
+// ── DRAW LZ MARKERS ───────────────────────────────────────────────────────
+function drawLZMarkers(){
+  clearLZMarkers();
+  LZ_CANDIDATES.forEach(function(lz){
+    var r=lz.size==='xlarge'?10:lz.size==='large'?8:6;
+    var m=L.circleMarker([lz.lat,lz.lng],{
+      radius:r,fillColor:'rgba(0,230,118,.15)',fillOpacity:1,
+      color:'#00e676',weight:1.5,dashArray:'4,3',opacity:.7
+    }).addTo(map);
+    m.bindTooltip('<div style="font-family:DM Mono,monospace;font-size:11px;background:#050c14;border:1px solid rgba(0,230,118,.35);padding:5px 9px;color:#c8e8ff"><strong style="color:#00e676">LZ: '+lz.name+'</strong><br>'+lz.county+' County &middot; '+lz.size.toUpperCase()+' site<br><span style="color:rgba(200,232,255,.45)">Open space helicopter landing zone</span></div>',{permanent:false,opacity:1});
+    lzLayers.push(m);
+  });
+}
+function clearLZMarkers(){clearLayer(lzLayers);}
+
+// ── DRAW PLAN ON MAP ──────────────────────────────────────────────────────
+function drawPlanOnMap(parsed, scenario){
+  clearLayer(planLayers);
+  if(!parsed||!parsed.pzs||parsed.pzs.length===0) return;
+
+  // Draw pickup zones as circles
+  parsed.pzs.forEach(function(pz,i){
+    // Find closest LZ candidate to match name
+    var lz=LZ_CANDIDATES.find(function(l){
+      return l.name.toLowerCase().indexOf(pz.name.toLowerCase().split(' ')[0])>=0||
+             pz.name.toLowerCase().indexOf(l.name.toLowerCase().split(' ')[0])>=0;
+    });
+    var lat=lz?lz.lat:(37.75+Math.sin(i)*0.08);
+    var lng=lz?lz.lng:(-122.25+Math.cos(i)*0.1);
+    var circle=L.circle([lat,lng],{
+      radius:800,fillColor:'rgba(0,230,118,.08)',fillOpacity:1,
+      color:'#00e676',weight:2,dashArray:'6,4'
+    }).addTo(map);
+    var label=L.divIcon({html:'<div style="background:rgba(2,4,10,.85);border:1px solid rgba(0,230,118,.5);color:#00e676;font-family:DM Mono,monospace;font-size:9px;padding:2px 5px;white-space:nowrap">PZ-'+(i+1)+': '+pz.name.slice(0,18)+'</div>',className:'',iconSize:[null,null],iconAnchor:[0,8]});
+    var lm=L.marker([lat,lng],{icon:label,interactive:false}).addTo(map);
+    planLayers.push(circle);planLayers.push(lm);
+  });
+
+  // Draw corridors as lines between airports and LZs
+  if(parsed.corridors&&parsed.corridors.length>0){
+    var colors=['#00b4ff','#00e676','#ffaa00','#ff4444'];
+    parsed.corridors.forEach(function(corr,i){
+      var col=colors[i%colors.length];
+      // Find start/end from airport list
+      var fromApt=Object.keys(AIRPORTS).find(function(k){return corr.indexOf(k)>=0;});
+      var fromPt=fromApt?[AIRPORTS[fromApt].lat,AIRPORTS[fromApt].lng]:[37.72,-122.22];
+      var toIdx=Math.min(i,parsed.pzs.length-1);
+      var toLz=LZ_CANDIDATES.find(function(l){return l.name.toLowerCase().indexOf((parsed.pzs[toIdx]&&parsed.pzs[toIdx].name.toLowerCase().split(' ')[0])||'')>=0;});
+      var toPt=toLz?[toLz.lat,toLz.lng]:[37.75+Math.sin(i+2)*0.1,-122.2+Math.cos(i+2)*0.1];
+      var line=L.polyline([fromPt,toPt],{color:col,weight:2,opacity:.7,dashArray:'8,4'}).addTo(map);
+      // Arrow at midpoint
+      var mid=[(fromPt[0]+toPt[0])/2,(fromPt[1]+toPt[1])/2];
+      var arrowIcon=L.divIcon({html:'<div style="color:'+col+';font-size:12px;transform:rotate('+Math.round(Math.atan2(toPt[1]-fromPt[1],toPt[0]-fromPt[0])*180/Math.PI)+'deg)">&#9658;</div>',className:'',iconSize:[12,12],iconAnchor:[6,6]});
+      var am=L.marker(mid,{icon:arrowIcon,interactive:false}).addTo(map);
+      var label=L.divIcon({html:'<div style="background:rgba(2,4,10,.85);border:1px solid '+col+'55;color:'+col+';font-family:DM Mono,monospace;font-size:8px;padding:2px 4px;white-space:nowrap">Corridor '+String.fromCharCode(65+i)+'</div>',className:'',iconSize:[null,null],iconAnchor:[0,18]});
+      var lm=L.marker(mid,{icon:label,interactive:false}).addTo(map);
+      planLayers.push(line);planLayers.push(am);planLayers.push(lm);
+    });
+  }
+
+  // Draw staging areas as rectangles around key airports
+  if(parsed.staging&&parsed.staging.length>0){
+    parsed.staging.slice(0,3).forEach(function(stage){
+      var apt=Object.keys(AIRPORTS).find(function(k){return stage.indexOf(k)>=0||AIRPORTS[k].name.toLowerCase().indexOf(stage.toLowerCase().split(' ')[0])>=0;});
+      if(!apt)return;
+      var c=AIRPORTS[apt];
+      var bounds=[[c.lat-0.008,c.lng-0.015],[c.lat+0.008,c.lng+0.015]];
+      var rect=L.rectangle(bounds,{color:'#ffaa00',weight:2,fillColor:'rgba(255,170,0,.08)',fillOpacity:1,dashArray:'5,3'}).addTo(map);
+      var sl=L.divIcon({html:'<div style="background:rgba(2,4,10,.85);border:1px solid rgba(255,170,0,.5);color:#ffaa00;font-family:DM Mono,monospace;font-size:9px;padding:2px 5px;white-space:nowrap">STAGING: '+apt+'</div>',className:'',iconSize:[null,null],iconAnchor:[0,20]});
+      var sm=L.marker([c.lat+0.009,c.lng],{icon:sl,interactive:false}).addTo(map);
+      planLayers.push(rect);planLayers.push(sm);
+    });
+  }
+}
+
+// ── ASSET SUMMARY ──────────────────────────────────────────────────────────
+function renderAssetSummary(){
+  var counties=['San Francisco','Alameda','Contra Costa','Marin','San Mateo','Santa Clara','Napa','Sonoma','Solano'];
+  var maxHeli=0,maxFixed=0;
+  var data=counties.map(function(c){
+    var helis=allAircraft.filter(function(a){return a.county===c&&a.cat==='heli';}).length;
+    var fixed=allAircraft.filter(function(a){return a.county===c&&a.cat==='fixed';}).length;
+    if(helis>maxHeli)maxHeli=helis;
+    if(fixed>maxFixed)maxFixed=fixed;
+    return{county:c,helis:helis,fixed:fixed};
+  });
+  var html=data.map(function(d){
+    var cshort=d.county.replace(' County','').replace('San ','S. ').replace('Santa ','Sta. ').replace('Contra Costa','Contra C.');
+    return '<div class="county-block">'
+      +'<div class="cb-name">'+d.county+'<span>'+(d.helis+d.fixed)+'</span></div>'
+      +'<div class="cb-bars">'
+      +'<div class="bar-row"><div class="bar-label" style="color:var(--green)">Heli</div><div class="bar-track"><div class="bar-fill" style="width:'+(maxHeli>0?Math.round(d.helis/maxHeli*100):0)+'%;background:var(--green)"></div></div><div class="bar-val">'+d.helis+'</div></div>'
+      +'<div class="bar-row"><div class="bar-label" style="color:var(--blue)">Fixed</div><div class="bar-track"><div class="bar-fill" style="width:'+(maxFixed>0?Math.round(d.fixed/maxFixed*100):0)+'%;background:var(--blue)"></div></div><div class="bar-val">'+d.fixed+'</div></div>'
+      +'</div></div>';
+  }).join('');
+  document.getElementById('assetSummary').innerHTML=html;
+  var totalCiv=allAircraft.length,totalGov=govFleet.length;
+  var totalHeli=allAircraft.filter(function(a){return a.cat==='heli';}).length+govFleet.filter(function(a){return a.cat==='heli';}).length;
+  var totalFixed=allAircraft.filter(function(a){return a.cat==='fixed';}).length;
+  document.getElementById('tTotal').textContent=totalCiv+totalGov;
+  document.getElementById('tHeli').textContent=totalHeli;
+  document.getElementById('tGov').textContent=totalGov;
+  document.getElementById('tFixed').textContent=totalFixed;
+}
+
+// ── WEATHER ────────────────────────────────────────────────────────────────
 async function fetchWx(){
   try{
     var r=await fetch('https://api.weather.gov/stations/KSFO/observations/latest',{headers:{'Accept':'application/geo+json'},signal:AbortSignal.timeout(6000)});
@@ -1041,408 +1219,308 @@ async function fetchWx(){
     var vis=o.visibility&&o.visibility.value?o.visibility.value/1609.34:10;
     var ceil=o.cloudLayers&&o.cloudLayers[0]&&o.cloudLayers[0].base&&o.cloudLayers[0].base.value?o.cloudLayers[0].base.value*3.28084:9999;
     var rules=vis<1||ceil<500?'LIFR':vis<3||ceil<1000?'IFR':vis<5||ceil<3000?'MVFR':'VFR';
-    return{temp:o.temperature&&o.temperature.value?Math.round(o.temperature.value*9/5+32)+'F':'62F',wind:o.windSpeed&&o.windSpeed.value?Math.round(o.windSpeed.value*.54)+'kt':'12kt',dir:o.windDirection&&o.windDirection.value?Math.round(o.windDirection.value)+'':'280',vis:Math.round(vis)+'mi',ceil:ceil<9000?Math.round(ceil/100)*100+'ft':'CLR',cond:o.textDescription||'Clear',rules:rules};
-  }catch(e){return{temp:'62F',wind:'12kt',dir:'280',vis:'10mi',ceil:'CLR',cond:'Clear',rules:'VFR'};}
+    return{temp:o.temperature&&o.temperature.value?Math.round(o.temperature.value*9/5+32)+'°F':'62°F',wind:o.windSpeed&&o.windSpeed.value?Math.round(o.windSpeed.value*.54)+'kt':'12kt',dir:o.windDirection&&o.windDirection.value?Math.round(o.windDirection.value)+'°':'280°',vis:Math.round(vis)+'mi',ceil:ceil<9000?Math.round(ceil/100)*100+'ft':'CLR',cond:o.textDescription||'Clear',rules:rules};
+  }catch(e){return{temp:'62°F',wind:'12kt',dir:'280°',vis:'10mi',ceil:'CLR',cond:'Clear',rules:'VFR'};}
 }
 
-// MARKERS
-function placeMarkers(){
-  Object.values(markers).forEach(function(m){map.removeLayer(m);});
-  markers={};
-  var all=VIEW_MODE==='live'?getFiltered().filter(function(a){return a.airborne;}):getFiltered();
-  all.forEach(function(ac){
-    var gc=ac.govColor||'civ';
-    var m=L.marker([ac.lat,ac.lng],{icon:makeIcon(ac.cat,ac.airborne,gc,selected&&selected.reg===ac.reg),title:ac.reg}).addTo(map);
-    var col=gc==='mil'?'#00e676':(gc==='le'||gc==='fire')?'#ff4444':'#00b4ff';
-    m.bindTooltip('<div style="font-family:DM Mono,monospace;font-size:11px;background:#050c14;border:1px solid '+col+'44;padding:5px 9px;color:#c8e8ff"><strong style="color:'+col+'">'+ac.reg+'</strong><br>'+ac.type+'<br>'+(ac.airborne?'<span style="color:#ffaa00">AIRBORNE '+(ac.alt?Math.round(ac.alt)+'ft':'')+'</span>':ac.airportName)+'<br>'+(ac.owner||ac.county)+'</div>',{permanent:false,offset:[8,0],opacity:1});
-    m.on('click',function(){selectAc(ac);});
-    markers[ac.reg]=m;
-  });
-  liveAircraft.forEach(function(la){
-    if(la.lat&&la.lng){
-      var m=L.marker([la.lat,la.lng],{icon:makeIcon('fixed',true,'civ',false)}).addTo(map);
-      m.bindTooltip('<div style="font-family:DM Mono,monospace;font-size:11px;background:#050c14;border:1px solid rgba(255,170,0,.3);padding:5px 9px;color:#c8e8ff"><strong style="color:#ffaa00">'+(la.call||la.icao24||'LIVE')+'</strong><br><span style="color:rgba(200,232,255,.4)">Live ADS-B Traffic</span><br>'+(la.alt?Math.round(la.alt)+'ft AGL':'')+' &middot; Not in FENRAX registry</div>',{permanent:false,offset:[8,0],opacity:1});
-    }
-  });
-}
-
-function placeAirportMarkers(){
-  Object.values(airportMarkers).forEach(function(m){map.removeLayer(m);});
-  airportMarkers={};
-  var byApt={};
-  allAircraft.forEach(function(ac){if(!byApt[ac.airport])byApt[ac.airport]=[];byApt[ac.airport].push(ac);});
-  govFleet.forEach(function(ac){var k=ac.airport||'?';if(!byApt[k])byApt[k]=[];byApt[k].push(ac);});
-  Object.keys(AIRPORTS).forEach(function(icao){
-    var apt=AIRPORTS[icao],aircraft=byApt[icao]||[];
-    if(aircraft.length===0)return;
-    var m=L.marker([apt.lat,apt.lng],{icon:makeAirportIcon(icao),zIndexOffset:1000,title:icao}).addTo(map);
-    var helis=aircraft.filter(function(a){return a.cat==='heli';}).length;
-    var rows=aircraft.slice(0,25).map(function(a){
-      var col=a.govColor==='mil'?'#00e676':(a.govColor==='le'||a.govColor==='fire')?'#ff4444':'#00b4ff';
-      return '<div style="display:grid;grid-template-columns:70px 1fr;gap:.3rem;padding:.3rem .6rem;border-bottom:1px solid rgba(0,180,255,.05);cursor:pointer" onclick="void(0)">'
-        +'<span style="font-size:.65rem;font-weight:500;color:'+col+'">'+a.reg+'</span>'
-        +'<span style="font-size:.58rem;color:rgba(200,232,255,.5)">'+a.type.slice(0,20)+'</span>'
-        +'</div>';
-    }).join('');
-    var extra=aircraft.length>25?'<div style="padding:.3rem .6rem;font-size:.54rem;color:rgba(200,232,255,.3)">+' +(aircraft.length-25)+' more</div>':'';
-    m.bindPopup(
-      '<div style="font-family:DM Mono,monospace;min-width:240px">'
-      +'<div style="background:#050c14;border-bottom:1px solid rgba(255,200,0,.25);padding:.5rem .75rem;display:flex;justify-content:space-between;align-items:center">'
-      +'<div><div style="font-size:.8rem;font-weight:500;color:#ffcc00">'+icao+'</div><div style="font-size:.56rem;color:rgba(200,232,255,.4)">'+apt.name+' &middot; '+apt.county+'</div></div>'
-      +'<div style="text-align:right;font-size:.56rem;color:rgba(200,232,255,.4)">'+aircraft.length+' acft<br>'+helis+' heli</div>'
-      +'</div>'
-      +'<div style="background:#02040a;max-height:200px;overflow-y:auto">'+rows+extra+'</div>'
-      +'</div>',
-      {maxWidth:280,minWidth:240,className:''}
-    );
-    airportMarkers[icao]=m;
-  });
-}
-
-function selectAc(ac){
-  selected=ac;placeMarkers();
-  var col=ac.govColor==='mil'?'#00e676':(ac.govColor==='le'||ac.govColor==='fire')?'#ff4444':'#00b4ff';
-  document.getElementById('detail').classList.add('on');
-  document.getElementById('dReg').innerHTML='<span style="color:'+col+'">'+ac.reg+'</span> &middot; '+ac.type;
-  var rows=[['Status',ac.airborne?'<span style="color:#ffaa00">AIRBORNE</span>':'<span style="color:#00ff88">AVAILABLE</span>'],['Owner',ac.owner||'—'],['Base',ac.airportName],['County',ac.county],['Passengers','<span style="color:'+col+';font-size:.85rem;font-weight:500">'+(ac.pax||'—')+'</span>'],['Payload',ac.payload||'—'],['Lift Cap',ac.liftCap||'N/A'],['Range',ac.range||'—']];
-  if(ac.missions)rows.push(['Missions','<span style="color:var(--muted);font-size:.58rem">'+ac.missions+'</span>']);
-  document.getElementById('dGrid').innerHTML=rows.map(function(r){return '<div><div class="dlbl">'+r[0]+'</div><div class="dval">'+r[1]+'</div></div>';}).join('');
-  map.panTo([ac.lat,ac.lng]);
-}
-
-function getFiltered(){
-  var civ=allAircraft.filter(function(ac){return activeCounties.has(ac.county)&&activeTypes.has('civ');});
-  var gov=govFleet.filter(function(ac){return activeCounties.has(ac.county)&&activeTypes.has(ac.govColor);});
-  return civ.concat(gov);
-}
-
-function renderList(){
-  var civ=allAircraft.filter(function(a){return activeCounties.has(a.county)&&activeTypes.has('civ');});
-  var mil=govFleet.filter(function(a){return activeCounties.has(a.county)&&activeTypes.has('mil')&&a.govColor==='mil';});
-  var le=govFleet.filter(function(a){return activeCounties.has(a.county)&&activeTypes.has('le')&&a.govColor==='le';});
-  var fire=govFleet.filter(function(a){return activeCounties.has(a.county)&&activeTypes.has('fire')&&a.govColor==='fire';});
-  civ.sort(function(a,b){if(a.airborne&&!b.airborne)return -1;if(!a.airborne&&b.airborne)return 1;if(a.cat==='heli'&&b.cat!=='heli')return -1;return 0;});
-  function row(ac,badge,bcls,col){var s=selected&&selected.reg===ac.reg?' sel':'',air=ac.airborne?' air':'';return '<div class="aitem'+s+air+'" data-reg="'+ac.reg+'"><div><div class="areg" style="color:'+(col||'var(--white)')+'">'+ac.reg+'</div><div class="atype">'+ac.type+'</div><div class="aloc">'+(ac.airportName.length>22?ac.airportName.slice(0,22)+'…':ac.airportName)+'</div></div><span class="abadge '+bcls+'">'+badge+'</span></div>';}
-  var h='';
-  if(mil.length)h+='<div class="sdiv">● Military ('+mil.length+')</div>'+mil.map(function(a){return row(a,'MIL','bmil','#00e676');}).join('');
-  if(le.length)h+='<div class="sdiv">● Law Enforcement ('+le.length+')</div>'+le.map(function(a){return row(a,'LE','ble','#ff4444');}).join('');
-  if(fire.length)h+='<div class="sdiv">● Fire/EMS ('+fire.length+')</div>'+fire.map(function(a){return row(a,'FIRE','bfire','#ff4444');}).join('');
-  if(civ.length)h+='<div class="sdiv">● Civilian ('+civ.length+')</div>'+civ.map(function(a){return row(a,a.airborne?'AIR':'AVAIL',a.airborne?'bair':'bciv',null);}).join('');
-  document.getElementById('aList').innerHTML=h;
-  document.getElementById('aCount').textContent=(civ.length+mil.length+le.length+fire.length)+' aircraft';
-  document.querySelectorAll('.aitem').forEach(function(el){el.addEventListener('click',function(){var reg=el.getAttribute('data-reg'),ac=getFiltered().find(function(a){return a.reg===reg;});if(ac)selectAc(ac);});});
-}
-
-function updateStats(){
-  var all=getFiltered();
-  var air=all.filter(function(a){return a.airborne;}).length;
-  var liveCount=liveAircraft.length;
-  document.getElementById('sTot').textContent=all.length;
-  document.getElementById('sAir').textContent=liveCount; // real ADS-B count
-  document.getElementById('sAvail').textContent=all.length-air;
-}
-
-function renderCounties(){
-  document.getElementById('countyChips').innerHTML=COUNTIES.map(function(c){return '<button class="chip active" data-county="'+c+'">'+c.replace(' County','').slice(0,11)+'</button>';}).join('');
-  document.querySelectorAll('.chip').forEach(function(btn){btn.addEventListener('click',function(){var county=btn.getAttribute('data-county');activeCounties.has(county)?activeCounties.delete(county):activeCounties.add(county);btn.classList.toggle('active');renderList();placeMarkers();updateStats();});});
-}
-
-document.querySelectorAll('.pb').forEach(function(btn){btn.addEventListener('click',function(){document.getElementById('sceneInput').value=PRESETS[btn.getAttribute('data-preset')]||'';});});
-document.querySelectorAll('#typeFilter .tc').forEach(function(btn){btn.addEventListener('click',function(){var t=btn.getAttribute('data-type');activeTypes.has(t)?activeTypes.delete(t):activeTypes.add(t);btn.classList.toggle('on');renderList();placeMarkers();updateStats();});});
-
-// GENERATE PLAN
+// ── GENERATE PLAN ─────────────────────────────────────────────────────────
 function generatePlan(){
   if(!ANTHROPIC_API_KEY){showKeyModal();return;}
   var scenario=document.getElementById('sceneInput').value.trim();
   if(!scenario){alert('Please describe a disaster scenario.');return;}
   var btn=document.getElementById('genBtn');
-  btn.disabled=true;btn.textContent='Generating...';
-  document.getElementById('rStatus').textContent='Generating IAP...';
+  btn.disabled=true;btn.textContent='Generating IAP...';
+  document.getElementById('rStatus').textContent='Generating...';
   document.getElementById('rPh').style.display='none';
   var rc=document.getElementById('rContent');
   rc.style.display='block';
-  var avail=allAircraft.filter(function(a){return !a.airborne;});
-  var helis=avail.filter(function(a){return a.cat==='heli';});
-  var fixed=avail.filter(function(a){return a.cat==='fixed';});
+
+  // Build context
+  var civHelis=allAircraft.filter(function(a){return a.cat==='heli';});
+  var civFixed=allAircraft.filter(function(a){return a.cat==='fixed';});
   var mil=govFleet.filter(function(a){return a.govColor==='mil';});
   var le=govFleet.filter(function(a){return a.govColor==='le';});
   var fire=govFleet.filter(function(a){return a.govColor==='fire';});
-  rc.innerHTML='<div class="thinking"><div class="dots"><span></span><span></span><span></span></div><div class="ttxt">FENRAX-1 analyzing '+avail.length+' civilian + '+govFleet.length+' government assets...</div></div>';
 
-  // Build context
   var affectedCounties=Object.keys(COUNTY_EOP).filter(function(c){return scenario.toLowerCase().indexOf(c.toLowerCase().split(' ')[0])>=0;});
-  if(affectedCounties.length===0)affectedCounties=Object.keys(COUNTY_EOP);
-  // Limit EOP to 3 most relevant facts per county to keep prompt manageable
-  var eopCtx=affectedCounties.slice(0,3).map(function(c){var d=COUNTY_EOP[c];return c.toUpperCase()+' EOP: '+d.facts.split(' | ').slice(0,4).join(' | ');}).join('\n');
+  if(affectedCounties.length===0) affectedCounties=Object.keys(COUNTY_EOP);
+  var eopCtx=affectedCounties.map(function(c){var d=COUNTY_EOP[c];return c.toUpperCase()+' EOP:\n'+d.facts.split(' | ').slice(0,5).map(function(f){return '  - '+f;}).join('\n');}).join('\n\n');
 
-  var ctx='FENRAX-1 ASSET DATABASE (Real FAA + Government Aircraft, Apr 2026):\n'
-    +'Total: '+allAircraft.length+' civilian + '+govFleet.length+' government\n'
-    +'Available: '+avail.length+' civilian ('+helis.length+' heli, '+(avail.length-helis.length)+' fixed)\n'
-    +'Military: '+mil.length+' | Law Enforcement: '+le.length+' | Fire/EMS: '+fire.length+'\n\n'
-    +'CIVILIAN HELICOPTERS AVAILABLE (real FAA registrations):\n'
-    +helis.slice(0,12).map(function(h){return h.reg+': '+h.type+', '+h.pax+' pax, '+h.payload+', '+h.range+', '+h.airportName+' ('+h.county+')';}).join('\n')+'\n\n'
-    +'MILITARY ASSETS:\n'
-    +mil.map(function(a){return a.reg+': '+a.type+' ['+a.owner+'] '+a.pax+' pax, payload '+a.payload+', lift '+a.liftCap+', '+a.range;}).join('\n')+'\n\n'
-    +'LAW ENFORCEMENT:\n'
-    +le.map(function(a){return a.reg+': '+a.type+' ['+a.owner+'] '+a.pax+' pax, '+a.range;}).join('\n')+'\n\n'
-    +'FIRE/EMS:\n'
-    +fire.map(function(a){return a.reg+': '+a.type+' ['+a.owner+'] '+a.pax+' pax, '+a.payload;}).join('\n')+'\n\n'
-    +'WEATHER (KSFO): '+weatherData.temp+' Wind '+weatherData.dir+' @ '+weatherData.wind+' Vis '+weatherData.vis+' Ceil '+weatherData.ceil+' '+weatherData.rules+'\n\n'
-    +'COUNTY EMERGENCY OPERATIONS PLANS:\n'+eopCtx;
+  var lzList=LZ_CANDIDATES.filter(function(lz){
+    return affectedCounties.some(function(c){return lz.county===c;});
+  }).map(function(lz){return lz.name+' ('+lz.county+', '+lz.size+' site)';}).join(', ');
 
-  var prompt='You are FENRAX-1 generating a formal ICS Incident Action Plan (IAP).\n'
-    +'Use REAL N-numbers from the asset database. Follow ICS/SEMS format exactly. Do not truncate. Complete every section.\n\n'
+  var ctx='ASSET DATABASE (Real FAA April 2026):\n'
+    +'Civilian helicopters: '+civHelis.length+' | Fixed-wing: '+civFixed.length+' | Military: '+mil.length+' | LE: '+le.length+' | Fire/EMS: '+fire.length+'\n\n'
+    +'HELICOPTERS AVAILABLE (sample):\n'+civHelis.slice(0,10).map(function(h){return h.reg+': '+h.type+', '+h.pax+' pax, '+h.payload+', base '+h.airportName;}).join('\n')+'\n\n'
+    +'MILITARY:\n'+mil.map(function(a){return a.reg+': '+a.type+' ['+a.owner+'] '+a.pax+' pax, lift '+a.liftCap;}).join('\n')+'\n\n'
+    +'LAW ENFORCEMENT:\n'+le.map(function(a){return a.reg+': '+a.type+' ['+a.owner+'];';}).join('\n')+'\n\n'
+    +'FIRE/EMS:\n'+fire.map(function(a){return a.reg+': '+a.type+' ['+a.owner+'] '+a.pax+' pax;';}).join('\n')+'\n\n'
+    +'WEATHER KSFO: '+weatherData.temp+' Wind '+weatherData.dir+' @ '+weatherData.wind+' Vis '+weatherData.vis+' Ceil '+weatherData.ceil+' Rules: '+weatherData.rules+'\n\n'
+    +'AIRPORTS AVAILABLE: '+Object.keys(AIRPORTS).join(', ')+'\n\n'
+    +'HELICOPTER LZ CANDIDATES (open spaces): '+lzList+'\n\n'
+    +'HOSPITAL HELIPADS: '+HOSPITALS.map(function(h){return h.name+(h.trauma?' [L1 Trauma]':'');}).join(', ')+'\n\n'
+    +'COUNTY EOPs:\n'+eopCtx;
+
+  var prompt='You are FENRAX-1 generating a formal ICS Incident Action Plan (IAP) for Bay Area emergency aviation response.\n'
+    +'Use REAL N-numbers from the database. Be specific to THIS scenario. Complete every section fully. Do not truncate.\n\n'
     +'=== AVAILABLE ASSETS ===\n'+ctx+'\n\n'
     +'=== INCIDENT ===\n'+scenario+'\n\n'
-    +'Generate the complete IAP using these exact section headers:\n\n'
+    +'Generate a complete IAP using EXACTLY these section headers:\n\n'
     +'SECTION 1 — INCIDENT OVERVIEW\n'
-    +'Incident Name, Type, Operational Period H+0000 to H+1200, Incident Commander (County OES Director + EOC location from EOP), Aviation Branch Director, Primary and Secondary Objectives.\n\n'
+    +'Incident Name, Type, Operational Period H+0000-H+1200, Incident Commander (use real county EOC location), Primary and Secondary Objectives.\n\n'
     +'SECTION 2 — SITUATION ANALYSIS\n'
-    +'Specific affected areas with real SF Bay Area census population figures. Access status (roads/bridges). Weather flight impact. Why aerial assets are required.\n\n'
+    +'Specific affected areas with REAL SF Bay Area population figures. Access status. Weather flight impact. Why aerial assets are required.\n\n'
     +'SECTION 3 — AIRCRAFT ASSIGNMENTS\n'
-    +'List minimum 15 aircraft. For EACH use this exact format on separate lines:\n'
-    +'AIRCRAFT: [N-number]\nType: [model]\nOperator: [owner]\nBase: [ICAO]\nMission: [specific tasking]\nPassengers/Payload: [X pax or X lbs]\nFrequency: [freq]\nPriority: [CRITICAL/HIGH/STANDARD]\nDeparture: H+[XX]\n\n'
+    +'List minimum 15 aircraft. For EACH:\nAIRCRAFT: [N-number]\nType: [model]\nOperator: [owner]\nBase: [ICAO]\nMission: [specific mission]\nPassengers/Payload: [amount]\nFrequency: [freq]\nPriority: [CRITICAL/HIGH/STANDARD]\nDeparture: H+[XX]\n\n'
     +'SECTION 4 — PICKUP ZONES\n'
-    +'List all extraction points. For EACH:\n'
-    +'PZ-[N]: [Name]\nCoordinates: [lat/lon or cross streets]\nType: [helipad/open field/airport/parking]\nCapacity: [X simultaneous aircraft]\nPopulation served: [area and count]\nGround coordinator: [agency]\nStatus: [ACTIVE/STANDBY]\n\n'
+    +'Use the LZ candidates provided. For EACH:\nPZ-[N]: [LZ Name from the list above]\nCoordinates: [lat/lng]\nType: [open field/park/former airfield]\nCapacity: [X simultaneous helicopters]\nPopulation served: [area + count]\nGround coordinator: [agency]\nStatus: [ACTIVE/STANDBY]\n\n'
     +'SECTION 5 — AERIAL CORRIDORS\n'
-    +'CORRIDOR [A/B/C]: [Name]\nRoute: [ICAO] to [destination]\nAltitude: [X]ft AGL\nUsers: [aircraft types]\nFrequency: [freq]\n\n'
-    +'SECTION 6 — EVACUATION CAPACITY\n'
-    +'Show math: helicopters assigned x avg pax x sorties/hr = X pax/hr. Total evacuation rate. Target population. Projected completion time. Cargo tons per 12hr.\n\n'
-    +'SECTION 7 — EXECUTION TIMELINE\n'
+    +'Name 3-4 corridors. Format:\nCORRIDOR [A/B/C]: [Name]\nRoute: [ICAO origin] to [destination LZ]\nAltitude: [X]ft AGL\nUsers: [which aircraft]\nFrequency: [freq]\n\n'
+    +'SECTION 6 — STAGING AREAS\n'
+    +'List 2-3 airports being used as staging. Include fuel capacity, maintenance, crew rest.\n\n'
+    +'SECTION 7 — EVACUATION CAPACITY\n'
+    +'Show math: [N] helicopters x [pax] x [sorties/hr] = [X] pax/hr\nTotal rate, target population, completion time, cargo tons/12hr.\n\n'
+    +'SECTION 8 — EXECUTION TIMELINE\n'
     +'H+0000-0030: [actions]\nH+0030-0100: [actions]\nH+0100-0200: [actions]\nH+0200-0600: [actions]\nH+0600-1200: [actions]\nH+1200+: [escalation]\n\n'
-    +'SECTION 8 — LOGISTICS\n'
-    +'Fuel locations and capacity. Crew rotation schedule. Maintenance support.\n\n'
     +'SECTION 9 — COMMUNICATIONS\n'
-    +'Command freq, tactical aviation freq, ground coordination freq, hospital freq.\n\n'
-    +'SECTION 10 — FENRAX INTEGRATION VALUE\n'
-    +'Time to first launch with FENRAX vs ad-hoc (ref Operation Helo: 4 days). Lives saved delta. Quantify specifically.';
+    +'Command, tactical, ground, hospital frequencies. NOTAMs required.\n\n'
+    +'SECTION 10 — FENRAX VALUE\n'
+    +'Quantify: minutes to first launch with FENRAX vs hours ad-hoc. Reference Operation Helo 4-day mobilization. Lives saved delta.';
+
+  rc.innerHTML='<div class="thinking"><div class="dots"><span></span><span></span><span></span></div><div class="ttxt">FENRAX-1 analyzing '+allAircraft.length+' civilian and '+govFleet.length+' government assets...</div></div>';
 
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4000,messages:[{role:'user',content:prompt}]}),
-    signal:AbortSignal.timeout(45000)
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':ANTHROPIC_API_KEY,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:8000,messages:[{role:'user',content:prompt}]}),
+    signal:AbortSignal.timeout(90000)
   }).then(function(r){
-    if(!r.ok)return r.json().then(function(e){throw new Error(e.error&&e.error.message||'HTTP '+r.status);});
+    if(!r.ok)return r.json().then(function(e){throw new Error((e.error&&e.error.message)||'HTTP '+r.status);});
     return r.json();
   }).then(function(d){
     var text=d.content&&d.content[0]&&d.content[0].text||'No response.';
-    lastPlanData={scenario:scenario,planText:text,aircraft:avail,weather:weatherData};
+    var parsed=parsePlanForMap(text);
+    lastPlanData={scenario:scenario,planText:text,parsedPlan:parsed,aircraft:civHelis.concat(civFixed),weather:weatherData};
     renderPlan(text);
-    parseAndRenderCharts(text,avail,helis);
+    renderCharts(text,civHelis,govFleet);
     document.getElementById('openPlanBtn').style.display='block';
-    document.getElementById('rStatus').textContent='IAP generated '+new Date().toLocaleTimeString();
+    document.getElementById('rStatus').textContent='IAP ready '+new Date().toLocaleTimeString();
+    // Auto-draw on map
+    showPlan=true;
+    document.getElementById('btnPlan').classList.add('on');
+    document.getElementById('mapLegend').classList.add('visible');
+    drawPlanOnMap(parsed,scenario);
   }).catch(function(e){
-    var isKey=e.message.indexOf('invalid')>=0||e.message.indexOf('401')>=0;
-    var isCors=e.message.indexOf('Failed to fetch')>=0||e.message.indexOf('NetworkError')>=0;
-    rc.innerHTML='<div class="err-box"><div class="err-title">'+(isKey?'✗ INVALID KEY':isCors?'⚠ NETWORK ERROR':'✗ API ERROR')+'</div><div class="err-body">'
-      +(isKey?'<strong>API key rejected.</strong><br>Go to <span>console.anthropic.com</span> &rarr; API Keys, copy the full key starting with sk-ant-'
-        :isCors?'<strong>Network error.</strong> Check that you have credits at <span>console.anthropic.com</span><br>Raw: '+e.message
-        :'<strong>Error:</strong> '+e.message)
+    var isKey=e.message.indexOf('invalid')>=0||e.message.indexOf('401')>=0||e.message.indexOf('authentication')>=0;
+    rc.innerHTML='<div class="err-box"><div class="err-title">'+(isKey?'✗ INVALID API KEY':'✗ API ERROR')+'</div><div class="err-body">'
+      +(isKey?'<strong>Key rejected.</strong> Go to <code>console.anthropic.com</code> → API Keys and copy the full key beginning with <code>sk-ant-</code>'
+              :'<strong>Error:</strong> '+e.message)
       +'</div></div>';
-    document.getElementById('rStatus').textContent='Error';
-  }).finally(function(){btn.disabled=false;btn.textContent='Generate Response Plan';});
+    document.getElementById('rStatus').textContent='Error — check API key';
+  }).finally(function(){btn.disabled=false;btn.textContent='⧫ Generate Incident Action Plan';});
 }
 
-// RENDER PLAN
+// ── PARSE PLAN FOR MAP ────────────────────────────────────────────────────
+function parsePlanForMap(text){
+  var pzs=[], corridors=[], staging=[];
+  var lines=text.split('\n');
+  var inPZ=false, inCorr=false, inStaging=false;
+  var curPZ={};
+  lines.forEach(function(line){
+    var l=line.trim();
+    if(l.match(/SECTION\s+4/i)){inPZ=true;inCorr=false;inStaging=false;}
+    else if(l.match(/SECTION\s+5/i)){if(curPZ.name)pzs.push(curPZ);curPZ={};inPZ=false;inCorr=true;inStaging=false;}
+    else if(l.match(/SECTION\s+6/i)){inPZ=false;inCorr=false;inStaging=true;}
+    else if(l.match(/SECTION\s+[789]/i)){inPZ=false;inCorr=false;inStaging=false;}
+    if(inPZ){
+      var pzm=l.match(/^PZ-\d+:\s*(.+)/i);
+      if(pzm){if(curPZ.name)pzs.push(curPZ);curPZ={name:pzm[1].trim()};}
+    }
+    if(inCorr){
+      var rm=l.match(/^CORRIDOR\s+([A-Z])/i)||l.match(/^Route:\s*([A-Z]{4})/i);
+      if(rm){var routeM=l.match(/([A-Z]{4})\s*(?:to|→|-)\s*(.+)/i);if(routeM)corridors.push(routeM[1]+' '+routeM[2]);}
+      else if(l.match(/^Route:/i)){var rm2=l.match(/([A-Z]{4})/);if(rm2)corridors.push(rm2[1]+' '+l);}
+    }
+    if(inStaging){var am=l.match(/([A-Z]{3,4})\s*(?:airport|airfield|AFB|field)/i)||l.match(/\b(K[A-Z]{3})\b/);if(am)staging.push(am[1]);}
+  });
+  if(curPZ.name)pzs.push(curPZ);
+  return{pzs:pzs,corridors:corridors,staging:staging};
+}
+
+// ── RENDER PLAN ───────────────────────────────────────────────────────────
 function renderPlan(text){
   var rc=document.getElementById('rContent');
-  var parts=text.split(/(?=SECTION\s+\d+\s*[\u2014\-]+)/i);
-  var sColors={'1':'#00b4ff','2':'#00b4ff','3':'#00e676','4':'#ffaa00','5':'#00b4ff','6':'#00e676','7':'#ffaa00','8':'#00b4ff','9':'#00b4ff','10':'#00e676'};
-  var sIcons={'1':'◈','2':'◉','3':'✦','4':'⊕','5':'▶','6':'◎','7':'⏱','8':'◆','9':'★','10':'★'};
+  var parts=text.split(/(?=SECTION\s+\d+\s*[—\-])/i);
+  var sColors={'1':'#00b4ff','2':'#00b4ff','3':'#00e676','4':'#ffaa00','5':'#00b4ff','6':'#ffaa00','7':'#00e676','8':'#ffaa00','9':'#00b4ff','10':'#00e676'};
+  var sIcons={'1':'◈','2':'◉','3':'✦','4':'⊕','5':'▶','6':'◆','7':'⏱','8':'◆','9':'📡','10':'★'};
 
-  var header=parts[0]||'';
-  var headerHtml=header.trim()?'<div style="background:rgba(0,180,255,.06);border:1px solid rgba(0,180,255,.2);border-left:3px solid #00b4ff;padding:.75rem 1rem;margin-bottom:.75rem"><div style="font-size:.52rem;letter-spacing:.18em;color:#00b4ff;margin-bottom:.25rem">INCIDENT ACTION PLAN &mdash; FENRAX-1</div><div style="font-size:.66rem;color:rgba(200,232,255,.55);line-height:1.7">'+header.replace(/\n/g,'<br>').replace(/---+/g,'').trim()+'</div></div>':'';
+  var hdr=parts[0]||'';
+  var hdrHtml=hdr.trim()?'<div class="iap-hdr"><div class="iap-hdr-label">INCIDENT ACTION PLAN — FENRAX-1</div><div class="iap-hdr-txt">'+hdr.replace(/\n/g,'<br>').replace(/---+/g,'').trim()+'</div></div>':'';
 
-  var sectHtml=parts.slice(1).map(function(part){
-    var firstLine=part.split('\n')[0];
-    var numM=firstLine.match(/SECTION\s+(\d+)/i);
-    var num=numM?numM[1]:'?';
-    var titleM=firstLine.match(/[\u2014\-]+\s*(.+)/);
-    var title=titleM?titleM[1].trim():firstLine;
+  var secHtml=parts.slice(1).map(function(part){
+    var fl=part.split('\n')[0];
+    var nm=fl.match(/SECTION\s+(\d+)/i);var num=nm?nm[1]:'?';
+    var tm=fl.match(/[—\-]+\s*(.+)/);var title=tm?tm[1].trim():fl;
     var body=part.split('\n').slice(1).join('\n').trim();
-    var color=sColors[num]||'#00b4ff';
+    var col=sColors[num]||'#00b4ff';
     var icon=sIcons[num]||'·';
     var renderedBody;
-    if(num==='3'){renderedBody=renderAircraftBlock(body,color);}
-    else if(num==='4'){renderedBody=renderPZBlock(body,color);}
-    else if(num==='7'){renderedBody=renderTimelineBlock(body);}
-    else{renderedBody='<div style="font-size:.67rem;color:rgba(200,232,255,.55);line-height:1.85">'+body.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong style="color:#c8e8ff">$1</strong>').replace(/CRITICAL/g,'<span style="color:#ff4444;font-weight:600">CRITICAL</span>').replace(/\bHIGH\b/g,'<span style="color:#ffaa00;font-weight:600">HIGH</span>').replace(/STANDARD/g,'<span style="color:#00b4ff">STANDARD</span>').replace(/H\+([0-9:]+)/g,'<span style="color:#00b4ff;font-weight:500">H+$1</span>').replace(/•/g,'<span style="color:'+color+'">•</span>')+'</div>';}
-    return '<div style="margin-bottom:.8rem;padding-bottom:.8rem;border-bottom:1px solid rgba(0,180,255,.07)"><div style="font-size:.57rem;letter-spacing:.18em;color:'+color+';text-transform:uppercase;margin-bottom:.5rem;padding-bottom:.3rem;border-bottom:1px solid rgba(0,180,255,.1);display:flex;align-items:center;gap:.4rem"><span>'+icon+'</span><span>SECTION '+num+' — '+title+'</span></div>'+renderedBody+'</div>';
+    if(num==='3') renderedBody=renderAcBlock(body,col);
+    else if(num==='4') renderedBody=renderPZBlock(body,col);
+    else if(num==='8') renderedBody=renderTimelineBlock(body);
+    else renderedBody='<div class="iap-sec-body">'+body.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/CRITICAL/g,'<span style="color:#ff4444;font-weight:600">CRITICAL</span>').replace(/\bHIGH\b/g,'<span style="color:#ffaa00;font-weight:600">HIGH</span>').replace(/STANDARD/g,'<span style="color:#00b4ff">STANDARD</span>').replace(/H\+([0-9:]+)/g,'<span style="color:#00b4ff;font-weight:500">H+$1</span>').replace(/•/g,'<span style="color:'+col+'">•</span>')+'</div>';
+    return '<div class="iap-sec"><div class="iap-sec-title"><span>'+icon+'</span><span>SECTION '+num+' — '+title+'</span></div>'+renderedBody+'</div>';
   }).join('');
 
-  rc.innerHTML=headerHtml+sectHtml||(sectHtml||'<div style="font-size:.67rem;color:rgba(200,232,255,.5);line-height:1.85">'+text.replace(/\n/g,'<br>')+'</div>');
+  rc.innerHTML=hdrHtml+secHtml||(secHtml||'<div class="iap-sec-body">'+text.replace(/\n/g,'<br>')+'</div>');
 }
 
-function renderAircraftBlock(body,color){
+function renderAcBlock(body,col){
   var blocks=body.split(/(?=AIRCRAFT:)/i).filter(function(b){return b.trim();});
-  if(blocks.length<2)return '<div style="font-size:.67rem;color:rgba(200,232,255,.55);line-height:1.85">'+body.replace(/\n/g,'<br>')+'</div>';
-  var header='<div style="font-size:.58rem;color:rgba(200,232,255,.3);margin-bottom:.4rem">'+blocks.length+' AIRCRAFT ASSIGNED</div>';
-  var rows=blocks.map(function(block){
-    var lines=block.trim().split('\n');
+  if(blocks.length<2)return'<div class="iap-sec-body">'+body.replace(/\n/g,'<br>')+'</div>';
+  var hdr='<div style="font-size:.56rem;color:rgba(200,232,255,.3);margin-bottom:.35rem">'+blocks.length+' AIRCRAFT ASSIGNED</div>';
+  return hdr+blocks.map(function(block){
+    var lines=block.trim().split('\n'),f={};
     var reg=(lines[0].match(/AIRCRAFT:\s*(.+)/i)||[])[1]||'—';
-    var f={};
     lines.forEach(function(l){var m=l.match(/^([^:]+):\s*(.+)/);if(m)f[m[1].trim().toLowerCase()]=m[2].trim();});
     var pri=(f['priority']||'STANDARD').toUpperCase();
     var pc=pri==='CRITICAL'?'#ff4444':pri==='HIGH'?'#ffaa00':'#00b4ff';
-    return '<div style="background:rgba(0,0,0,.2);border:1px solid rgba(0,180,255,.1);border-left:2px solid '+color+';padding:.45rem .7rem;margin-bottom:.35rem;display:grid;grid-template-columns:75px 1fr auto;gap:.4rem;align-items:start">'
-      +'<div style="font-size:.7rem;font-weight:500;color:'+color+'">'+reg+'</div>'
-      +'<div><div style="font-size:.62rem;color:#c8e8ff">'+(f['type']||'')+'</div>'
-      +'<div style="font-size:.57rem;color:rgba(200,232,255,.4);margin-top:.1rem">'+(f['mission']||'')+'</div>'
-      +'<div style="font-size:.54rem;color:rgba(200,232,255,.25);margin-top:.08rem">'+(f['base']||'')+' · Dep '+(f['departure']||'—')+' · '+(f['passengers/payload']||f['payload']||'')+'</div></div>'
-      +'<div style="font-size:.53rem;color:'+pc+';border:1px solid '+pc+'44;padding:.1rem .3rem;height:fit-content;white-space:nowrap">'+pri+'</div>'
-      +'</div>';
+    return '<div class="ac-card"><div class="ac-reg" style="color:'+col+'">'+reg+'</div><div><div class="ac-type">'+(f['type']||'')+'</div><div class="ac-mission">'+(f['mission']||'')+'</div><div class="ac-detail">'+(f['base']||'')+' · Dep '+(f['departure']||'—')+' · '+(f['passengers/payload']||f['payload']||'')+'</div></div><div class="pri-badge" style="color:'+pc+';border-color:'+pc+'55">'+pri+'</div></div>';
   }).join('');
-  return header+rows;
 }
 
-function renderPZBlock(body,color){
+function renderPZBlock(body,col){
   var zones=body.split(/(?=PZ-\d+:)/i).filter(function(b){return b.trim();});
-  if(zones.length<2)return '<div style="font-size:.67rem;color:rgba(200,232,255,.55);line-height:1.85">'+body.replace(/\n/g,'<br>')+'</div>';
+  if(zones.length<2)return'<div class="iap-sec-body">'+body.replace(/\n/g,'<br>')+'</div>';
   return zones.map(function(block){
-    var lines=block.trim().split('\n');
+    var lines=block.trim().split('\n'),f={};
     var hdr=lines[0];
-    var f={};
     lines.slice(1).forEach(function(l){var m=l.match(/^([^:]+):\s*(.+)/);if(m)f[m[1].trim().toLowerCase()]=m[2].trim();});
     var status=(f['status']||'STANDBY').toUpperCase();
     var sc=status==='ACTIVE'?'#00e676':'#ffaa00';
-    return '<div style="background:rgba(255,170,0,.03);border:1px solid rgba(255,170,0,.12);padding:.45rem .7rem;margin-bottom:.35rem">'
-      +'<div style="display:flex;justify-content:space-between;margin-bottom:.2rem">'
-      +'<span style="font-size:.67rem;font-weight:500;color:'+color+'">'+hdr.replace(/:.*/,'')+'</span>'
-      +'<span style="font-size:.56rem;color:'+sc+'">'+status+'</span>'
-      +'</div>'
-      +'<div style="font-size:.63rem;color:#c8e8ff;margin-bottom:.15rem">'+hdr.replace(/^PZ-\d+:/i,'').trim()+'</div>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.1rem .6rem">'
-      +Object.keys(f).slice(0,4).map(function(k){return '<div style="font-size:.54rem;color:rgba(200,232,255,.35)">'+k.toUpperCase()+': <span style="color:rgba(200,232,255,.65)">'+f[k]+'</span></div>';}).join('')
-      +'</div></div>';
+    return '<div class="pz-card"><div class="pz-hdr"><span class="pz-name">'+hdr.replace(/:.*/,'')+'</span><span class="pz-status" style="color:'+sc+'">'+status+'</span></div><div class="pz-body">'+hdr.replace(/^PZ-\d+:\s*/i,'').trim()+'</div><div class="pz-detail">'+Object.keys(f).slice(0,4).map(function(k){return'<div class="pz-item">'+k.toUpperCase()+': <span>'+f[k]+'</span></div>';}).join('')+'</div></div>';
   }).join('');
 }
 
 function renderTimelineBlock(body){
   var items=body.split('\n').filter(function(l){return l.match(/^H\+/i);});
-  if(items.length===0)return '<div style="font-size:.67rem;color:rgba(200,232,255,.55);line-height:1.85">'+body.replace(/\n/g,'<br>')+'</div>';
+  if(items.length===0)return'<div class="iap-sec-body">'+body.replace(/\n/g,'<br>')+'</div>';
   return items.map(function(item){
-    var m=item.match(/^(H\+[0-9:]+(?:[\u2014\-]+[0-9:]+)?)\s*[:\u2014\-]+\s*(.+)/i);
-    if(!m)return '<div style="font-size:.63rem;color:rgba(200,232,255,.35);margin-bottom:.2rem">'+item+'</div>';
-    return '<div style="display:grid;grid-template-columns:95px 1fr;gap:.5rem;margin-bottom:.4rem;align-items:start"><div style="font-size:.6rem;font-weight:500;color:#ffaa00">'+m[1]+'</div><div style="font-size:.63rem;color:rgba(200,232,255,.6);line-height:1.6">'+m[2]+'</div></div>';
+    var m=item.match(/^(H\+[0-9:]+(?:[—\-]+[0-9:]+)?)\s*[:\-—]+\s*(.+)/i);
+    if(!m)return'<div class="tl-body" style="margin-bottom:.2rem">'+item+'</div>';
+    return'<div class="tl-item"><div class="tl-time">'+m[1]+'</div><div class="tl-body">'+m[2]+'</div></div>';
   }).join('');
 }
 
-// CHARTS
-function parseAndRenderCharts(text,avail,helis){
+// ── CHARTS ────────────────────────────────────────────────────────────────
+function renderCharts(text,helis,gov){
   var evacMatch=text.match(/(\d[\d,]+)\s*(?:persons?|people|evacuees?)\s*(?:\/|per)\s*hour/i);
-  var evacRate=evacMatch?parseInt(evacMatch[1].replace(/,/g,'')):Math.round(helis.length*6*2.5);
+  var rate=evacMatch?parseInt(evacMatch[1].replace(/,/g,'')):Math.round(helis.length*5*2.5);
   var cargoMatch=text.match(/(\d[\d.]+)\s*tons?\s*(?:\/|per)\s*(?:12|twelve)/i);
-  var cargoTons=cargoMatch?parseFloat(cargoMatch[1]):Math.round(evacRate*0.03);
-  var missions={Evacuation:0,Medevac:0,Recon:0,Cargo:0,Fire:0,Coordination:0};
-  text.split('\n').forEach(function(line){
-    var l=line.toUpperCase();
-    if(!(l.match(/^[A-Z0-9\-]+:/)&&l.length<120))return;
-    if(l.indexOf('EVAC')>=0||l.indexOf('TRANSPORT')>=0)missions.Evacuation++;
-    else if(l.indexOf('MEDEVAC')>=0||l.indexOf('MEDICAL')>=0)missions.Medevac++;
-    else if(l.indexOf('RECON')>=0||l.indexOf('SURVEY')>=0)missions.Recon++;
-    else if(l.indexOf('CARGO')>=0||l.indexOf('SUPPLY')>=0)missions.Cargo++;
-    else if(l.indexOf('FIRE')>=0||l.indexOf('WATER')>=0)missions.Fire++;
-    else if(l.indexOf('COORD')>=0||l.indexOf('COMMAND')>=0)missions.Coordination++;
-    else if(l.indexOf('AIRCRAFT:')>=0)missions.Evacuation++;
+  var cargo=cargoMatch?parseFloat(cargoMatch[1]):Math.round(rate*0.03);
+  var acMatch=text.match(/(\d+)\s*aircraft\s*assigned/i);
+  var acCount=acMatch?parseInt(acMatch[1]):15;
+  var timeMatch=text.match(/(\d+)\s*hours?\s*(?:to complete|completion|estimated)/i);
+  var compTime=timeMatch?parseInt(timeMatch[1]):Math.round(120000/Math.max(rate,100));
+
+  document.getElementById('csEvac').textContent=rate.toLocaleString();
+  document.getElementById('csCargo').textContent=cargo.toFixed(0);
+  document.getElementById('csAcft').textContent=acCount;
+  document.getElementById('csTime').textContent=Math.min(compTime,72);
+  document.getElementById('chartsStrip').classList.add('visible');
+
+  // Parse missions
+  var ms={Evacuation:0,Medevac:0,Recon:0,Cargo:0,Fire:0,LE:0};
+  text.split('\n').forEach(function(l){
+    if(!l.match(/^(?:AIRCRAFT|[A-Z0-9\-]+):/))return;
+    var u=l.toUpperCase();
+    if(u.indexOf('EVAC')>=0||u.indexOf('TRANSPORT')>=0)ms.Evacuation++;
+    else if(u.indexOf('MEDEVAC')>=0||u.indexOf('MEDICAL')>=0)ms.Medevac++;
+    else if(u.indexOf('RECON')>=0||u.indexOf('SURVEY')>=0)ms.Recon++;
+    else if(u.indexOf('CARGO')>=0||u.indexOf('SUPPLY')>=0)ms.Cargo++;
+    else if(u.indexOf('FIRE')>=0||u.indexOf('WATER')>=0)ms.Fire++;
+    else if(u.indexOf('LAW')>=0||u.indexOf('POLICE')>=0)ms.LE++;
   });
-  if(Object.values(missions).reduce(function(a,b){return a+b;},0)===0)missions={Evacuation:8,Medevac:3,Recon:2,Cargo:3,Fire:1,Coordination:1};
-  var rate=evacRate,ramp=[0.3,0.6,0.9,1.0,1.0,1.0,1.0,.95,.9,.85,.8,.75],cum=[],run=0;
+  if(Object.values(ms).reduce(function(a,b){return a+b;},0)===0) ms={Evacuation:8,Medevac:3,Recon:2,Cargo:3,Fire:1,LE:1};
+
+  var ramp=[.3,.6,.9,1,1,1,1,.95,.9,.85,.8,.75],cum=[],run=0;
   ramp.forEach(function(f){run+=Math.round(rate*f);cum.push(run);});
-  document.getElementById('chartsPanel').classList.add('visible');
-  document.getElementById('chartsTs').textContent=new Date().toLocaleTimeString();
-  document.getElementById('cEvac').textContent=evacRate.toLocaleString();
-  document.getElementById('cCargo').textContent=cargoTons.toFixed(0);
+
   if(chartMInst){chartMInst.destroy();chartMInst=null;}
   if(chartTInst){chartTInst.destroy();chartTInst=null;}
-  Chart.defaults.color='rgba(200,232,255,.5)';
-  Chart.defaults.font={family:'DM Mono',size:9};
-  var activeM=Object.keys(missions).filter(function(k){return missions[k]>0;});
-  chartMInst=new Chart(document.getElementById('chartM').getContext('2d'),{type:'doughnut',data:{labels:activeM,datasets:[{data:activeM.map(function(k){return missions[k];}),backgroundColor:['#00b4ff','#ff4444','#00e676','#ffaa00','#ff6b35','#9b59b6'],borderColor:'rgba(2,4,10,.8)',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'right',labels:{boxWidth:8,padding:5,font:{size:8}}},tooltip:{callbacks:{label:function(c){return c.label+': '+c.raw;}}}}}});
-  chartTInst=new Chart(document.getElementById('chartT').getContext('2d'),{type:'line',data:{labels:['H+1','H+2','H+3','H+4','H+5','H+6','H+7','H+8','H+9','H+10','H+11','H+12'],datasets:[{label:'Evacuees',data:cum,borderColor:'#00e676',backgroundColor:'rgba(0,230,118,.08)',borderWidth:1.5,fill:true,tension:.3,pointRadius:2,pointBackgroundColor:'#00e676'}]},options:{responsive:true,maintainAspectRatio:true,scales:{x:{grid:{color:'rgba(0,180,255,.06)'},ticks:{font:{size:8}}},y:{grid:{color:'rgba(0,180,255,.06)'},ticks:{font:{size:8},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw.toLocaleString()+' evacuated';}}}}}});
+  Chart.defaults.color='rgba(200,232,255,.45)';
+  Chart.defaults.font={family:'DM Mono',size:8};
+
+  var active=Object.keys(ms).filter(function(k){return ms[k]>0;});
+  chartMInst=new Chart(document.getElementById('chartM').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:active,datasets:[{data:active.map(function(k){return ms[k];}),backgroundColor:['#00b4ff','#ff4444','#00e676','#ffaa00','#ff6b35','#9b59b6'],borderColor:'rgba(2,4,10,.8)',borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'right',labels:{boxWidth:7,padding:4,font:{size:8}}},tooltip:{callbacks:{label:function(c){return c.label+': '+c.raw;}}}}}
+  });
+  chartTInst=new Chart(document.getElementById('chartT').getContext('2d'),{
+    type:'line',
+    data:{labels:['H1','H2','H3','H4','H5','H6','H7','H8','H9','H10','H11','H12'],datasets:[{data:cum,borderColor:'#00e676',backgroundColor:'rgba(0,230,118,.07)',borderWidth:1.5,fill:true,tension:.3,pointRadius:2,pointBackgroundColor:'#00e676'}]},
+    options:{responsive:true,maintainAspectRatio:true,scales:{x:{grid:{color:'rgba(0,180,255,.05)'},ticks:{font:{size:8}}},y:{grid:{color:'rgba(0,180,255,.05)'},ticks:{font:{size:8},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw.toLocaleString()+' evacuated';}}}}}
+  });
 }
 
-// FULL PLAN
+// ── FULL PLAN PAGE ────────────────────────────────────────────────────────
 function openFullPlan(){
   if(!lastPlanData)return;
   var d=lastPlanData,w=window.open('','_blank');
-  var avail=d.aircraft,helis=avail.filter(function(a){return a.cat==='heli';});
   var now=new Date(),ds=now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),ts=now.toUTCString().match(/(\d+:\d+:\d+)/)[1]+' UTC';
+  var helis=d.aircraft.filter(function(a){return a.cat==='heli';});
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>FENRAX-1 IAP</title>'
     +'<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">'
-    +'<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#02040a;color:#c8e8ff;font-family:"DM Mono",monospace;padding:0}.page{max-width:960px;margin:0 auto;padding:2.5rem}'
-    +'.hdr{border-bottom:2px solid rgba(0,180,255,.15);padding-bottom:1.5rem;margin-bottom:2rem}'
-    +'.logo{font-size:.7rem;letter-spacing:.25em;color:#00b4ff;margin-bottom:.5rem}'
-    +'.title{font-family:"Inter",sans-serif;font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:.3rem}'
-    +'.sub{font-size:.68rem;color:rgba(200,232,255,.4);margin-bottom:.85rem}'
-    +'.scene{background:#050c14;border:1px solid rgba(255,170,0,.25);border-left:3px solid #ffaa00;padding:.75rem 1.1rem}'
-    +'.scene-lbl{font-size:.52rem;letter-spacing:.18em;color:#ffaa00;margin-bottom:.25rem}'
-    +'.scene-txt{font-size:.75rem;color:#fff;line-height:1.7;font-family:"Inter",sans-serif;font-weight:300}'
-    +'.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(0,180,255,.1);border:1px solid rgba(0,180,255,.1);margin:1.5rem 0}'
-    +'.mc{background:#050c14;padding:.6rem .9rem}.mc-lbl{font-size:.48rem;letter-spacing:.14em;color:rgba(200,232,255,.3);text-transform:uppercase}.mc-val{font-size:.8rem;font-weight:500;color:#00b4ff;margin-top:.2rem}'
-    +'.sec{margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(0,180,255,.08)}'
-    +'.sec-title{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:.75rem;padding-bottom:.35rem;border-bottom:1px solid rgba(0,180,255,.08)}'
-    +'.sec-body{font-size:.7rem;color:rgba(200,232,255,.55);line-height:1.9}'
-    +'.sec-body strong{color:#fff;font-weight:500}'
-    +'.footer{margin-top:2.5rem;padding-top:1.2rem;border-top:1px solid rgba(0,180,255,.1);display:flex;justify-content:space-between;font-size:.56rem;color:rgba(200,232,255,.25)}'
-    +'@media print{body{background:#fff;color:#000}.page{max-width:100%}}</style>'
+    +'<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#02040a;color:#c8e8ff;font-family:"DM Mono",monospace}.page{max-width:960px;margin:0 auto;padding:2.5rem}.hdr{border-bottom:2px solid rgba(0,180,255,.12);padding-bottom:1.5rem;margin-bottom:2rem}.logo{font-size:.68rem;letter-spacing:.25em;color:#00b4ff;margin-bottom:.5rem}.doctitle{font-family:"Inter",sans-serif;font-size:1.75rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:.3rem}.sub{font-size:.65rem;color:rgba(200,232,255,.35);margin-bottom:.85rem}.scene{background:#050c14;border:1px solid rgba(255,170,0,.2);border-left:3px solid #ffaa00;padding:.75rem 1.1rem}.scene-lbl{font-size:.5rem;letter-spacing:.2em;color:#ffaa00;margin-bottom:.25rem}.scene-txt{font-size:.73rem;color:#fff;line-height:1.7;font-family:"Inter",sans-serif;font-weight:300}.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(0,180,255,.08);border:1px solid rgba(0,180,255,.08);margin:1.5rem 0}.mc{background:#050c14;padding:.55rem .85rem}.mc-lbl{font-size:.48rem;letter-spacing:.13em;color:rgba(200,232,255,.3);text-transform:uppercase}.mc-val{font-size:.78rem;font-weight:500;color:#00b4ff;margin-top:.15rem}.body{font-size:.68rem;color:rgba(200,232,255,.5);line-height:1.95}.body strong{color:#fff;font-weight:500}.footer{margin-top:2.5rem;padding-top:1.2rem;border-top:1px solid rgba(0,180,255,.08);display:flex;justify-content:space-between;font-size:.55rem;color:rgba(200,232,255,.2)}@media print{body{background:#fff;color:#000}.page{max-width:100%}}</style>'
     +'</head><body><div class="page">'
-    +'<div class="hdr"><div class="logo">FENRAX-1 // SF BAY AREA AVIATION ASSET RESPONSE SYSTEM</div>'
-    +'<div class="title">Incident Action Plan</div>'
-    +'<div class="sub">Generated '+ds+' &nbsp;&middot;&nbsp; '+ts+' &nbsp;&middot;&nbsp; Real FAA aircraft data &nbsp;&middot;&nbsp; County EOP integrated</div>'
-    +'<div class="scene"><div class="scene-lbl">Scenario</div><div class="scene-txt">'+d.scenario+'</div></div></div>'
-    +'<div class="meta">'
-    +'<div class="mc"><div class="mc-lbl">Weather</div><div class="mc-val">'+(d.weather.rules||'VFR')+'</div></div>'
-    +'<div class="mc"><div class="mc-lbl">Wind</div><div class="mc-val" style="color:#ffaa00">'+(d.weather.dir||'—')+' @ '+(d.weather.wind||'—')+'</div></div>'
-    +'<div class="mc"><div class="mc-lbl">Helis Available</div><div class="mc-val" style="color:#00e676">'+helis.length+'</div></div>'
-    +'<div class="mc"><div class="mc-lbl">Total Assets</div><div class="mc-val">'+avail.length+'</div></div>'
-    +'</div>'
-    +'<div class="sec"><div class="sec-body" style="font-size:.7rem;line-height:1.9">'+d.planText.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/SECTION\s+(\d+)\s*[\u2014\-]+\s*/gi,'<br><strong style="color:#00b4ff;letter-spacing:.15em">SECTION $1 &mdash; </strong>')+'</div></div>'
-    +'<div class="footer"><div>FENRAX-1 &middot; fenrax.com &middot; Community Disaster Response, AI Aggregated</div><div>For emergency planning use only</div></div>'
+    +'<div class="hdr"><div class="logo">FENRAX-1 // SF BAY AREA AVIATION ASSET RESPONSE SYSTEM</div><div class="doctitle">Incident Action Plan</div><div class="sub">Generated '+ds+' &nbsp;·&nbsp; '+ts+' &nbsp;·&nbsp; Real FAA aircraft data &nbsp;·&nbsp; County EOP integrated</div><div class="scene"><div class="scene-lbl">Scenario</div><div class="scene-txt">'+d.scenario+'</div></div></div>'
+    +'<div class="meta"><div class="mc"><div class="mc-lbl">Weather</div><div class="mc-val">'+(d.weather.rules||'VFR')+'</div></div><div class="mc"><div class="mc-lbl">Wind</div><div class="mc-val" style="color:#ffaa00">'+(d.weather.dir||'—')+' @ '+(d.weather.wind||'—')+'</div></div><div class="mc"><div class="mc-lbl">Helis Available</div><div class="mc-val" style="color:#00e676">'+helis.length+'</div></div><div class="mc"><div class="mc-lbl">Total Assets</div><div class="mc-val">'+(allAircraft.length+govFleet.length)+'</div></div></div>'
+    +'<div class="body">'+d.planText.replace(/\n/g,'<br>').replace(/SECTION\s+(\d+)\s*[—\-]+\s*/gi,'<br><br><strong style="color:#00b4ff;letter-spacing:.15em;font-size:.72rem">SECTION $1 — </strong>')+'</div>'
+    +'<div class="footer"><div>FENRAX-1 · fenrax.com · Community Disaster Response, AI Aggregated</div><div>For emergency planning use only</div></div>'
     +'</div></body></html>');
   w.document.close();
 }
 
-// INIT
+// ── PRESET BUTTONS ────────────────────────────────────────────────────────
+document.querySelectorAll('.pb').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.getElementById('sceneInput').value=PRESETS[btn.getAttribute('data-p')]||'';
+  });
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────
 async function initialize(){
   var prog=document.getElementById('lProg'),sub=document.getElementById('lSub');
+
   sub.textContent='Initializing map...';prog.style.width='10%';
-  initMap();renderCounties();
-  await new Promise(function(r){setTimeout(r,200);});
+  initMap();
+  await new Promise(function(r){setTimeout(r,100);});
+
   sub.textContent='Loading FAA aircraft registry...';prog.style.width='30%';
   allAircraft=genFleet();
   govFleet=buildGovFleet();
-  await new Promise(function(r){setTimeout(r,300);});
-  sub.textContent='Connecting to ADS-B...';prog.style.width='55%';
-  liveAircraft=await fetchLive();
-  // Registered fleet stays grounded at their airports
-  // Only real ADS-B data from OpenSky shows as airborne
-  // Match any registered aircraft to live ADS-B by callsign
-  liveAircraft.forEach(function(la) {
-    if (!la.call) return;
-    var match = allAircraft.find(function(ac) {
-      return ac.reg === la.call || ac.reg === 'N'+la.call.replace(/^N/,'');
-    });
-    if (match) {
-      match.airborne = true;
-      match.lat = la.lat;
-      match.lng = la.lng;
-      match.alt = la.alt;
-    }
-  });
   await new Promise(function(r){setTimeout(r,200);});
-  sub.textContent='Fetching weather...';prog.style.width='75%';
+
+  sub.textContent='Fetching weather data...';prog.style.width='55%';
   weatherData=await fetchWx();
-  var rc2=weatherData.rules,col2=rc2==='VFR'?'#00ff88':rc2==='MVFR'?'#00b4ff':rc2==='IFR'?'#ffaa00':'#ff4444';
-  document.getElementById('wbar').innerHTML='<span style="color:var(--blue);letter-spacing:.14em">KSFO</span><span class="wv">'+weatherData.temp+'</span><span>Wind <span class="wv">'+weatherData.dir+' @ '+weatherData.wind+'</span></span><span>Vis <span class="wv">'+weatherData.vis+'</span></span><span>Ceil <span class="wv">'+weatherData.ceil+'</span></span><span style="color:'+col2+';font-weight:500">'+rc2+'</span><span style="color:var(--faint)">'+weatherData.cond+'</span>';
-  prog.style.width='90%';sub.textContent='Building asset registry...';
-  renderList();updateStats();placeMarkers();placeAirportMarkers();
+  var col=weatherData.rules==='VFR'?'#00ff88':weatherData.rules==='MVFR'?'#00b4ff':weatherData.rules==='IFR'?'#ffaa00':'#ff4444';
+  document.getElementById('wbar').innerHTML='<span style="color:var(--blue);letter-spacing:.14em;font-size:.57rem">KSFO</span><span class="wv">'+weatherData.temp+'</span><span>Wind <span class="wv">'+weatherData.dir+' @ '+weatherData.wind+'</span></span><span>Vis <span class="wv">'+weatherData.vis+'</span></span><span>Ceil <span class="wv">'+weatherData.ceil+'</span></span><span style="color:'+col+';font-weight:500">'+weatherData.rules+'</span><span style="color:var(--faint)">'+weatherData.cond+'</span>';
+
+  sub.textContent='Building asset registry...';prog.style.width='80%';
+  renderAssetSummary();
+  drawHospitals();
+  drawAirports();
+
+  prog.style.width='100%';sub.textContent='Ready';
   await new Promise(function(r){setTimeout(r,200);});
-  prog.style.width='100%';
-  await new Promise(function(r){setTimeout(r,150);});
   document.getElementById('lOverlay').style.display='none';
-  setInterval(async function(){liveAircraft=await fetchLive();renderList();placeMarkers();},60000);
 }
 
 initialize();
