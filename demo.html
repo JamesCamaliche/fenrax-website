@@ -16,168 +16,202 @@
   --blue:#00b4ff;--green:#00e676;--red:#ff4444;--amber:#ffaa00;
   --white:#c8e8ff;--muted:rgba(200,232,255,.45);--faint:rgba(200,232,255,.15)
 }
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);font-family:"DM Mono",monospace;font-size:13px}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);font-family:"DM Mono",monospace}
 
 /* ── MODAL ── */
 #keyModal{position:fixed;inset:0;background:rgba(2,4,10,.97);z-index:9999;display:flex;align-items:center;justify-content:center}
 .kbox{background:var(--panel);border:1px solid var(--bb);padding:2rem;width:420px;max-width:92vw}
-.ktop{font-size:.58rem;letter-spacing:.22em;color:var(--blue);margin-bottom:.35rem;text-transform:uppercase}
-.ktitle{font-size:1.1rem;color:var(--white);margin-bottom:.5rem;font-weight:500;font-family:"Inter",sans-serif}
-.knote{font-size:.62rem;color:var(--muted);margin-bottom:1.1rem;line-height:1.75}
-#apiKeyInput{width:100%;background:var(--surface);border:1px solid rgba(0,180,255,.25);color:var(--white);font-family:inherit;font-size:.72rem;padding:.65rem .85rem;outline:none;display:block;margin-bottom:.4rem;letter-spacing:.02em}
+.ktop{font-size:.57rem;letter-spacing:.22em;color:var(--blue);margin-bottom:.3rem;text-transform:uppercase}
+.ktitle{font-size:1.05rem;color:var(--white);margin-bottom:.5rem;font-weight:500;font-family:"Inter",sans-serif}
+.knote{font-size:.61rem;color:var(--muted);margin-bottom:1rem;line-height:1.75}
+#apiKeyInput{width:100%;background:var(--surface);border:1px solid rgba(0,180,255,.25);color:var(--white);font-family:inherit;font-size:.7rem;padding:.6rem .8rem;outline:none;display:block;margin-bottom:.4rem}
 #apiKeyInput:focus{border-color:var(--blue)}
-#keyStatus{font-size:.6rem;margin-bottom:.75rem;min-height:1.1rem}
+#keyStatus{font-size:.58rem;margin-bottom:.7rem;min-height:1rem}
 .kbtns{display:flex;gap:.5rem}
-#saveKeyBtn{flex:1;background:var(--blue);color:#02040a;font-family:inherit;font-size:.7rem;font-weight:500;letter-spacing:.1em;border:none;padding:.65rem;cursor:pointer;text-transform:uppercase}
+#saveKeyBtn{flex:1;background:var(--blue);color:#02040a;font-family:inherit;font-size:.68rem;font-weight:500;letter-spacing:.1em;border:none;padding:.62rem;cursor:pointer;text-transform:uppercase}
 #saveKeyBtn:hover{background:#33c4ff}
-#cancelKeyBtn{background:transparent;color:var(--muted);font-family:inherit;font-size:.7rem;border:1px solid var(--border);padding:.65rem 1rem;cursor:pointer;display:none;text-transform:uppercase}
+#cancelKeyBtn{background:transparent;color:var(--muted);font-family:inherit;font-size:.68rem;border:1px solid var(--border);padding:.62rem .9rem;cursor:pointer;display:none;text-transform:uppercase}
 
-/* ── LAYOUT ── */
+/* ── APP SHELL ── */
 .app{display:grid;grid-template-rows:44px 1fr;height:100vh}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 1.1rem;border-bottom:1px solid var(--border);background:var(--panel);flex-shrink:0}
-.tl{display:flex;align-items:center;gap:.7rem}
-.tlogo{font-size:.82rem;font-weight:500;letter-spacing:.2em;color:var(--blue)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 1rem;border-bottom:1px solid var(--border);background:var(--panel);flex-shrink:0}
+.tl{display:flex;align-items:center;gap:.65rem}
+.tlogo{font-size:.8rem;font-weight:500;letter-spacing:.2em;color:var(--blue)}
 .tsep{color:rgba(0,180,255,.3)}
 .ttitle{font-size:.6rem;color:var(--muted)}
-.tr{display:flex;align-items:center;gap:.6rem}
-.topbtn{background:transparent;font-family:inherit;font-size:.58rem;letter-spacing:.1em;padding:.22rem .6rem;cursor:pointer;border:1px solid var(--bb);color:var(--muted);transition:all .15s;text-transform:uppercase}
+.tr{display:flex;align-items:center;gap:.55rem}
+.topbtn{background:transparent;font-family:inherit;font-size:.57rem;letter-spacing:.1em;padding:.2rem .58rem;cursor:pointer;border:1px solid var(--bb);color:var(--muted);transition:all .15s;text-transform:uppercase}
 .topbtn:hover{color:var(--blue);border-color:var(--blue)}
-.topbtn.keyset{color:var(--green);border-color:rgba(0,230,118,.4)}
-#clock{font-size:.58rem;color:var(--faint);letter-spacing:.08em}
+.topbtn.keyset{color:var(--green);border-color:rgba(0,230,118,.45)}
+#clock{font-size:.57rem;color:var(--faint);letter-spacing:.08em}
 
-/* ── THREE COLUMNS ── */
-.main{display:grid;grid-template-columns:260px 1fr 300px;height:calc(100vh - 44px);overflow:hidden}
+/* ── THREE-COLUMN MAIN ── */
+/* Left: 260px fixed | Center: flex grow | Right: 320px fixed */
+.main{display:grid;grid-template-columns:260px 1fr 320px;height:calc(100vh - 44px);overflow:hidden}
 
-/* ── LEFT: ASSET LIST ── */
-.lpanel{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+/* ══════════════════════════════════════════════════════
+   LEFT COLUMN — Aircraft Registry List
+══════════════════════════════════════════════════════ */
+.lcol{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
 .lhdr{padding:.6rem .85rem;border-bottom:1px solid var(--border);flex-shrink:0}
-.lhdr-title{font-size:.58rem;letter-spacing:.18em;color:var(--blue);text-transform:uppercase;margin-bottom:.1rem}
-.lhdr-sub{font-size:.52rem;color:var(--faint)}
-.lfilter{padding:.45rem .85rem;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;flex-wrap:wrap;gap:.25rem}
-.fc{font-size:.52rem;padding:.14rem .38rem;border:1px solid var(--border);cursor:pointer;background:transparent;font-family:inherit;color:var(--muted);transition:all .15s;text-transform:uppercase}
-.fc:hover{border-color:var(--blue);color:var(--blue)}
+.lhdr-title{font-size:.57rem;letter-spacing:.18em;color:var(--blue);text-transform:uppercase;margin-bottom:.08rem}
+.lhdr-sub{font-size:.51rem;color:var(--faint)}
+.lfilter{padding:.42rem .85rem;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;flex-wrap:wrap;gap:.22rem}
+.fc{font-size:.51rem;padding:.13rem .36rem;border:1px solid var(--border);cursor:pointer;background:transparent;font-family:inherit;color:var(--muted);transition:all .12s;text-transform:uppercase;letter-spacing:.05em}
 .fc.on{border-color:var(--blue);color:var(--blue);background:rgba(0,180,255,.08)}
-.fc.mil.on{border-color:var(--green);color:var(--green);background:rgba(0,230,118,.08)}
-.fc.le.on{border-color:var(--red);color:var(--red);background:rgba(255,68,68,.08)}
-.fc.fire.on{border-color:var(--amber);color:var(--amber);background:rgba(255,170,0,.08)}
+.fc.mil.on{border-color:var(--green);color:var(--green);background:rgba(0,230,118,.07)}
+.fc.le.on{border-color:var(--red);color:var(--red);background:rgba(255,68,68,.07)}
+.fc.fire.on{border-color:var(--amber);color:var(--amber);background:rgba(255,170,0,.07)}
 .alist{flex:1;overflow-y:auto}
 .alist::-webkit-scrollbar{width:2px}
 .alist::-webkit-scrollbar-thumb{background:var(--bb)}
-.asec-hdr{padding:.28rem .85rem;font-size:.5rem;letter-spacing:.15em;color:var(--faint);background:rgba(0,0,0,.15);border-bottom:1px solid rgba(0,180,255,.04);text-transform:uppercase}
-.arow{display:grid;grid-template-columns:62px 1fr auto;gap:.3rem;padding:.38rem .85rem;border-bottom:1px solid rgba(0,180,255,.04);cursor:pointer;align-items:center;transition:background .1s}
-.arow:hover{background:rgba(0,180,255,.06)}
-.arow.sel{background:rgba(0,180,255,.12);border-left:2px solid var(--blue)}
-.ar-reg{font-size:.65rem;font-weight:500;color:var(--blue)}
-.ar-reg.mil{color:var(--green)}
-.ar-reg.le{color:var(--red)}
-.ar-reg.fire{color:var(--amber)}
-.ar-type{font-size:.55rem;color:var(--muted)}
-.ar-loc{font-size:.5rem;color:var(--faint)}
-.ar-badge{font-size:.48rem;letter-spacing:.06em;padding:.08rem .28rem;border:1px solid;height:fit-content;white-space:nowrap}
+.asec{padding:.25rem .85rem;font-size:.49rem;letter-spacing:.14em;color:var(--faint);background:rgba(0,0,0,.18);border-bottom:1px solid rgba(0,180,255,.04);text-transform:uppercase}
+.arow{display:grid;grid-template-columns:62px 1fr auto;gap:.28rem;padding:.36rem .85rem;border-bottom:1px solid rgba(0,180,255,.04);cursor:pointer;align-items:center;transition:background .1s}
+.arow:hover{background:rgba(0,180,255,.05)}
+.arow.sel{background:rgba(0,180,255,.11);border-left:2px solid var(--blue)}
+.ar-reg{font-size:.64rem;font-weight:500;color:var(--blue)}
+.ar-reg.mil{color:var(--green)}.ar-reg.le{color:var(--red)}.ar-reg.fire{color:var(--amber)}
+.ar-type{font-size:.54rem;color:var(--muted)}
+.ar-loc{font-size:.49rem;color:var(--faint)}
+.ar-badge{font-size:.47rem;letter-spacing:.05em;padding:.07rem .26rem;border:1px solid currentColor;height:fit-content;white-space:nowrap}
 .lfoot{flex-shrink:0;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr)}
-.lstat{padding:.45rem .3rem;text-align:center;border-right:1px solid var(--border)}
+.lstat{padding:.42rem .2rem;text-align:center;border-right:1px solid var(--border)}
 .lstat:last-child{border-right:none}
-.lstat-val{font-size:.85rem;font-weight:500;color:var(--blue);line-height:1}
-.lstat-val.g{color:var(--green)}.lstat-val.a{color:var(--amber)}.lstat-val.r{color:var(--red)}
-.lstat-lbl{font-size:.47rem;letter-spacing:.08em;color:var(--faint);margin-top:.1rem;text-transform:uppercase}
+.lstat-val{font-size:.82rem;font-weight:500;color:var(--blue);line-height:1}
+.lstat-val.g{color:var(--green)}.lstat-val.a{color:var(--amber)}
+.lstat-lbl{font-size:.46rem;letter-spacing:.07em;color:var(--faint);margin-top:.08rem;text-transform:uppercase}
 
-/* ── CENTER: INPUT + PLAN ── */
-.cpanel{display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)}
-.cinput{padding:.75rem .9rem;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--panel)}
-.cinput-lbl{font-size:.55rem;letter-spacing:.16em;color:var(--blue);text-transform:uppercase;margin-bottom:.4rem}
-#sceneInput{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--white);font-family:inherit;font-size:.67rem;padding:.55rem .7rem;resize:none;line-height:1.6;outline:none}
+/* ══════════════════════════════════════════════════════
+   CENTER COLUMN — Scenario Input + IAP Plan Output
+══════════════════════════════════════════════════════ */
+.ccol{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+/* input box */
+.cinput{background:var(--panel);border-bottom:1px solid var(--border);padding:.7rem .9rem;flex-shrink:0}
+.cinput-lbl{font-size:.54rem;letter-spacing:.16em;color:var(--blue);text-transform:uppercase;margin-bottom:.38rem}
+#sceneInput{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--white);font-family:inherit;font-size:.66rem;padding:.52rem .68rem;resize:none;line-height:1.6;outline:none}
 #sceneInput:focus{border-color:var(--blue)}
 #sceneInput::placeholder{color:var(--faint)}
-.presets{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.4rem}
-.pb{font-size:.52rem;letter-spacing:.05em;padding:.15rem .42rem;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:transparent;font-family:inherit;transition:all .15s}
-.pb:hover{border-color:var(--blue);color:var(--blue);background:rgba(0,180,255,.06)}
-#genBtn{width:100%;margin-top:.5rem;padding:.58rem;background:var(--blue);color:#02040a;font-family:inherit;font-size:.68rem;font-weight:500;letter-spacing:.12em;border:none;cursor:pointer;text-transform:uppercase;transition:background .15s}
+.presets{display:flex;flex-wrap:wrap;gap:.22rem;margin-top:.38rem}
+.pb{font-size:.51rem;letter-spacing:.04em;padding:.13rem .4rem;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:transparent;font-family:inherit;transition:all .12s}
+.pb:hover{border-color:var(--blue);color:var(--blue);background:rgba(0,180,255,.05)}
+#genBtn{width:100%;margin-top:.48rem;padding:.56rem;background:var(--blue);color:#02040a;font-family:inherit;font-size:.66rem;font-weight:500;letter-spacing:.12em;border:none;cursor:pointer;text-transform:uppercase;transition:background .15s}
 #genBtn:hover{background:#33c4ff}
 #genBtn:disabled{background:rgba(0,180,255,.2);color:var(--muted);cursor:not-allowed}
-/* charts strip */
-.ccharts{display:none;border-bottom:1px solid var(--border);padding:.6rem .9rem;flex-shrink:0;background:var(--panel)}
-.ccharts.visible{display:block}
-.cc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin-bottom:.5rem}
-.cc-stat{background:var(--surface);border:1px solid var(--border);padding:.38rem .3rem;text-align:center}
-.cc-val{font-size:1.05rem;font-weight:500;line-height:1;color:var(--green)}
-.cc-val.a{color:var(--amber)}.cc-val.b{color:var(--blue)}.cc-val.r{color:var(--red)}
-.cc-unit{font-size:.48rem;color:var(--muted);margin-top:.1rem}
-.cc-lbl{font-size:.46rem;letter-spacing:.07em;color:var(--faint);text-transform:uppercase;margin-top:.05rem}
-.cc-charts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
-.cc-chart{background:var(--surface);border:1px solid var(--border);padding:.4rem}
-.cc-chart-lbl{font-size:.48rem;letter-spacing:.1em;color:var(--faint);margin-bottom:.25rem;text-transform:uppercase}
-.cc-chart canvas{max-height:85px}
-/* plan output */
-.cplan-hdr{padding:.5rem .9rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--panel)}
-.cplan-title{font-size:.57rem;letter-spacing:.16em;color:var(--blue);text-transform:uppercase}
-.cplan-right{display:flex;align-items:center;gap:.5rem}
-#openPlanBtn{display:none;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:var(--green);font-family:inherit;font-size:.52rem;letter-spacing:.1em;padding:.16rem .48rem;cursor:pointer;text-transform:uppercase}
-#rStatus{font-size:.52rem;color:var(--muted)}
-.cplan-body{flex:1;overflow-y:auto;padding:.85rem .9rem;background:var(--bg)}
+/* plan header */
+.cplan-hdr{background:var(--panel);border-bottom:1px solid var(--border);padding:.45rem .9rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cplan-title{font-size:.56rem;letter-spacing:.16em;color:var(--blue);text-transform:uppercase}
+.cplan-r{display:flex;align-items:center;gap:.45rem}
+#openPlanBtn{display:none;background:rgba(0,230,118,.09);border:1px solid rgba(0,230,118,.3);color:var(--green);font-family:inherit;font-size:.51rem;letter-spacing:.1em;padding:.15rem .45rem;cursor:pointer;text-transform:uppercase}
+#rStatus{font-size:.51rem;color:var(--muted)}
+/* plan body */
+.cplan-body{flex:1;overflow-y:auto;padding:.8rem .9rem}
 .cplan-body::-webkit-scrollbar{width:2px}
 .cplan-body::-webkit-scrollbar-thumb{background:var(--bb)}
-.rph{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;opacity:.3}
-.rph-icon{font-size:2.5rem;color:var(--blue)}
-.rph-txt{font-size:.62rem;color:var(--muted);text-align:center;line-height:2}
+.rph{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7rem;opacity:.28}
+.rph-icon{font-size:2.2rem;color:var(--blue)}
+.rph-txt{font-size:.61rem;color:var(--muted);text-align:center;line-height:2}
 #rContent{display:none}
-.thinking{display:flex;align-items:center;gap:.65rem;padding:1.2rem 0}
+/* thinking animation */
+.thinking{display:flex;align-items:center;gap:.6rem;padding:1.1rem 0}
 .dots span{display:inline-block;width:4px;height:4px;background:var(--blue);border-radius:50%;animation:pulse 1.2s ease-in-out infinite;margin:0 2px}
 .dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
 @keyframes pulse{0%,60%,100%{transform:scale(1);opacity:.25}30%{transform:scale(1.5);opacity:1}}
-.ttxt{font-size:.62rem;color:var(--muted);line-height:1.6}
-/* IAP rendering */
-.iap-hdr-box{background:rgba(0,180,255,.05);border:1px solid rgba(0,180,255,.18);border-left:3px solid var(--blue);padding:.65rem .85rem;margin-bottom:.75rem}
-.iap-hdr-lbl{font-size:.5rem;letter-spacing:.2em;color:var(--blue);margin-bottom:.2rem;text-transform:uppercase}
-.iap-hdr-txt{font-size:.63rem;color:rgba(200,232,255,.5);line-height:1.7}
-.iap-sec{margin-bottom:.8rem;padding-bottom:.8rem;border-bottom:1px solid rgba(0,180,255,.07)}
-.iap-sec:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.iap-sec-hdr{font-size:.54rem;letter-spacing:.17em;color:var(--blue);text-transform:uppercase;margin-bottom:.45rem;display:flex;align-items:center;gap:.35rem;padding-bottom:.3rem;border-bottom:1px solid rgba(0,180,255,.08)}
-.iap-body{font-size:.64rem;color:rgba(200,232,255,.52);line-height:1.85}
-.iap-body strong{color:var(--white);font-weight:500}
-.ac-card{background:rgba(0,0,0,.2);border:1px solid rgba(0,180,255,.1);border-left:2px solid var(--green);padding:.4rem .65rem;margin-bottom:.3rem;display:grid;grid-template-columns:68px 1fr auto;gap:.4rem;align-items:start}
-.ac-reg{font-size:.67rem;font-weight:500;color:var(--green)}
-.ac-type{font-size:.6rem;color:#c8e8ff}
-.ac-mission{font-size:.55rem;color:rgba(200,232,255,.4);margin-top:.08rem}
-.ac-meta{font-size:.51rem;color:rgba(200,232,255,.25);margin-top:.06rem}
-.pri{font-size:.49rem;padding:.09rem .28rem;border:1px solid;height:fit-content;white-space:nowrap}
-.pz-card{background:rgba(255,170,0,.03);border:1px solid rgba(255,170,0,.13);padding:.4rem .65rem;margin-bottom:.3rem}
-.pz-top{display:flex;justify-content:space-between;margin-bottom:.18rem}
-.pz-name{font-size:.64rem;font-weight:500;color:var(--amber)}
-.pz-stat{font-size:.52rem}
-.pz-loc{font-size:.6rem;color:#c8e8ff;margin-bottom:.12rem}
-.pz-grid{display:grid;grid-template-columns:1fr 1fr;gap:.08rem .5rem}
-.pz-field{font-size:.52rem;color:rgba(200,232,255,.35)}
-.pz-field span{color:rgba(200,232,255,.6)}
-.tl-row{display:grid;grid-template-columns:100px 1fr;gap:.5rem;margin-bottom:.4rem;align-items:start}
-.tl-time{font-size:.6rem;font-weight:500;color:var(--amber);font-family:"DM Mono",monospace}
-.tl-body{font-size:.63rem;color:rgba(200,232,255,.55);line-height:1.6}
-.err-box{border:1px solid rgba(255,68,68,.25);padding:.85rem;background:rgba(255,68,68,.04)}
-.err-title{color:var(--red);font-size:.6rem;letter-spacing:.12em;margin-bottom:.45rem;text-transform:uppercase}
-.err-body{font-size:.62rem;color:var(--muted);line-height:1.85}
+.ttxt{font-size:.61rem;color:var(--muted);line-height:1.65}
+/* error */
+.err-box{border:1px solid rgba(255,68,68,.25);padding:.8rem;background:rgba(255,68,68,.04)}
+.err-title{color:var(--red);font-size:.59rem;letter-spacing:.12em;margin-bottom:.42rem;text-transform:uppercase}
+.err-body{font-size:.61rem;color:var(--muted);line-height:1.85}
 .err-body strong{color:var(--white)}
 .err-body code{color:var(--blue)}
+/* IAP sections */
+.iap-hdr-box{background:rgba(0,180,255,.05);border:1px solid rgba(0,180,255,.18);border-left:3px solid var(--blue);padding:.62rem .82rem;margin-bottom:.7rem}
+.iap-hdr-lbl{font-size:.49rem;letter-spacing:.2em;color:var(--blue);margin-bottom:.18rem;text-transform:uppercase}
+.iap-hdr-txt{font-size:.62rem;color:rgba(200,232,255,.5);line-height:1.68}
+.iap-sec{margin-bottom:.72rem;padding-bottom:.72rem;border-bottom:1px solid rgba(0,180,255,.07)}
+.iap-sec:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.iap-sec-hdr{font-size:.53rem;letter-spacing:.17em;color:var(--blue);text-transform:uppercase;margin-bottom:.42rem;display:flex;align-items:center;gap:.33rem;padding-bottom:.28rem;border-bottom:1px solid rgba(0,180,255,.08)}
+.iap-body{font-size:.63rem;color:rgba(200,232,255,.52);line-height:1.88}
+.iap-body strong{color:var(--white);font-weight:500}
+/* Aircraft cards */
+.ac-card{background:rgba(0,0,0,.2);border:1px solid rgba(0,180,255,.09);border-left:2px solid var(--green);padding:.38rem .62rem;margin-bottom:.28rem;display:grid;grid-template-columns:66px 1fr auto;gap:.36rem;align-items:start}
+.ac-reg{font-size:.66rem;font-weight:500;color:var(--green)}
+.ac-type{font-size:.59rem;color:#c8e8ff}
+.ac-mission{font-size:.54rem;color:rgba(200,232,255,.4);margin-top:.07rem}
+.ac-meta{font-size:.5rem;color:rgba(200,232,255,.24);margin-top:.05rem}
+.pri{font-size:.48rem;padding:.08rem .26rem;border:1px solid currentColor;height:fit-content;white-space:nowrap}
+/* PZ cards */
+.pz-card{background:rgba(255,170,0,.03);border:1px solid rgba(255,170,0,.12);padding:.38rem .62rem;margin-bottom:.28rem}
+.pz-top{display:flex;justify-content:space-between;margin-bottom:.16rem}
+.pz-name{font-size:.63rem;font-weight:500;color:var(--amber)}
+.pz-stat-lbl{font-size:.51rem}
+.pz-loc{font-size:.59rem;color:#c8e8ff;margin-bottom:.1rem}
+.pz-grid{display:grid;grid-template-columns:1fr 1fr;gap:.07rem .48rem}
+.pz-field{font-size:.51rem;color:rgba(200,232,255,.34)}
+.pz-field span{color:rgba(200,232,255,.6)}
+/* Timeline */
+.tl-row{display:grid;grid-template-columns:95px 1fr;gap:.45rem;margin-bottom:.38rem;align-items:start}
+.tl-time{font-size:.59rem;font-weight:500;color:var(--amber)}
+.tl-body{font-size:.62rem;color:rgba(200,232,255,.54);line-height:1.6}
 
-/* ── RIGHT: MAP ── */
-.rpanel{display:flex;flex-direction:column;overflow:hidden;background:var(--panel)}
-.rmap-hdr{padding:.55rem .8rem;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
-.rmap-title{font-size:.57rem;letter-spacing:.16em;color:var(--blue);text-transform:uppercase}
-.rmap-btns{display:flex;gap:.3rem}
-.mbtn{font-size:.5rem;letter-spacing:.07em;padding:.14rem .38rem;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:transparent;font-family:inherit;transition:all .15s;text-transform:uppercase}
-.mbtn:hover,.mbtn.on{color:var(--blue);border-color:var(--blue);background:rgba(0,180,255,.07)}
-.rmap-wrap{flex:1;position:relative;min-height:0}
+/* ══════════════════════════════════════════════════════
+   RIGHT COLUMN — Map (top) + Data Panels (bottom)
+══════════════════════════════════════════════════════ */
+.rcol{display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border)}
+
+/* Map section — top ~45% of right col */
+.rmap{flex:0 0 48%;display:flex;flex-direction:column;border-bottom:1px solid var(--border);min-height:0}
+.rmap-hdr{padding:.5rem .78rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--panel)}
+.rmap-title{font-size:.55rem;letter-spacing:.16em;color:var(--blue);text-transform:uppercase}
+.rmap-btns{display:flex;gap:.28rem}
+.mbtn{font-size:.49rem;letter-spacing:.06em;padding:.13rem .35rem;border:1px solid var(--border);color:var(--muted);cursor:pointer;background:transparent;font-family:inherit;transition:all .12s;text-transform:uppercase}
+.mbtn:hover,.mbtn.on{color:var(--blue);border-color:var(--blue);background:rgba(0,180,255,.06)}
+.rmap-body{flex:1;position:relative;min-height:0}
 #map{width:100%;height:100%}
 .leaflet-control-attribution{display:none}
-.leaflet-tile-pane{filter:brightness(.22) saturate(.2) hue-rotate(190deg)}
-.map-btns{position:absolute;top:.5rem;right:.5rem;z-index:500;display:flex;flex-direction:column;gap:.3rem}
-.wbar{position:absolute;bottom:0;left:0;right:0;background:rgba(2,4,10,.88);border-top:1px solid var(--border);padding:.3rem .6rem;font-size:.52rem;letter-spacing:.07em;color:var(--muted);display:flex;gap:.7rem;flex-wrap:wrap;z-index:500}
+/* dark filter on map tiles */
+.leaflet-tile-pane{filter:brightness(.18) saturate(.15) hue-rotate(195deg)}
+.leaflet-control-zoom{margin:0 !important}
+.wbar{position:absolute;bottom:0;left:0;right:0;background:rgba(2,4,10,.88);border-top:1px solid var(--border);padding:.28rem .55rem;font-size:.5rem;letter-spacing:.06em;color:var(--muted);display:flex;gap:.65rem;flex-wrap:wrap;z-index:500;line-height:1.4}
 .wv{color:var(--white)}
-/* selected aircraft detail */
-.rdetail{flex-shrink:0;border-bottom:1px solid var(--border);display:none;padding:.55rem .8rem}
-.rdetail.on{display:block}
-.rd-reg{font-size:.72rem;font-weight:500;margin-bottom:.35rem}
-.rd-grid{display:grid;grid-template-columns:1fr 1fr;gap:.22rem .5rem}
-.rd-lbl{font-size:.48rem;letter-spacing:.1em;color:var(--faint);text-transform:uppercase}
-.rd-val{font-size:.6rem;color:var(--white);margin-top:.05rem}
+
+/* Data section — bottom ~55% of right col */
+.rdata{flex:1;overflow-y:auto;background:var(--bg);min-height:0}
+.rdata::-webkit-scrollbar{width:2px}
+.rdata::-webkit-scrollbar-thumb{background:var(--bb)}
+
+/* Stats grid — always visible */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
+.stat-box{background:var(--panel);padding:.55rem .7rem}
+.stat-val{font-size:1.15rem;font-weight:500;line-height:1;color:var(--blue)}
+.stat-val.g{color:var(--green)}.stat-val.a{color:var(--amber)}.stat-val.r{color:var(--red)}
+.stat-unit{font-size:.48rem;color:var(--muted);margin-top:.1rem}
+.stat-lbl{font-size:.46rem;letter-spacing:.08em;color:var(--faint);margin-top:.06rem;text-transform:uppercase}
+
+/* Selected aircraft detail */
+.sel-detail{border-bottom:1px solid var(--border);padding:.55rem .78rem;display:none;background:var(--panel)}
+.sel-detail.on{display:block}
+.sd-reg{font-size:.7rem;font-weight:500;margin-bottom:.32rem}
+.sd-grid{display:grid;grid-template-columns:1fr 1fr;gap:.2rem .45rem}
+.sd-lbl{font-size:.46rem;letter-spacing:.1em;color:var(--faint);text-transform:uppercase}
+.sd-val{font-size:.59rem;color:var(--white);margin-top:.04rem}
+
+/* Charts — appear after plan generation */
+.rcharts{display:none;padding:.65rem .78rem;border-bottom:1px solid var(--border)}
+.rcharts.visible{display:block}
+.rcharts-title{font-size:.52rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.45rem}
+.rchart-wrap{background:var(--surface);border:1px solid var(--border);padding:.42rem;margin-bottom:.42rem}
+.rchart-lbl{font-size:.47rem;letter-spacing:.1em;color:var(--faint);margin-bottom:.22rem;text-transform:uppercase}
+.rchart-wrap canvas{max-height:95px}
+
+/* County breakdown — always visible */
+.county-breakdown{padding:.65rem .78rem}
+.cb-title{font-size:.52rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.45rem}
+.cb-row{display:grid;grid-template-columns:72px 1fr 1fr;gap:.35rem;align-items:center;margin-bottom:.28rem}
+.cb-name{font-size:.52rem;color:var(--muted)}
+.cb-bar-wrap{position:relative}
+.cb-track{height:4px;background:rgba(0,180,255,.08);border-radius:2px;overflow:hidden}
+.cb-fill{height:100%;border-radius:2px}
+.cb-val{font-size:.49rem;color:var(--faint);text-align:right}
 </style>
 </head>
 <body>
@@ -187,7 +221,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
   <div class="kbox">
     <div class="ktop">FENRAX-1 // Configuration</div>
     <div class="ktitle">Anthropic API Key</div>
-    <div class="knote">Required to generate AI response plans.<br>Get one at <strong style="color:var(--blue)">console.anthropic.com</strong> &rarr; API Keys<br><br><em style="color:rgba(0,180,255,.45)">Running on fenrax.com — direct API calls enabled.</em></div>
+    <div class="knote">Required to generate AI response plans.<br>Get one at <strong style="color:var(--blue)">console.anthropic.com</strong> &rarr; API Keys<br><br><em style="color:rgba(0,180,255,.42)">Running on fenrax.com — direct API calls enabled.</em></div>
     <input id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
     <div id="keyStatus"></div>
     <div class="kbtns">
@@ -212,32 +246,34 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
 
   <div class="main">
 
-    <!-- LEFT: ASSET LIST -->
-    <div class="lpanel">
+    <!-- ── LEFT: AIRCRAFT LIST ── -->
+    <div class="lcol">
       <div class="lhdr">
         <div class="lhdr-title">Aviation Asset Registry</div>
         <div class="lhdr-sub">Real FAA data &middot; All 9 Bay Area counties</div>
       </div>
-      <div class="lfilter" id="lfilter">
+      <div class="lfilter">
         <button class="fc on" data-t="civ">Civilian</button>
         <button class="fc mil on" data-t="mil">Military</button>
         <button class="fc le on" data-t="le">Law Enf.</button>
         <button class="fc fire on" data-t="fire">Fire/EMS</button>
       </div>
-      <div class="alist" id="aList"></div>
+      <div class="alist" id="aList">
+        <div style="padding:.8rem;font-size:.58rem;color:var(--faint)">Loading registry...</div>
+      </div>
       <div class="lfoot">
         <div class="lstat"><div class="lstat-val" id="lTot">—</div><div class="lstat-lbl">Total</div></div>
         <div class="lstat"><div class="lstat-val g" id="lHeli">—</div><div class="lstat-lbl">Heli</div></div>
         <div class="lstat"><div class="lstat-val a" id="lGov">—</div><div class="lstat-lbl">Gov</div></div>
-        <div class="lstat"><div class="lstat-val b" id="lFixed">—</div><div class="lstat-lbl">Fixed</div></div>
+        <div class="lstat"><div class="lstat-val" id="lFixed">—</div><div class="lstat-lbl">Fixed</div></div>
       </div>
     </div>
 
-    <!-- CENTER: INPUT + PLAN -->
-    <div class="cpanel">
+    <!-- ── CENTER: SCENARIO INPUT + PLAN ── -->
+    <div class="ccol">
       <div class="cinput">
         <div class="cinput-lbl">Scenario Input</div>
-        <textarea id="sceneInput" rows="4" placeholder="Describe the emergency scenario in detail...&#10;&#10;e.g. 7.2 earthquake on Hayward Fault, Bay Bridge closed, Alameda Island isolated with 80,000 residents, Oakland Hills wildfire ignited, mass casualties"></textarea>
+        <textarea id="sceneInput" rows="4" placeholder="Describe the emergency scenario in detail...&#10;&#10;e.g. 7.2 earthquake on Hayward Fault, Bay Bridge closed, Alameda Island isolated with 80,000 residents, mass casualties, Oakland Hills wildfire ignited"></textarea>
         <div class="presets">
           <button class="pb" data-p="eq">&#9650; Earthquake</button>
           <button class="pb" data-p="wf">&#9670; Wildfire</button>
@@ -248,23 +284,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
         </div>
         <button id="genBtn" onclick="generatePlan()">&#9672; Generate Incident Action Plan</button>
       </div>
-
-      <div class="ccharts" id="ccharts">
-        <div class="cc-stats">
-          <div class="cc-stat"><div class="cc-val g" id="ccEvac">—</div><div class="cc-unit">pax / hr</div><div class="cc-lbl">Evac Rate</div></div>
-          <div class="cc-stat"><div class="cc-val a" id="ccCargo">—</div><div class="cc-unit">tons / 12hr</div><div class="cc-lbl">Cargo Cap.</div></div>
-          <div class="cc-stat"><div class="cc-val b" id="ccAcft">—</div><div class="cc-unit">aircraft</div><div class="cc-lbl">Assigned</div></div>
-          <div class="cc-stat"><div class="cc-val r" id="ccTime">—</div><div class="cc-unit">hours est.</div><div class="cc-lbl">Completion</div></div>
-        </div>
-        <div class="cc-charts">
-          <div class="cc-chart"><div class="cc-chart-lbl">Mission Breakdown</div><canvas id="chartM"></canvas></div>
-          <div class="cc-chart"><div class="cc-chart-lbl">Cumulative Evacuees (12hr)</div><canvas id="chartT"></canvas></div>
-        </div>
-      </div>
-
       <div class="cplan-hdr">
         <div class="cplan-title">Incident Action Plan</div>
-        <div class="cplan-right">
+        <div class="cplan-r">
           <button id="openPlanBtn" onclick="openFullPlan()">&#9654; Full Plan</button>
           <div id="rStatus">Awaiting scenario</div>
         </div>
@@ -272,29 +294,108 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
       <div class="cplan-body">
         <div class="rph" id="rPh">
           <div class="rph-icon">&#9672;</div>
-          <div class="rph-txt">Enter a scenario above and generate a plan.<br>FENRAX-1 identifies available assets from the registry,<br>calculates capacity, and produces a full ICS/IAP document.<br>The response map updates automatically.</div>
+          <div class="rph-txt">Enter a scenario above and generate a plan.<br>FENRAX-1 draws on 578 registered FAA aircraft<br>across all 9 Bay Area counties plus government,<br>law enforcement, and fire assets.<br><br>The response map and data panels update automatically.</div>
         </div>
         <div id="rContent"></div>
       </div>
     </div>
 
-    <!-- RIGHT: MAP -->
-    <div class="rpanel">
-      <div class="rmap-hdr">
-        <div class="rmap-title">Response Map</div>
-        <div class="rmap-btns">
-          <button class="mbtn on" id="btnSat" onclick="toggleSat()">Satellite</button>
-          <button class="mbtn on" id="btnHosp" onclick="toggleLayer('hosp')">Hospitals</button>
-          <button class="mbtn on" id="btnApt" onclick="toggleLayer('apt')">Airports</button>
+    <!-- ── RIGHT: MAP (top) + DATA (bottom) ── -->
+    <div class="rcol">
+
+      <!-- MAP — top half -->
+      <div class="rmap">
+        <div class="rmap-hdr">
+          <div class="rmap-title">Response Map</div>
+          <div class="rmap-btns">
+            <button class="mbtn on" id="btnSat" onclick="toggleSat()">SAT</button>
+            <button class="mbtn on" id="btnH" onclick="toggleLayer('h')">Hosp.</button>
+            <button class="mbtn on" id="btnA" onclick="toggleLayer('a')">Airports</button>
+          </div>
+        </div>
+        <div class="rmap-body">
+          <div id="map"></div>
+          <div class="wbar" id="wbar">
+            <span style="color:var(--blue);letter-spacing:.1em">KSFO</span>
+            <span>Loading weather...</span>
+          </div>
         </div>
       </div>
-      <div class="rdetail" id="rdetail">
-        <div class="rd-reg" id="rdReg"></div>
-        <div class="rd-grid" id="rdGrid"></div>
-      </div>
-      <div class="rmap-wrap">
-        <div id="map"></div>
-        <div class="wbar" id="wbar"><span style="color:var(--blue);letter-spacing:.12em">KSFO</span><span>Loading...</span></div>
+
+      <!-- DATA — bottom half -->
+      <div class="rdata">
+
+        <!-- Always-visible stats -->
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-val g" id="sHeli">147</div>
+            <div class="stat-unit">helicopters</div>
+            <div class="stat-lbl">Bay Area Registry</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val a" id="sGov">20</div>
+            <div class="stat-unit">gov / mil assets</div>
+            <div class="stat-lbl">Pre-Identified</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="sTot">598</div>
+            <div class="stat-unit">total aircraft</div>
+            <div class="stat-lbl">All 9 Counties</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="sFixed">450</div>
+            <div class="stat-unit">fixed-wing</div>
+            <div class="stat-lbl">Cargo & Support</div>
+          </div>
+        </div>
+
+        <!-- Selected aircraft detail -->
+        <div class="sel-detail" id="selDetail">
+          <div class="sd-reg" id="sdReg">—</div>
+          <div class="sd-grid" id="sdGrid"></div>
+        </div>
+
+        <!-- Charts — appear after plan generates -->
+        <div class="rcharts" id="rcharts">
+          <div class="rcharts-title">&#9672; Plan Analytics</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.42rem;margin-bottom:.42rem">
+            <div class="stat-box" style="background:var(--surface);border:1px solid var(--border)">
+              <div class="stat-val g" id="ccEvac">—</div>
+              <div class="stat-unit">persons / hour</div>
+              <div class="stat-lbl">Evac Rate</div>
+            </div>
+            <div class="stat-box" style="background:var(--surface);border:1px solid var(--border)">
+              <div class="stat-val a" id="ccCargo">—</div>
+              <div class="stat-unit">tons / 12 hrs</div>
+              <div class="stat-lbl">Cargo Cap.</div>
+            </div>
+            <div class="stat-box" style="background:var(--surface);border:1px solid var(--border)">
+              <div class="stat-val b" style="color:var(--blue)" id="ccAcft">—</div>
+              <div class="stat-unit">aircraft assigned</div>
+              <div class="stat-lbl">This Plan</div>
+            </div>
+            <div class="stat-box" style="background:var(--surface);border:1px solid var(--border)">
+              <div class="stat-val r" id="ccTime">—</div>
+              <div class="stat-unit">hours est.</div>
+              <div class="stat-lbl">Completion</div>
+            </div>
+          </div>
+          <div class="rchart-wrap">
+            <div class="rchart-lbl">Mission Breakdown</div>
+            <canvas id="chartM"></canvas>
+          </div>
+          <div class="rchart-wrap">
+            <div class="rchart-lbl">Cumulative Evacuees (12hr)</div>
+            <canvas id="chartT"></canvas>
+          </div>
+        </div>
+
+        <!-- County breakdown — always visible -->
+        <div class="county-breakdown" id="countyBreakdown">
+          <div class="cb-title">&#9670; Assets by County</div>
+          <div id="cbRows"></div>
+        </div>
+
       </div>
     </div>
 
@@ -934,8 +1035,8 @@ function buildGovFleet() {
 }
 
 
-// ── CONSTANTS ──────────────────────────────────────────────────────────────
-var AIRPORTS = {
+// ── AIRPORTS & HOSPITALS ──────────────────────────────────────────────────
+var AIRPORTS={
   KSFO:{lat:37.619,lng:-122.375,name:'SF International',county:'San Mateo'},
   KOAK:{lat:37.721,lng:-122.221,name:'Oakland Intl',county:'Alameda'},
   KSJC:{lat:37.362,lng:-121.929,name:'San Jose Intl',county:'Santa Clara'},
@@ -953,8 +1054,7 @@ var AIRPORTS = {
   KVCB:{lat:38.376,lng:-121.962,name:'Nut Tree',county:'Solano'},
   KRHV:{lat:37.333,lng:-121.819,name:'Reid-Hillview',county:'Santa Clara'}
 };
-
-var HOSPITALS = [
+var HOSPITALS=[
   {name:'UCSF Medical Center',lat:37.7631,lng:-122.4575,trauma:1,county:'San Francisco'},
   {name:'Zuckerberg SF General',lat:37.7554,lng:-122.4057,trauma:1,county:'San Francisco'},
   {name:'Kaiser Oakland Medical',lat:37.8044,lng:-122.2416,trauma:1,county:'Alameda'},
@@ -966,209 +1066,141 @@ var HOSPITALS = [
   {name:'St. Mary\'s SF',lat:37.7842,lng:-122.4381,trauma:0,county:'San Francisco'},
   {name:'UCSF Benioff Oakland',lat:37.8306,lng:-122.2561,trauma:0,county:'Alameda'}
 ];
-
-var PRESETS = {
+var PRESETS={
   eq:'7.2 magnitude earthquake on the Hayward Fault. Bay Bridge and San Mateo Bridge closed. Alameda Island isolated with 80,000 residents. Oakland Hills wildfire ignited. Roads severely damaged across East Bay. Mass casualties reported. Need immediate aerial evacuation, medevac, and reconnaissance.',
   wf:'Fast-moving wildfire in Sonoma hills driven by 45mph Diablo winds. 15,000 structures threatened. Highway 12 and 101 closed. 8,000 residents stranded. Cal Fire resources overwhelmed. Need helicopter water drops, aerial recon, and evacuation of mobility-impaired residents.',
-  fl:'Catastrophic flooding in South Bay from atmospheric river. Highway 101 submerged between San Jose and San Mateo. 20,000 residents stranded in Alviso and North San Jose lowlands. Water rising 2 inches per hour. Need aerial water rescue, medevac, and emergency supply drops.',
-  ts:'Cascadia subduction event. Tsunami warning active, 45 minutes to first wave. Marina District, Treasure Island, Alameda waterfront, Foster City require immediate mass aerial evacuation. Ground routes gridlocked. Every minute critical.',
-  br:'Bay Bridge catastrophic structural failure. Closed indefinitely. Ferry capacity overwhelmed. Medical personnel, emergency supplies, and critical infrastructure workers need aerial transport between East Bay and SF. 200,000 commuters affected.',
-  mc:'Multi-vehicle mass casualty incident on I-880 near Oakland Coliseum. 200+ casualties. Hospital system overwhelmed. Need aerial medevac coordination, supply distribution to triage sites, and medical personnel transport across all Bay Area trauma centers.'
+  fl:'Catastrophic flooding in South Bay. Highway 101 submerged between San Jose and San Mateo. 20,000 residents stranded in Alviso and North San Jose. Water rising 2 inches per hour. Need aerial water rescue, medevac, and emergency supply drops.',
+  ts:'Cascadia subduction event. Tsunami warning active, 45 minutes to first wave. Marina District, Treasure Island, Alameda waterfront, Foster City require immediate aerial mass evacuation. Ground routes gridlocked.',
+  br:'Bay Bridge catastrophic structural failure. Closed indefinitely. Ferry capacity overwhelmed. Medical personnel, emergency supplies, and critical workers need aerial transport between East Bay and SF.',
+  mc:'Multi-vehicle mass casualty on I-880 near Oakland. 200+ casualties. Hospital system overwhelmed. Need aerial medevac coordination, supply distribution to triage sites, and medical personnel transport across Bay Area trauma centers.'
 };
 
-// ── STATE ──────────────────────────────────────────────────────────────────
-var ANTHROPIC_API_KEY = sessionStorage.getItem('fnx_key') || '';
-var allAircraft = [], govFleet = [], weatherData = {};
-var activeTypes = new Set(['civ','mil','le','fire']);
-var selected = null;
-var map, useSat = true;
-var hospLayers = [], aptLayers = [], planLayers = [];
-var showHosp = true, showApt = true;
-var chartMInst = null, chartTInst = null, lastPlanData = null;
+// ── STATE ─────────────────────────────────────────────────────────────────
+var ANTHROPIC_API_KEY=sessionStorage.getItem('fnx_key')||'';
+var allAircraft=[],govFleet=[],weatherData={};
+var activeTypes=new Set(['civ','mil','le','fire']);
+var selected=null,map,useSat=true;
+var hospLayers=[],aptLayers=[],planLayers=[];
+var showH=true,showA=true;
+var chartMInst=null,chartTInst=null,lastPlanData=null;
 
-// ── CLOCK ──────────────────────────────────────────────────────────────────
-function tick(){
-  var n=new Date();
-  document.getElementById('clock').textContent=
-    String(n.getUTCHours()).padStart(2,'0')+':'+
-    String(n.getUTCMinutes()).padStart(2,'0')+':'+
-    String(n.getUTCSeconds()).padStart(2,'0')+' UTC';
-}
-setInterval(tick,1000); tick();
+// ── CLOCK ─────────────────────────────────────────────────────────────────
+function tick(){var n=new Date();document.getElementById('clock').textContent=String(n.getUTCHours()).padStart(2,'0')+':'+String(n.getUTCMinutes()).padStart(2,'0')+':'+String(n.getUTCSeconds()).padStart(2,'0')+' UTC';}
+setInterval(tick,1000);tick();
 
-// ── API KEY ────────────────────────────────────────────────────────────────
-if(ANTHROPIC_API_KEY){
-  document.getElementById('keyBtn').classList.add('keyset');
-  document.getElementById('keyBtn').textContent = '\u2714 API Key';
-}
-
-function showKeyModal(){
-  document.getElementById('keyModal').style.display='flex';
-  if(ANTHROPIC_API_KEY){
-    document.getElementById('cancelKeyBtn').style.display='block';
-  }
-  setTimeout(function(){document.getElementById('apiKeyInput').focus();},60);
-}
+// ── API KEY ───────────────────────────────────────────────────────────────
+if(ANTHROPIC_API_KEY){document.getElementById('keyBtn').classList.add('keyset');document.getElementById('keyBtn').textContent='\u2714 API Key';}
+function showKeyModal(){document.getElementById('keyModal').style.display='flex';if(ANTHROPIC_API_KEY)document.getElementById('cancelKeyBtn').style.display='block';setTimeout(function(){document.getElementById('apiKeyInput').focus();},60);}
 function saveKey(){
-  var val = document.getElementById('apiKeyInput').value.trim();
-  var st = document.getElementById('keyStatus');
-  if(!val || val.length < 80){
-    st.textContent = 'Key looks too short — paste the full key from console.anthropic.com';
-    st.style.color = 'var(--red)';
-    return;
-  }
-  ANTHROPIC_API_KEY = val;
-  sessionStorage.setItem('fnx_key', val);
-  st.textContent = '\u2714 Saved!';
-  st.style.color = 'var(--green)';
+  var val=document.getElementById('apiKeyInput').value.trim();
+  var st=document.getElementById('keyStatus');
+  if(!val||val.length<80){st.textContent='Key too short — paste the full key from console.anthropic.com';st.style.color='var(--red)';return;}
+  ANTHROPIC_API_KEY=val;
+  sessionStorage.setItem('fnx_key',val);
+  st.textContent='\u2714 Saved!';st.style.color='var(--green)';
   document.getElementById('keyBtn').classList.add('keyset');
-  document.getElementById('keyBtn').textContent = '\u2714 API Key';
-  document.getElementById('cancelKeyBtn').style.display = 'block';
-  setTimeout(function(){ document.getElementById('keyModal').style.display='none'; }, 350);
+  document.getElementById('keyBtn').textContent='\u2714 API Key';
+  document.getElementById('cancelKeyBtn').style.display='block';
+  setTimeout(function(){document.getElementById('keyModal').style.display='none';},350);
 }
-function hideModal(){ document.getElementById('keyModal').style.display='none'; }
+function hideModal(){document.getElementById('keyModal').style.display='none';}
 document.getElementById('apiKeyInput').addEventListener('keydown',function(e){if(e.key==='Enter')saveKey();});
 
-// ── MAP ────────────────────────────────────────────────────────────────────
+// ── MAP ───────────────────────────────────────────────────────────────────
 function initMap(){
-  map = L.map('map',{center:[37.78,-122.22],zoom:10,zoomControl:false,attributionControl:false});
+  map=L.map('map',{center:[37.78,-122.25],zoom:9,zoomControl:false,attributionControl:false});
   L.control.zoom({position:'bottomright'}).addTo(map);
-  // Dark satellite default
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19}).addTo(map);
+  addTiles();
 }
-
-function toggleSat(){
-  useSat=!useSat;
-  // rebuild tile layer
-  map.eachLayer(function(l){ if(l._url) map.removeLayer(l); });
+function addTiles(){
+  map.eachLayer(function(l){if(l._url)map.removeLayer(l);});
   if(useSat){
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19}).addTo(map);
   } else {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
   }
-  // Re-add overlays
-  if(showHosp) drawHospitals();
-  if(showApt) drawAirports();
-  if(lastPlanData) drawPlanOnMap(lastPlanData.parsedPlan);
-  document.getElementById('btnSat').classList.toggle('on',useSat);
+  if(showH)drawHospitals();
+  if(showA)drawAirports();
+  if(lastPlanData)drawPlanOnMap(lastPlanData.parsedPlan);
 }
-
-function toggleLayer(name){
-  if(name==='hosp'){
-    showHosp=!showHosp;
-    document.getElementById('btnHosp').classList.toggle('on',showHosp);
-    if(showHosp) drawHospitals(); else clearL(hospLayers);
-  }
-  if(name==='apt'){
-    showApt=!showApt;
-    document.getElementById('btnApt').classList.toggle('on',showApt);
-    if(showApt) drawAirports(); else clearL(aptLayers);
-  }
+function toggleSat(){useSat=!useSat;addTiles();document.getElementById('btnSat').classList.toggle('on',useSat);}
+function toggleLayer(n){
+  if(n==='h'){showH=!showH;document.getElementById('btnH').classList.toggle('on',showH);if(showH)drawHospitals();else clearL(hospLayers);}
+  if(n==='a'){showA=!showA;document.getElementById('btnA').classList.toggle('on',showA);if(showA)drawAirports();else clearL(aptLayers);}
 }
-
-function clearL(arr){ arr.forEach(function(l){map.removeLayer(l);}); arr.length=0; }
+function clearL(arr){arr.forEach(function(l){map.removeLayer(l);});arr.length=0;}
 
 function drawHospitals(){
   clearL(hospLayers);
   HOSPITALS.forEach(function(h){
-    var col = h.trauma ? '#ff4444' : '#ff8844';
-    var m = L.circleMarker([h.lat,h.lng],{radius:6,fillColor:col,fillOpacity:.65,color:col,weight:1.5}).addTo(map);
-    m.bindTooltip('<div style="font-family:DM Mono,monospace;font-size:11px;background:#050c14;border:1px solid rgba(255,68,68,.4);padding:5px 9px;color:#c8e8ff"><strong style="color:#ff4444">'+h.name+'</strong><br>'+h.county+' County'+(h.trauma?'<br><span style="color:#ff4444">Level I Trauma</span>':'')+'</div>',{opacity:1});
-    var cross = L.divIcon({html:'<div style="color:'+col+';font-size:9px;font-weight:700;line-height:1;margin:-4px 0 0 -3px">+</div>',className:'',iconSize:[6,6],iconAnchor:[3,3]});
-    var lm = L.marker([h.lat,h.lng],{icon:cross,interactive:false}).addTo(map);
-    hospLayers.push(m); hospLayers.push(lm);
+    var col=h.trauma?'#ff4444':'#ff8844';
+    var m=L.circleMarker([h.lat,h.lng],{radius:5,fillColor:col,fillOpacity:.65,color:col,weight:1.5}).addTo(map);
+    m.bindTooltip('<div style="font-family:DM Mono,monospace;font-size:11px;background:#050c14;border:1px solid rgba(255,68,68,.4);padding:5px 9px;color:#c8e8ff"><strong style="color:#ff4444">'+h.name+'</strong><br>'+h.county+(h.trauma?'<br><span style="color:#ff4444">L1 Trauma</span>':'')+'</div>',{opacity:1});
+    var lm=L.marker([h.lat,h.lng],{icon:L.divIcon({html:'<div style="color:'+col+';font-size:9px;font-weight:700;margin:-4px 0 0 -3px;line-height:1">+</div>',className:'',iconSize:[6,6],iconAnchor:[3,3]}),interactive:false}).addTo(map);
+    hospLayers.push(m);hospLayers.push(lm);
   });
 }
-
 function drawAirports(){
   clearL(aptLayers);
   Object.keys(AIRPORTS).forEach(function(icao){
-    var a = AIRPORTS[icao];
-    var isMil = icao==='KNUQ'||icao==='KSUU';
-    var col = isMil ? '#00e676' : '#ffcc00';
-    var icon = L.divIcon({
+    var a=AIRPORTS[icao];
+    var isMil=icao==='KNUQ'||icao==='KSUU';
+    var col=isMil?'#00e676':'#ffcc00';
+    var cnt=allAircraft.filter(function(ac){return ac.airport===icao;}).length;
+    var gcnt=govFleet.filter(function(ac){return ac.airport===icao;}).length;
+    var icon=L.divIcon({
       html:'<div style="text-align:center;line-height:1">'
-        +'<svg width="13" height="13" viewBox="0 0 14 14"><polygon points="7,1 8.5,5 13,5 9.5,7.5 11,12 7,9.5 3,12 4.5,7.5 1,5 5.5,5" fill="'+col+'" stroke="rgba(0,0,0,.3)" stroke-width=".5" opacity=".8"/></svg>'
-        +'<div style="color:'+col+';font-family:DM Mono,monospace;font-size:7.5px;letter-spacing:.04em;white-space:nowrap;text-shadow:0 0 5px rgba(0,0,0,1);opacity:.85;margin-top:1px">'+icao+'</div>'
+        +'<svg width="12" height="12" viewBox="0 0 14 14"><polygon points="7,1 8.5,5 13,5 9.5,7.5 11,12 7,9.5 3,12 4.5,7.5 1,5 5.5,5" fill="'+col+'" opacity=".82"/></svg>'
+        +'<div style="color:'+col+';font-family:DM Mono,monospace;font-size:7px;letter-spacing:.04em;white-space:nowrap;text-shadow:0 0 5px #000;opacity:.85;margin-top:1px">'+icao+'</div>'
         +'</div>',
-      className:'',iconSize:[34,22],iconAnchor:[17,7]
+      className:'',iconSize:[32,20],iconAnchor:[16,6]
     });
-    var cnt = allAircraft.filter(function(ac){return ac.airport===icao;}).length;
-    var gcnt = govFleet.filter(function(ac){return ac.airport===icao;}).length;
-    var m = L.marker([a.lat,a.lng],{icon:icon,zIndexOffset:500}).addTo(map);
-    m.bindTooltip('<div style="font-family:DM Mono,monospace;font-size:11px;background:#050c14;border:1px solid rgba(255,200,0,.35);padding:5px 9px;color:#c8e8ff"><strong style="color:#ffcc00">'+icao+'</strong><br>'+a.name+'<br>'+a.county+' County<br><span style="color:rgba(200,232,255,.45)">'+cnt+' civilian &middot; '+gcnt+' gov</span></div>',{opacity:1});
+    var m=L.marker([a.lat,a.lng],{icon:icon,zIndexOffset:400}).addTo(map);
+    m.bindTooltip('<div style="font-family:DM Mono,monospace;font-size:11px;background:#050c14;border:1px solid rgba(255,200,0,.35);padding:5px 9px;color:#c8e8ff"><strong style="color:#ffcc00">'+icao+'</strong><br>'+a.name+'<br>'+a.county+'<br><span style="color:rgba(200,232,255,.45)">'+cnt+' civilian · '+gcnt+' gov</span></div>',{opacity:1});
     aptLayers.push(m);
   });
 }
 
-// ── PLAN MAP DRAWING ───────────────────────────────────────────────────────
+// ── PLAN MAP DRAWING ──────────────────────────────────────────────────────
+var LZ_LOCS={'Marina Green':{lat:37.8068,lng:-122.4381},'Crissy Field':{lat:37.8034,lng:-122.4592},'Dolores Park':{lat:37.7596,lng:-122.4269},'McLaren Park':{lat:37.7201,lng:-122.4232},'Candlestick':{lat:37.7122,lng:-122.3849},'Alameda Point':{lat:37.7891,lng:-122.3014},'Cesar Chavez':{lat:37.8668,lng:-122.3146},'Shoreline Park':{lat:37.4361,lng:-122.0822},'Hamilton Field':{lat:38.0633,lng:-122.5022},'Marin Headlands':{lat:37.8329,lng:-122.5053},'Coyote Hills':{lat:37.5589,lng:-122.0598},'Bayfront Park':{lat:37.4782,lng:-122.1384}};
+
 function drawPlanOnMap(parsed){
   clearL(planLayers);
-  if(!parsed) return;
-
-  var LZ_LOCS = {
-    'Marina Green':{lat:37.8068,lng:-122.4381},
-    'Crissy Field':{lat:37.8034,lng:-122.4592},
-    'Dolores Park':{lat:37.7596,lng:-122.4269},
-    'McLaren Park':{lat:37.7201,lng:-122.4232},
-    'Candlestick':{lat:37.7122,lng:-122.3849},
-    'Alameda Point':{lat:37.7891,lng:-122.3014},
-    'Cesar Chavez Park':{lat:37.8668,lng:-122.3146},
-    'Shoreline Park':{lat:37.4361,lng:-122.0822},
-    'Hamilton Field':{lat:38.0633,lng:-122.5022},
-    'Marin Headlands':{lat:37.8329,lng:-122.5053}
-  };
-
-  // Draw pickup zones
-  parsed.pzs.forEach(function(pz, i){
-    var loc = null;
-    Object.keys(LZ_LOCS).forEach(function(k){
-      if(!loc && pz.name.toLowerCase().indexOf(k.toLowerCase().split(' ')[0]) >= 0) loc = LZ_LOCS[k];
-    });
-    if(!loc) loc = {lat:37.75+Math.sin(i*1.4)*0.09, lng:-122.2+Math.cos(i*1.4)*0.12};
-    var c = L.circle([loc.lat,loc.lng],{radius:700,fillColor:'rgba(0,230,118,.1)',fillOpacity:1,color:'#00e676',weight:2,dashArray:'6,4'}).addTo(map);
-    var lbl = L.divIcon({html:'<div style="background:rgba(2,4,10,.88);border:1px solid rgba(0,230,118,.55);color:#00e676;font-family:DM Mono,monospace;font-size:8px;padding:2px 5px;white-space:nowrap">PZ-'+(i+1)+' '+pz.name.slice(0,16)+'</div>',className:'',iconSize:[null,null],iconAnchor:[0,8]});
-    var lm = L.marker([loc.lat,loc.lng],{icon:lbl,interactive:false}).addTo(map);
-    planLayers.push(c); planLayers.push(lm);
+  if(!parsed)return;
+  parsed.pzs.forEach(function(pz,i){
+    var loc=null;
+    Object.keys(LZ_LOCS).forEach(function(k){if(!loc&&pz.name.toLowerCase().indexOf(k.toLowerCase().split(' ')[0])>=0)loc=LZ_LOCS[k];});
+    if(!loc)loc={lat:37.75+Math.sin(i*1.4)*.09,lng:-122.2+Math.cos(i*1.4)*.12};
+    var c=L.circle([loc.lat,loc.lng],{radius:700,fillColor:'rgba(0,230,118,.1)',fillOpacity:1,color:'#00e676',weight:2,dashArray:'6,4'}).addTo(map);
+    var lm=L.marker([loc.lat,loc.lng],{icon:L.divIcon({html:'<div style="background:rgba(2,4,10,.88);border:1px solid rgba(0,230,118,.55);color:#00e676;font-family:DM Mono,monospace;font-size:8px;padding:2px 5px;white-space:nowrap">PZ-'+(i+1)+' '+pz.name.slice(0,14)+'</div>',className:'',iconSize:[null,null],iconAnchor:[0,8]}),interactive:false}).addTo(map);
+    planLayers.push(c);planLayers.push(lm);
   });
-
-  // Draw corridors
-  var corrColors = ['#00b4ff','#ffaa00','#00e676','#ff4444'];
-  parsed.corridors.forEach(function(corr, i){
-    var aptMatch = corr.match(/\b(K[A-Z]{3})\b/g);
-    if(!aptMatch||aptMatch.length<1) return;
-    var fromIcao = aptMatch[0];
-    var from = AIRPORTS[fromIcao];
-    if(!from) return;
-    var pzIdx = Math.min(i, parsed.pzs.length-1);
-    var toLoc = null;
-    if(parsed.pzs[pzIdx]){
-      var nm = parsed.pzs[pzIdx].name;
-      Object.keys(LZ_LOCS).forEach(function(k){if(!toLoc&&nm.toLowerCase().indexOf(k.toLowerCase().split(' ')[0])>=0)toLoc=LZ_LOCS[k];});
-    }
-    if(!toLoc) toLoc = {lat:37.75+Math.sin(i*1.8)*0.1,lng:-122.2+Math.cos(i*1.8)*0.12};
-    var col = corrColors[i%corrColors.length];
-    var line = L.polyline([[from.lat,from.lng],[toLoc.lat,toLoc.lng]],{color:col,weight:2,opacity:.7,dashArray:'8,5'}).addTo(map);
-    var mid = [(from.lat+toLoc.lat)/2,(from.lng+toLoc.lng)/2];
-    var ang = Math.atan2(toLoc.lat-from.lat,toLoc.lng-from.lng)*180/Math.PI;
-    var arr = L.divIcon({html:'<div style="color:'+col+';font-size:11px;transform:rotate('+ang+'deg);line-height:1">&#9658;</div>',className:'',iconSize:[11,11],iconAnchor:[5,5]});
-    var am = L.marker(mid,{icon:arr,interactive:false}).addTo(map);
-    planLayers.push(line); planLayers.push(am);
+  var cc=['#00b4ff','#ffaa00','#00e676','#ff4444'];
+  parsed.corridors.forEach(function(corr,i){
+    var am=corr.match(/\b(K[A-Z]{3})\b/g);
+    if(!am)return;
+    var from=AIRPORTS[am[0]];if(!from)return;
+    var toIdx=Math.min(i,parsed.pzs.length-1);
+    var toLoc=null;
+    if(parsed.pzs[toIdx]){Object.keys(LZ_LOCS).forEach(function(k){if(!toLoc&&parsed.pzs[toIdx].name.toLowerCase().indexOf(k.toLowerCase().split(' ')[0])>=0)toLoc=LZ_LOCS[k];});}
+    if(!toLoc)toLoc={lat:37.75+Math.sin(i*1.8)*.1,lng:-122.2+Math.cos(i*1.8)*.12};
+    var col=cc[i%cc.length];
+    var line=L.polyline([[from.lat,from.lng],[toLoc.lat,toLoc.lng]],{color:col,weight:2,opacity:.68,dashArray:'8,5'}).addTo(map);
+    var mid=[(from.lat+toLoc.lat)/2,(from.lng+toLoc.lng)/2];
+    var ang=Math.atan2(toLoc.lat-from.lat,toLoc.lng-from.lng)*180/Math.PI;
+    var am2=L.marker(mid,{icon:L.divIcon({html:'<div style="color:'+col+';font-size:10px;transform:rotate('+ang+'deg);line-height:1">&#9658;</div>',className:'',iconSize:[10,10],iconAnchor:[5,5]}),interactive:false}).addTo(map);
+    planLayers.push(line);planLayers.push(am2);
   });
-
-  // Draw staging area boxes around key airports
   parsed.staging.forEach(function(icao){
-    var a = AIRPORTS[icao];
-    if(!a) return;
-    var r = L.rectangle([[a.lat-.009,a.lng-.016],[a.lat+.009,a.lng+.016]],{color:'#ffaa00',weight:2,fillColor:'rgba(255,170,0,.07)',fillOpacity:1,dashArray:'5,3'}).addTo(map);
-    var sl = L.divIcon({html:'<div style="background:rgba(2,4,10,.88);border:1px solid rgba(255,170,0,.55);color:#ffaa00;font-family:DM Mono,monospace;font-size:8px;padding:2px 5px;white-space:nowrap">STAGING: '+icao+'</div>',className:'',iconSize:[null,null],iconAnchor:[0,20]});
-    var sm = L.marker([a.lat+.01,a.lng],{icon:sl,interactive:false}).addTo(map);
-    planLayers.push(r); planLayers.push(sm);
+    var a=AIRPORTS[icao];if(!a)return;
+    var r=L.rectangle([[a.lat-.008,a.lng-.014],[a.lat+.008,a.lng+.014]],{color:'#ffaa00',weight:1.5,fillColor:'rgba(255,170,0,.07)',fillOpacity:1,dashArray:'5,3'}).addTo(map);
+    var sl=L.marker([a.lat+.009,a.lng],{icon:L.divIcon({html:'<div style="background:rgba(2,4,10,.88);border:1px solid rgba(255,170,0,.55);color:#ffaa00;font-family:DM Mono,monospace;font-size:7.5px;padding:2px 5px;white-space:nowrap">STAGING:'+icao+'</div>',className:'',iconSize:[null,null],iconAnchor:[0,18]}),interactive:false}).addTo(map);
+    planLayers.push(r);planLayers.push(sl);
   });
 }
 
 function parsePlanForMap(text){
-  var pzs=[], corridors=[], staging=[];
+  var pzs=[],corridors=[],staging=[];
   var lines=text.split('\n');
   var inPZ=false,inCorr=false,inStage=false,curPZ=null;
   lines.forEach(function(line){
@@ -1178,87 +1210,94 @@ function parsePlanForMap(text){
     else if(l.match(/SECTION\s+6/i)){inPZ=false;inCorr=false;inStage=true;}
     else if(l.match(/SECTION\s+[7-9]|SECTION\s+10/i)){inPZ=false;inCorr=false;inStage=false;}
     if(inPZ){var m=l.match(/^PZ-\d+:\s*(.+)/i);if(m){if(curPZ)pzs.push(curPZ);curPZ={name:m[1].trim()};}}
-    if(inCorr){var rm=l.match(/Route:\s*(.+)/i)||l.match(/^CORRIDOR\s+[A-Z].*Route:\s*(.+)/i);if(rm)corridors.push(rm[1]);}
+    if(inCorr){var rm=l.match(/Route:\s*(.+)/i);if(rm)corridors.push(rm[1]);}
     if(inStage){var am=l.match(/\b(K[A-Z]{3})\b/);if(am)staging.push(am[1]);}
   });
   if(curPZ)pzs.push(curPZ);
-  return {pzs:pzs,corridors:corridors,staging:staging};
+  return{pzs:pzs,corridors:corridors,staging:staging};
 }
 
-// ── ASSET LIST ─────────────────────────────────────────────────────────────
+// ── ASSET LIST ────────────────────────────────────────────────────────────
 function renderList(){
-  var civ = allAircraft.filter(function(a){return activeTypes.has('civ');});
-  var mil = govFleet.filter(function(a){return a.govColor==='mil'&&activeTypes.has('mil');});
-  var le  = govFleet.filter(function(a){return a.govColor==='le'&&activeTypes.has('le');});
-  var fire= govFleet.filter(function(a){return a.govColor==='fire'&&activeTypes.has('fire');});
-  var helis = allAircraft.filter(function(a){return a.cat==='heli';});
-  var fixed = allAircraft.filter(function(a){return a.cat==='fixed';});
+  var heliCiv=allAircraft.filter(function(a){return a.cat==='heli';});
+  var fixedCiv=allAircraft.filter(function(a){return a.cat==='fixed';});
+  var mil=govFleet.filter(function(a){return a.govColor==='mil';});
+  var le=govFleet.filter(function(a){return a.govColor==='le';});
+  var fire=govFleet.filter(function(a){return a.govColor==='fire';});
 
-  function rows(list, colorClass, badge){
-    return list.map(function(ac){
-      var s = selected&&selected.reg===ac.reg?' sel':'';
-      return '<div class="arow'+s+'" data-reg="'+ac.reg+'">'
-        +'<div class="ar-reg '+colorClass+'">'+ac.reg+'</div>'
-        +'<div><div class="ar-type">'+ac.type.slice(0,20)+'</div>'
-        +'<div class="ar-loc">'+(ac.airportName||ac.county||'').slice(0,22)+'</div></div>'
-        +'<div class="ar-badge" style="color:'+(colorClass==='mil'?'var(--green)':colorClass==='le'?'var(--red)':colorClass==='fire'?'var(--amber)':'var(--blue)')+';border-color:currentColor">'+badge+'</div>'
-        +'</div>';
-    }).join('');
+  function row(ac,cls,badge){
+    var s=selected&&selected.reg===ac.reg?' sel':'';
+    return '<div class="arow'+s+'" data-reg="'+ac.reg+'">'
+      +'<div class="ar-reg '+cls+'">'+ac.reg+'</div>'
+      +'<div><div class="ar-type">'+ac.type.slice(0,18)+'</div><div class="ar-loc">'+(ac.airportName||ac.county||'').slice(0,20)+'</div></div>'
+      +'<div class="ar-badge" style="color:'+(cls==='mil'?'var(--green)':cls==='le'?'var(--red)':cls==='fire'?'var(--amber)':'var(--blue)')+'">'+badge+'</div>'
+      +'</div>';
   }
-
-  var h = '';
-  if(mil.length && activeTypes.has('mil')) h += '<div class="asec-hdr">&#9670; Military ('+mil.length+')</div>'+rows(mil,'mil','MIL');
-  if(le.length && activeTypes.has('le'))   h += '<div class="asec-hdr">&#9670; Law Enforcement ('+le.length+')</div>'+rows(le,'le','LE');
-  if(fire.length && activeTypes.has('fire'))h += '<div class="asec-hdr">&#9670; Fire / EMS ('+fire.length+')</div>'+rows(fire,'fire','FIRE');
-
-  // Civilian: sort helis first, then fixed
-  var civSorted = helis.concat(fixed).filter(function(a){return activeTypes.has('civ');});
-  if(civSorted.length) h += '<div class="asec-hdr">&#9670; Civilian — Helicopter ('+helis.filter(function(){return activeTypes.has('civ');}).length+')</div>'
-    +rows(helis.filter(function(){return activeTypes.has('civ');}),'','HELI')
-    +'<div class="asec-hdr">&#9670; Civilian — Fixed Wing ('+fixed.filter(function(){return activeTypes.has('civ');}).length+')</div>'
-    +rows(fixed.filter(function(){return activeTypes.has('civ');}),'','FIXED');
-
-  document.getElementById('aList').innerHTML = h || '<div style="padding:.75rem .85rem;font-size:.58rem;color:var(--faint)">No aircraft match current filter</div>';
-  document.getElementById('lTot').textContent = allAircraft.length+govFleet.length;
-  document.getElementById('lHeli').textContent = helis.length+(govFleet.filter(function(a){return a.cat==='heli';}).length);
-  document.getElementById('lGov').textContent = govFleet.length;
-  document.getElementById('lFixed').textContent = fixed.length;
-
+  var h='';
+  if(activeTypes.has('mil')&&mil.length) h+='<div class="asec">&#9670; Military ('+mil.length+')</div>'+mil.map(function(a){return row(a,'mil','MIL');}).join('');
+  if(activeTypes.has('le')&&le.length)   h+='<div class="asec">&#9670; Law Enforcement ('+le.length+')</div>'+le.map(function(a){return row(a,'le','LE');}).join('');
+  if(activeTypes.has('fire')&&fire.length)h+='<div class="asec">&#9670; Fire / EMS ('+fire.length+')</div>'+fire.map(function(a){return row(a,'fire','FIRE');}).join('');
+  if(activeTypes.has('civ')&&heliCiv.length)h+='<div class="asec">&#9670; Helicopter ('+heliCiv.length+')</div>'+heliCiv.map(function(a){return row(a,'','HELI');}).join('');
+  if(activeTypes.has('civ')&&fixedCiv.length)h+='<div class="asec">&#9670; Fixed Wing ('+fixedCiv.length+')</div>'+fixedCiv.map(function(a){return row(a,'','FIXED');}).join('');
+  document.getElementById('aList').innerHTML=h||'<div style="padding:.8rem;font-size:.58rem;color:var(--faint)">No aircraft match filter</div>';
+  var allHeli=heliCiv.length+govFleet.filter(function(a){return a.cat==='heli';}).length;
+  document.getElementById('lTot').textContent=allAircraft.length+govFleet.length;
+  document.getElementById('lHeli').textContent=allHeli;
+  document.getElementById('lGov').textContent=govFleet.length;
+  document.getElementById('lFixed').textContent=fixedCiv.length;
   document.querySelectorAll('.arow').forEach(function(el){
     el.addEventListener('click',function(){
-      var reg = el.getAttribute('data-reg');
-      var ac = allAircraft.concat(govFleet).find(function(a){return a.reg===reg;});
-      if(ac) selectAc(ac);
+      var ac=allAircraft.concat(govFleet).find(function(a){return a.reg===el.getAttribute('data-reg');});
+      if(ac)selectAc(ac);
     });
   });
 }
 
 function selectAc(ac){
-  selected = ac;
-  renderList();
-  var col = ac.govColor==='mil'?'var(--green)':ac.govColor==='le'?'var(--red)':ac.govColor==='fire'?'var(--amber)':'var(--blue)';
-  document.getElementById('rdetail').classList.add('on');
-  document.getElementById('rdReg').innerHTML='<span style="color:'+col+'">'+ac.reg+'</span> &nbsp;&#183;&nbsp; '+ac.type;
-  var fields=[['Owner',ac.owner||ac.county],['Base',ac.airportName||'—'],['County',ac.county],['Passengers',ac.pax||'—'],['Payload',ac.payload||'—'],['Lift Cap',ac.liftCap||'—'],['Range',ac.range||'—']];
-  document.getElementById('rdGrid').innerHTML=fields.map(function(f){return'<div><div class="rd-lbl">'+f[0]+'</div><div class="rd-val">'+f[1]+'</div></div>';}).join('');
+  selected=ac;renderList();
+  var col=ac.govColor==='mil'?'var(--green)':ac.govColor==='le'?'var(--red)':ac.govColor==='fire'?'var(--amber)':'var(--blue)';
+  document.getElementById('selDetail').classList.add('on');
+  document.getElementById('sdReg').innerHTML='<span style="color:'+col+'">'+ac.reg+'</span> &nbsp;·&nbsp; '+ac.type;
+  var f=[['Owner',ac.owner||ac.county||'—'],['Base',ac.airportName||'—'],['County',ac.county||'—'],['Passengers',ac.pax||'—'],['Payload',ac.payload||'—'],['Range',ac.range||'—']];
+  document.getElementById('sdGrid').innerHTML=f.map(function(r){return'<div><div class="sd-lbl">'+r[0]+'</div><div class="sd-val">'+r[1]+'</div></div>';}).join('');
 }
 
-// Filter buttons
-document.getElementById('lfilter').addEventListener('click',function(e){
-  var btn=e.target.closest('.fc');
-  if(!btn)return;
+document.querySelector('.lfilter').addEventListener('click',function(e){
+  var btn=e.target.closest('.fc');if(!btn)return;
   var t=btn.getAttribute('data-t');
   activeTypes.has(t)?activeTypes.delete(t):activeTypes.add(t);
   btn.classList.toggle('on',activeTypes.has(t));
   renderList();
 });
 
-// Presets
 document.querySelectorAll('.pb').forEach(function(btn){
   btn.addEventListener('click',function(){document.getElementById('sceneInput').value=PRESETS[btn.getAttribute('data-p')]||'';});
 });
 
-// ── WEATHER ────────────────────────────────────────────────────────────────
+// ── COUNTY BREAKDOWN ──────────────────────────────────────────────────────
+function renderCountyBreakdown(){
+  var counties=['San Francisco','Alameda','Contra Costa','Marin','San Mateo','Santa Clara','Napa','Sonoma','Solano'];
+  var data=counties.map(function(c){
+    var h=allAircraft.filter(function(a){return a.county===c&&a.cat==='heli';}).length;
+    var f=allAircraft.filter(function(a){return a.county===c&&a.cat==='fixed';}).length;
+    return{c:c,h:h,f:f,tot:h+f};
+  });
+  var maxH=Math.max.apply(null,data.map(function(d){return d.h;}));
+  var maxF=Math.max.apply(null,data.map(function(d){return d.f;}));
+  document.getElementById('cbRows').innerHTML=data.map(function(d){
+    var short=d.c.replace('San ','S. ').replace('Santa ','Sta. ').replace('Contra Costa','Contra C.');
+    return '<div class="cb-row">'
+      +'<div class="cb-name">'+short+'</div>'
+      +'<div>'
+      +'<div style="display:flex;align-items:center;gap:.28rem;margin-bottom:.16rem"><div class="cb-track" style="flex:1"><div class="cb-fill" style="width:'+(maxH>0?Math.round(d.h/maxH*100):0)+'%;background:var(--green)"></div></div><div class="cb-val" style="color:var(--green)">'+d.h+'h</div></div>'
+      +'<div style="display:flex;align-items:center;gap:.28rem"><div class="cb-track" style="flex:1"><div class="cb-fill" style="width:'+(maxF>0?Math.round(d.f/maxF*100):0)+'%;background:var(--blue)"></div></div><div class="cb-val">'+d.f+'f</div></div>'
+      +'</div>'
+      +'<div class="cb-val" style="font-size:.56rem;color:var(--muted);text-align:right">'+d.tot+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// ── WEATHER ───────────────────────────────────────────────────────────────
 async function fetchWx(){
   try{
     var r=await fetch('https://api.weather.gov/stations/KSFO/observations/latest',{headers:{'Accept':'application/geo+json'},signal:AbortSignal.timeout(6000)});
@@ -1266,14 +1305,12 @@ async function fetchWx(){
     var vis=o.visibility&&o.visibility.value?o.visibility.value/1609.34:10;
     var ceil=o.cloudLayers&&o.cloudLayers[0]&&o.cloudLayers[0].base&&o.cloudLayers[0].base.value?o.cloudLayers[0].base.value*3.28084:9999;
     var rules=vis<1||ceil<500?'LIFR':vis<3||ceil<1000?'IFR':vis<5||ceil<3000?'MVFR':'VFR';
-    var rc=rules==='VFR'?'#00ff88':rules==='MVFR'?'#00b4ff':rules==='IFR'?'#ffaa00':'#ff4444';
-    return{temp:o.temperature&&o.temperature.value?Math.round(o.temperature.value*9/5+32)+'°F':'62°F',wind:o.windSpeed&&o.windSpeed.value?Math.round(o.windSpeed.value*.54)+'kt':'12kt',dir:o.windDirection&&o.windDirection.value?Math.round(o.windDirection.value)+'°':'280°',vis:Math.round(vis)+'mi',ceil:ceil<9000?Math.round(ceil/100)*100+'ft':'CLR',cond:o.textDescription||'Clear',rules:rules,rc:rc};
-  }catch(e){
-    return{temp:'62°F',wind:'12kt',dir:'280°',vis:'10mi',ceil:'CLR',cond:'Clear',rules:'VFR',rc:'#00ff88'};
-  }
+    var rc2=rules==='VFR'?'#00ff88':rules==='MVFR'?'#00b4ff':rules==='IFR'?'#ffaa00':'#ff4444';
+    return{temp:o.temperature&&o.temperature.value?Math.round(o.temperature.value*9/5+32)+'°F':'62°F',wind:o.windSpeed&&o.windSpeed.value?Math.round(o.windSpeed.value*.54)+'kt':'12kt',dir:o.windDirection&&o.windDirection.value?Math.round(o.windDirection.value)+'°':'280°',vis:Math.round(vis)+'mi',ceil:ceil<9000?Math.round(ceil/100)*100+'ft':'CLR',cond:o.textDescription||'Clear',rules:rules,rc:rc2};
+  }catch(e){return{temp:'62°F',wind:'12kt',dir:'280°',vis:'10mi',ceil:'CLR',cond:'Clear',rules:'VFR',rc:'#00ff88'};}
 }
 
-// ── GENERATE PLAN ──────────────────────────────────────────────────────────
+// ── GENERATE PLAN ─────────────────────────────────────────────────────────
 function generatePlan(){
   if(!ANTHROPIC_API_KEY){showKeyModal();return;}
   var scenario=document.getElementById('sceneInput').value.trim();
@@ -1283,249 +1320,220 @@ function generatePlan(){
   document.getElementById('rStatus').textContent='Generating...';
   document.getElementById('rPh').style.display='none';
   document.getElementById('rContent').style.display='block';
-  document.getElementById('rContent').innerHTML='<div class="thinking"><div class="dots"><span></span><span></span><span></span></div><div class="ttxt">FENRAX-1 analyzing '+allAircraft.length+' civilian + '+govFleet.length+' government assets<br>Building Incident Action Plan...</div></div>';
+  document.getElementById('rContent').innerHTML='<div class="thinking"><div class="dots"><span></span><span></span><span></span></div><div class="ttxt">FENRAX-1 analyzing '+allAircraft.length+' civilian and '+govFleet.length+' government assets...<br>Building Incident Action Plan — this takes 30-60 seconds.</div></div>';
 
-  // Build LEAN context — not the full fleet
-  var helis = allAircraft.filter(function(a){return a.cat==='heli';});
-  var mil = govFleet.filter(function(a){return a.govColor==='mil';});
-  var le  = govFleet.filter(function(a){return a.govColor==='le';});
-  var fire= govFleet.filter(function(a){return a.govColor==='fire';});
+  var helis=allAircraft.filter(function(a){return a.cat==='heli';});
+  var mil=govFleet.filter(function(a){return a.govColor==='mil';});
+  var le=govFleet.filter(function(a){return a.govColor==='le';});
+  var fire=govFleet.filter(function(a){return a.govColor==='fire';});
 
-  // Detect affected counties from scenario text
-  var affCounties = ['San Francisco','Alameda','Contra Costa','Marin','San Mateo','Santa Clara','Napa','Sonoma','Solano'].filter(function(c){
-    return scenario.toLowerCase().indexOf(c.toLowerCase().split(' ')[0]) >= 0;
-  });
-  if(affCounties.length===0) affCounties = ['San Francisco','Alameda','Contra Costa','San Mateo','Santa Clara'];
+  // Affected counties
+  var affC=['San Francisco','Alameda','Contra Costa','Marin','San Mateo','Santa Clara','Napa','Sonoma','Solano'].filter(function(c){return scenario.toLowerCase().indexOf(c.toLowerCase().split(' ')[0])>=0;});
+  if(affC.length===0)affC=['San Francisco','Alameda','Contra Costa','San Mateo','Santa Clara'];
 
-  // EOP key facts for affected counties only, max 3 facts each
-  var eopCtx = affCounties.map(function(c){
-    if(!COUNTY_EOP[c]) return '';
-    var facts = COUNTY_EOP[c].facts.split(' | ').slice(0,3);
-    return c+' EOP: '+facts.join('; ');
+  // Tight EOP context — 2 facts per county max
+  var eopCtx=affC.map(function(c){
+    if(!COUNTY_EOP[c])return'';
+    var facts=COUNTY_EOP[c].facts.split(' | ').slice(0,2);
+    return c+': '+facts.join('; ');
   }).filter(Boolean).join('\n');
 
-  var ctx = 'ASSET SUMMARY (Real FAA Bay Area, Apr 2026):\n'
-    +'Civilian helicopters: '+helis.length+' registered\n'
-    +'Civilian fixed-wing: '+allAircraft.filter(function(a){return a.cat==='fixed';}).length+' registered\n'
+  var ctx='ASSETS (Real FAA Bay Area, Apr 2026):\n'
+    +'Civilian helicopters: '+helis.length+' | Fixed-wing: '+allAircraft.filter(function(a){return a.cat==='fixed';}).length+'\n'
     +'Military: '+mil.length+' | Law Enforcement: '+le.length+' | Fire/EMS: '+fire.length+'\n\n'
-    +'TOP AVAILABLE HELICOPTERS:\n'
-    +helis.slice(0,12).map(function(h){return h.reg+': '+h.type+', '+h.pax+' pax, '+h.payload+', '+h.airportName;}).join('\n')+'\n\n'
-    +'GOVERNMENT ASSETS:\n'
+    +'TOP HELICOPTERS:\n'
+    +helis.slice(0,8).map(function(h){return h.reg+': '+h.type+', '+h.pax+' pax, base '+h.airportName;}).join('\n')+'\n\n'
+    +'GOV/MIL/LE/FIRE:\n'
     +mil.concat(le).concat(fire).map(function(a){return a.reg+': '+a.type+' ['+a.owner+'] '+a.pax+' pax';}).join('\n')+'\n\n'
-    +'STAGING AIRPORTS: '+Object.keys(AIRPORTS).join(', ')+'\n\n'
-    +'WEATHER KSFO: '+weatherData.temp+' Wind '+weatherData.dir+' @ '+weatherData.wind+' Ceil '+weatherData.ceil+' '+weatherData.rules+'\n\n'
-    +'COUNTY EOPs:\n'+eopCtx;
+    +'AIRPORTS: '+Object.keys(AIRPORTS).join(', ')+'\n'
+    +'WEATHER KSFO: '+weatherData.temp+' Wind '+weatherData.dir+'@'+weatherData.wind+' '+weatherData.rules+'\n\n'
+    +'EOP KEY FACTS:\n'+eopCtx;
 
-  var prompt = 'You are FENRAX-1 generating a formal ICS Incident Action Plan (IAP) for Bay Area emergency aviation response.\n'
-    +'Use REAL N-numbers from the helicopter list above. Be specific to this exact scenario. Complete every section.\n\n'
+  var prompt='You are FENRAX-1 generating a formal ICS Incident Action Plan (IAP).\n'
+    +'Use real N-numbers from the list. Be specific to this scenario. Complete all 10 sections.\n\n'
     +'ASSETS:\n'+ctx+'\n\n'
     +'INCIDENT: '+scenario+'\n\n'
-    +'Generate the complete IAP using these exact section headers:\n\n'
+    +'Write the full IAP using exactly these section headers:\n\n'
     +'SECTION 1 — INCIDENT OVERVIEW\n'
-    +'Incident Name, Type, Period H+0000-H+1200, Incident Commander (real county EOC), objectives.\n\n'
+    +'Incident Name, Type, Period H+0000-H+1200, Incident Commander (county EOC), objectives.\n\n'
     +'SECTION 2 — SITUATION ANALYSIS\n'
-    +'Affected areas with real SF Bay Area population figures. Access status. Why aerial assets needed.\n\n'
+    +'Specific areas, real population figures, access status, why aerial needed.\n\n'
     +'SECTION 3 — AIRCRAFT ASSIGNMENTS\n'
-    +'List 15+ aircraft. For each:\nAIRCRAFT: [N-number]\nType: [model]\nOperator: [owner]\nBase: [ICAO]\nMission: [specific]\nPassengers/Payload: [amount]\nFrequency: [freq]\nPriority: [CRITICAL/HIGH/STANDARD]\nDeparture: H+[XX]\n\n'
+    +'Assign 12-15 aircraft. Each on separate lines:\nAIRCRAFT: [N-number] | Type: [model] | Base: [ICAO] | Mission: [specific] | Payload: [pax or lbs] | Priority: [CRITICAL/HIGH/STANDARD] | Departure: H+[XX]\n\n'
     +'SECTION 4 — PICKUP ZONES\n'
-    +'Real Bay Area open spaces. For each:\nPZ-[N]: [Location name]\nCoordinates: [lat/lng]\nType: [park/field/former airfield]\nCapacity: [X helicopters simultaneous]\nPopulation served: [area + count]\nGround coordinator: [agency]\nStatus: [ACTIVE/STANDBY]\n\n'
+    +'4-6 real Bay Area open spaces. Each:\nPZ-[N]: [Location]\nCoordinates: [lat,lng] | Capacity: [X heli] | Population: [area + count] | Coordinator: [agency] | Status: ACTIVE\n\n'
     +'SECTION 5 — AERIAL CORRIDORS\n'
-    +'3-4 corridors. Format:\nCORRIDOR [A/B/C]: [Name]\nRoute: [ICAO origin] to [LZ destination]\nAltitude: [X]ft AGL\nFrequency: [freq]\n\n'
+    +'3 corridors:\nCORRIDOR [A/B/C]: [Name] | Route: [ICAO] to [LZ] | Altitude: [X]ft AGL | Freq: [freq]\n\n'
     +'SECTION 6 — STAGING AREAS\n'
-    +'2-3 airports used as staging. Fuel, maintenance, crew rest capacity.\n\n'
+    +'2 airports for staging with fuel and crew capacity.\n\n'
     +'SECTION 7 — EVACUATION CAPACITY\n'
-    +'Show math: [N] helis x [pax] x [sorties/hr] = [X] pax/hr. Total rate, target population, completion time, cargo tons/12hr.\n\n'
+    +'Math: [N] helis x [pax] x [sorties/hr] = [X] pax/hr. Total, completion time, cargo tons/12hr.\n\n'
     +'SECTION 8 — EXECUTION TIMELINE\n'
-    +'H+0000-0030: [actions]\nH+0030-0100: [actions]\nH+0100-0200: [actions]\nH+0200-0600: [actions]\nH+0600-1200: [actions]\n\n'
+    +'H+0000-0030: [actions]\nH+0030-0200: [actions]\nH+0200-0600: [actions]\nH+0600-1200: [actions]\n\n'
     +'SECTION 9 — COMMUNICATIONS\n'
-    +'Command freq, tactical freq, ground freq, hospital freq.\n\n'
+    +'Command, tactical, hospital frequencies.\n\n'
     +'SECTION 10 — FENRAX VALUE\n'
-    +'Specific time savings vs ad-hoc mobilization. Reference Operation Helo (Hurricane Helene: 4 days uncoordinated). Lives saved delta.';
+    +'Time saved vs ad-hoc. Ref Operation Helo (Hurricane Helene: 4 days uncoordinated). Lives saved.';
 
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:8000,messages:[{role:'user',content:prompt}]}),
-    signal:AbortSignal.timeout(120000)
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:3000,messages:[{role:'user',content:prompt}]}),
+    signal:AbortSignal.timeout(90000)
   }).then(function(r){
-    if(!r.ok) return r.json().then(function(e){throw new Error((e.error&&e.error.message)||'HTTP '+r.status);});
+    if(!r.ok)return r.json().then(function(e){throw new Error((e.error&&e.error.message)||'HTTP '+r.status);});
     return r.json();
   }).then(function(d){
-    var text = d.content&&d.content[0]&&d.content[0].text||'No response.';
-    var parsed = parsePlanForMap(text);
-    lastPlanData = {scenario:scenario,planText:text,parsedPlan:parsed,weather:weatherData};
+    var text=d.content&&d.content[0]&&d.content[0].text||'No response.';
+    var parsed=parsePlanForMap(text);
+    lastPlanData={scenario:scenario,planText:text,parsedPlan:parsed,weather:weatherData};
     renderPlan(text);
     renderCharts(text,helis);
     document.getElementById('openPlanBtn').style.display='block';
     document.getElementById('rStatus').textContent='IAP ready '+new Date().toLocaleTimeString();
     drawPlanOnMap(parsed);
-    map.setView([37.75,-122.25],10);
   }).catch(function(e){
     var isKey=e.message.indexOf('invalid')>=0||e.message.indexOf('401')>=0||e.message.indexOf('authentication')>=0;
-    document.getElementById('rContent').innerHTML='<div class="err-box"><div class="err-title">'+(isKey?'&#10007; Invalid API Key':'&#10007; API Error')+'</div><div class="err-body">'+(isKey?'<strong>Key rejected.</strong> Click API Key button top-right and re-enter your full key from <code>console.anthropic.com</code>':'<strong>Error:</strong> '+e.message)+'</div></div>';
+    var isTimeout=e.message.indexOf('timed out')>=0||e.message.indexOf('timeout')>=0;
+    document.getElementById('rContent').innerHTML='<div class="err-box"><div class="err-title">'+(isKey?'&#10007; Invalid API Key':isTimeout?'&#10007; Timeout':'&#10007; API Error')+'</div><div class="err-body">'
+      +(isKey?'<strong>Key rejected.</strong> Click API Key button top-right and paste your full key from <code>console.anthropic.com</code>.'
+        :isTimeout?'<strong>Request timed out.</strong> The server took too long. Try a shorter scenario or click generate again.'
+        :'<strong>Error:</strong> '+e.message)
+      +'</div></div>';
     document.getElementById('rStatus').textContent='Error';
   }).finally(function(){btn.disabled=false;btn.textContent='\u25CA Generate Incident Action Plan';});
 }
 
-// ── RENDER PLAN ────────────────────────────────────────────────────────────
+// ── RENDER PLAN ───────────────────────────────────────────────────────────
 function renderPlan(text){
-  var rc = document.getElementById('rContent');
-  var parts = text.split(/(?=SECTION\s+\d+\s*[—\-])/i);
+  var rc=document.getElementById('rContent');
+  var parts=text.split(/(?=SECTION\s+\d+\s*[—\-])/i);
   var sCol={'1':'#00b4ff','2':'#00b4ff','3':'#00e676','4':'#ffaa00','5':'#00b4ff','6':'#ffaa00','7':'#00e676','8':'#ffaa00','9':'#00b4ff','10':'#00e676'};
   var sIcon={'1':'◈','2':'◉','3':'✦','4':'⊕','5':'▶','6':'◆','7':'⏱','8':'◆','9':'◈','10':'★'};
-
-  var hdr = parts[0]||'';
-  var html = hdr.trim() ? '<div class="iap-hdr-box"><div class="iap-hdr-lbl">Incident Action Plan — FENRAX-1</div><div class="iap-hdr-txt">'+hdr.replace(/\n/g,'<br>').replace(/---+/g,'').trim()+'</div></div>' : '';
-
-  html += parts.slice(1).map(function(part){
+  var hdr=parts[0]||'';
+  var html=hdr.trim()?'<div class="iap-hdr-box"><div class="iap-hdr-lbl">Incident Action Plan — FENRAX-1</div><div class="iap-hdr-txt">'+hdr.replace(/\n/g,'<br>').replace(/---+/g,'').trim()+'</div></div>':'';
+  html+=parts.slice(1).map(function(part){
     var fl=part.split('\n')[0];
-    var nm=fl.match(/SECTION\s+(\d+)/i); var num=nm?nm[1]:'?';
-    var tm=fl.match(/[—\-]+\s*(.+)/); var title=tm?tm[1].trim():fl;
+    var nm=fl.match(/SECTION\s+(\d+)/i),num=nm?nm[1]:'?';
+    var tm=fl.match(/[—\-]+\s*(.+)/),title=tm?tm[1].trim():fl;
     var body=part.split('\n').slice(1).join('\n').trim();
-    var col=sCol[num]||'#00b4ff';
-    var icon=sIcon[num]||'·';
+    var col=sCol[num]||'#00b4ff',icon=sIcon[num]||'·';
     var bd;
-    if(num==='3') bd=renderAcBlock(body,col);
-    else if(num==='4') bd=renderPZBlock(body,col);
-    else if(num==='8') bd=renderTLBlock(body);
+    if(num==='3')bd=renderAcBlock(body);
+    else if(num==='4')bd=renderPZBlock(body);
+    else if(num==='8')bd=renderTLBlock(body);
     else bd='<div class="iap-body">'+body.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/CRITICAL/g,'<span style="color:var(--red);font-weight:600">CRITICAL</span>').replace(/\bHIGH\b/g,'<span style="color:var(--amber);font-weight:600">HIGH</span>').replace(/STANDARD/g,'<span style="color:var(--blue)">STANDARD</span>').replace(/H\+([0-9:]+)/g,'<span style="color:var(--blue);font-weight:500">H+$1</span>').replace(/•/g,'<span style="color:'+col+'">•</span>')+'</div>';
-    return '<div class="iap-sec"><div class="iap-sec-hdr" style="color:'+col+'"><span>'+icon+'</span><span>SECTION '+num+' — '+title+'</span></div>'+bd+'</div>';
+    return'<div class="iap-sec"><div class="iap-sec-hdr" style="color:'+col+'"><span>'+icon+'</span><span>SECTION '+num+' — '+title+'</span></div>'+bd+'</div>';
   }).join('');
-
-  rc.innerHTML = html || '<div class="iap-body">'+text.replace(/\n/g,'<br>')+'</div>';
+  rc.innerHTML=html||'<div class="iap-body">'+text.replace(/\n/g,'<br>')+'</div>';
 }
 
-function renderAcBlock(body,col){
+function renderAcBlock(body){
   var blocks=body.split(/(?=AIRCRAFT:)/i).filter(function(b){return b.trim();});
-  if(blocks.length<2) return'<div class="iap-body">'+body.replace(/\n/g,'<br>')+'</div>';
-  var hdr='<div style="font-size:.54rem;color:var(--faint);margin-bottom:.35rem">'+blocks.length+' AIRCRAFT ASSIGNED</div>';
-  return hdr+blocks.map(function(b){
-    var lines=b.trim().split('\n'),f={};
+  if(blocks.length<2)return'<div class="iap-body">'+body.replace(/\n/g,'<br>')+'</div>';
+  var out='<div style="font-size:.52rem;color:var(--faint);margin-bottom:.32rem">'+blocks.length+' AIRCRAFT ASSIGNED</div>';
+  return out+blocks.map(function(b){
+    var lines=b.trim().split(/[\n|]+/),f={};
     var reg=(lines[0].match(/AIRCRAFT:\s*(.+)/i)||[])[1]||'—';
-    lines.forEach(function(l){var m=l.match(/^([^:]+):\s*(.+)/);if(m)f[m[1].trim().toLowerCase()]=m[2].trim();});
+    lines.forEach(function(l){var m=l.match(/^\s*([^:]+):\s*(.+)/);if(m)f[m[1].trim().toLowerCase()]=m[2].trim();});
     var pri=(f['priority']||'STANDARD').toUpperCase();
     var pc=pri==='CRITICAL'?'var(--red)':pri==='HIGH'?'var(--amber)':'var(--blue)';
-    return '<div class="ac-card"><div class="ac-reg">'+reg+'</div><div><div class="ac-type">'+(f['type']||'')+'</div><div class="ac-mission">'+(f['mission']||'')+'</div><div class="ac-meta">'+(f['base']||'')+' &nbsp;&#183;&nbsp; Dep '+(f['departure']||'—')+' &nbsp;&#183;&nbsp; '+(f['passengers/payload']||f['payload']||'')+'</div></div><div class="pri" style="color:'+pc+';border-color:'+pc+'">'+pri+'</div></div>';
+    return'<div class="ac-card"><div class="ac-reg">'+reg+'</div><div><div class="ac-type">'+(f['type']||'')+'</div><div class="ac-mission">'+(f['mission']||'')+'</div><div class="ac-meta">'+(f['base']||'')+' · Dep '+(f['departure']||'—')+' · '+(f['payload']||f['passengers/payload']||'')+'</div></div><div class="pri" style="color:'+pc+'">'+pri+'</div></div>';
   }).join('');
 }
 
-function renderPZBlock(body,col){
+function renderPZBlock(body){
   var zones=body.split(/(?=PZ-\d+:)/i).filter(function(b){return b.trim();});
-  if(zones.length<2) return'<div class="iap-body">'+body.replace(/\n/g,'<br>')+'</div>';
+  if(zones.length<2)return'<div class="iap-body">'+body.replace(/\n/g,'<br>')+'</div>';
   return zones.map(function(b){
-    var lines=b.trim().split('\n'),f={};
+    var lines=b.trim().split(/[\n|]+/),f={};
     var hdr=lines[0];
-    lines.slice(1).forEach(function(l){var m=l.match(/^([^:]+):\s*(.+)/);if(m)f[m[1].trim().toLowerCase()]=m[2].trim();});
+    lines.slice(1).forEach(function(l){var m=l.match(/^\s*([^:]+):\s*(.+)/);if(m)f[m[1].trim().toLowerCase()]=m[2].trim();});
     var status=(f['status']||'STANDBY').toUpperCase();
     var sc=status==='ACTIVE'?'var(--green)':'var(--amber)';
-    return '<div class="pz-card"><div class="pz-top"><span class="pz-name">'+hdr.replace(/:.*/,'')+'</span><span class="pz-stat" style="color:'+sc+'">'+status+'</span></div><div class="pz-loc">'+hdr.replace(/^PZ-\d+:\s*/i,'').trim()+'</div><div class="pz-grid">'+Object.keys(f).slice(0,4).map(function(k){return'<div class="pz-field">'+k.toUpperCase()+': <span>'+f[k]+'</span></div>';}).join('')+'</div></div>';
+    return'<div class="pz-card"><div class="pz-top"><span class="pz-name">'+hdr.replace(/:.*/,'')+'</span><span class="pz-stat-lbl" style="color:'+sc+'">'+status+'</span></div><div class="pz-loc">'+hdr.replace(/^PZ-\d+:\s*/i,'').trim()+'</div><div class="pz-grid">'+Object.keys(f).slice(0,4).map(function(k){return'<div class="pz-field">'+k.toUpperCase()+': <span>'+f[k]+'</span></div>';}).join('')+'</div></div>';
   }).join('');
 }
 
 function renderTLBlock(body){
   var items=body.split('\n').filter(function(l){return l.match(/^H\+/i);});
-  if(items.length===0) return'<div class="iap-body">'+body.replace(/\n/g,'<br>')+'</div>';
+  if(items.length===0)return'<div class="iap-body">'+body.replace(/\n/g,'<br>')+'</div>';
   return items.map(function(item){
     var m=item.match(/^(H\+[0-9:]+(?:[—\-]+[0-9:]+)?)\s*[:\-—]+\s*(.+)/i);
-    if(!m) return'<div class="tl-body" style="margin-bottom:.2rem">'+item+'</div>';
+    if(!m)return'<div class="tl-body" style="margin-bottom:.18rem">'+item+'</div>';
     return'<div class="tl-row"><div class="tl-time">'+m[1]+'</div><div class="tl-body">'+m[2]+'</div></div>';
   }).join('');
 }
 
-// ── CHARTS ─────────────────────────────────────────────────────────────────
-function renderCharts(text, helis){
+// ── CHARTS ────────────────────────────────────────────────────────────────
+function renderCharts(text,helis){
   var em=text.match(/(\d[\d,]+)\s*(?:persons?|people|evacuees?)\s*(?:\/|per)\s*hour/i);
   var rate=em?parseInt(em[1].replace(/,/g,'')):Math.round(helis.length*5*2.5);
   var cm=text.match(/(\d[\d.]+)\s*tons?\s*(?:\/|per)\s*(?:12|twelve)/i);
   var cargo=cm?parseFloat(cm[1]):Math.round(rate*.03);
-  var am=text.match(/(\d+)\s*aircraft\s*assigned/i);
-  var acft=am?parseInt(am[1]):15;
+  var am=text.match(/(\d+)\s*aircraft\s*assign/i);
+  var acft=am?parseInt(am[1]):13;
   var tm=text.match(/(\d+)\s*hours?\s*(?:to complete|completion)/i);
   var comp=tm?parseInt(tm[1]):Math.round(80000/Math.max(rate,50));
-
   document.getElementById('ccEvac').textContent=rate.toLocaleString();
   document.getElementById('ccCargo').textContent=cargo.toFixed(0);
   document.getElementById('ccAcft').textContent=acft;
   document.getElementById('ccTime').textContent=Math.min(comp,96);
-  document.getElementById('ccharts').classList.add('visible');
+  document.getElementById('rcharts').classList.add('visible');
 
   var ms={Evacuation:0,Medevac:0,Recon:0,Cargo:0,Fire:0,LE:0};
   text.split('\n').forEach(function(l){
-    if(!l.match(/^AIRCRAFT:/i)) return;
     var u=l.toUpperCase();
-    if(u.indexOf('EVAC')>=0) ms.Evacuation++;
-    else if(u.indexOf('MEDEVAC')>=0||u.indexOf('MEDICAL')>=0) ms.Medevac++;
-    else if(u.indexOf('RECON')>=0) ms.Recon++;
-    else if(u.indexOf('CARGO')>=0||u.indexOf('SUPPLY')>=0) ms.Cargo++;
-    else if(u.indexOf('FIRE')>=0) ms.Fire++;
+    if(!u.match(/AIRCRAFT:|MISSION:/))return;
+    if(u.indexOf('EVAC')>=0||u.indexOf('TRANSPORT')>=0)ms.Evacuation++;
+    else if(u.indexOf('MEDEVAC')>=0||u.indexOf('MEDICAL')>=0)ms.Medevac++;
+    else if(u.indexOf('RECON')>=0)ms.Recon++;
+    else if(u.indexOf('CARGO')>=0||u.indexOf('SUPPLY')>=0)ms.Cargo++;
+    else if(u.indexOf('FIRE')>=0||u.indexOf('WATER')>=0)ms.Fire++;
     else ms.Evacuation++;
   });
-  if(!Object.values(ms).some(function(v){return v>0;})) ms={Evacuation:8,Medevac:3,Recon:2,Cargo:3,Fire:1,LE:1};
-
+  if(!Object.values(ms).some(function(v){return v>0;}))ms={Evacuation:7,Medevac:3,Recon:1,Cargo:2,Fire:1,LE:1};
   var ramp=[.3,.6,.9,1,1,1,1,.95,.9,.85,.8,.75],cum=[],run=0;
   ramp.forEach(function(f){run+=Math.round(rate*f);cum.push(run);});
-
   if(chartMInst){chartMInst.destroy();chartMInst=null;}
   if(chartTInst){chartTInst.destroy();chartTInst=null;}
-  Chart.defaults.color='rgba(200,232,255,.4)';
-  Chart.defaults.font={family:'DM Mono',size:8};
-
+  Chart.defaults.color='rgba(200,232,255,.4)';Chart.defaults.font={family:'DM Mono',size:8};
   var active=Object.keys(ms).filter(function(k){return ms[k]>0;});
-  chartMInst=new Chart(document.getElementById('chartM').getContext('2d'),{
-    type:'doughnut',
-    data:{labels:active,datasets:[{data:active.map(function(k){return ms[k];}),backgroundColor:['#00b4ff','#ff4444','#00e676','#ffaa00','#ff6b35','#9b59b6'],borderColor:'rgba(2,4,10,.8)',borderWidth:2}]},
-    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'right',labels:{boxWidth:7,padding:4,font:{size:8}}},tooltip:{callbacks:{label:function(c){return c.label+': '+c.raw;}}}}}
-  });
-  chartTInst=new Chart(document.getElementById('chartT').getContext('2d'),{
-    type:'line',
-    data:{labels:['H1','H2','H3','H4','H5','H6','H7','H8','H9','H10','H11','H12'],datasets:[{data:cum,borderColor:'#00e676',backgroundColor:'rgba(0,230,118,.07)',borderWidth:1.5,fill:true,tension:.3,pointRadius:2,pointBackgroundColor:'#00e676'}]},
-    options:{responsive:true,maintainAspectRatio:true,scales:{x:{grid:{color:'rgba(0,180,255,.05)'}},y:{grid:{color:'rgba(0,180,255,.05)'},ticks:{callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw.toLocaleString()+' evacuated';}}}}}
-  });
+  chartMInst=new Chart(document.getElementById('chartM').getContext('2d'),{type:'doughnut',data:{labels:active,datasets:[{data:active.map(function(k){return ms[k];}),backgroundColor:['#00b4ff','#ff4444','#00e676','#ffaa00','#ff6b35','#9b59b6'],borderColor:'rgba(2,4,10,.8)',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'right',labels:{boxWidth:7,padding:4,font:{size:8}}},tooltip:{callbacks:{label:function(c){return c.label+': '+c.raw;}}}}}});
+  chartTInst=new Chart(document.getElementById('chartT').getContext('2d'),{type:'line',data:{labels:['H1','H2','H3','H4','H5','H6','H7','H8','H9','H10','H11','H12'],datasets:[{data:cum,borderColor:'#00e676',backgroundColor:'rgba(0,230,118,.07)',borderWidth:1.5,fill:true,tension:.3,pointRadius:2,pointBackgroundColor:'#00e676'}]},options:{responsive:true,maintainAspectRatio:true,scales:{x:{grid:{color:'rgba(0,180,255,.05)'}},y:{grid:{color:'rgba(0,180,255,.05)'},ticks:{callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw.toLocaleString()+' evacuated';}}}}}});
 }
 
-// ── FULL PLAN PAGE ─────────────────────────────────────────────────────────
+// ── FULL PLAN PAGE ────────────────────────────────────────────────────────
 function openFullPlan(){
-  if(!lastPlanData) return;
-  var d=lastPlanData, w=window.open('','_blank');
+  if(!lastPlanData)return;
+  var d=lastPlanData,w=window.open('','_blank');
   var now=new Date(),ds=now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),ts=now.toUTCString().match(/(\d+:\d+:\d+)/)[1]+' UTC';
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>FENRAX-1 IAP</title>'
-    +'<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">'
-    +'<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#02040a;color:#c8e8ff;font-family:"DM Mono",monospace}.page{max-width:900px;margin:0 auto;padding:2.5rem 2rem}.logo{font-size:.65rem;letter-spacing:.25em;color:#00b4ff;margin-bottom:.4rem}.doctitle{font-family:"Inter",sans-serif;font-size:1.7rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin:.25rem 0}.sub{font-size:.62rem;color:rgba(200,232,255,.3);margin-bottom:.85rem}.scene{background:#050c14;border:1px solid rgba(255,170,0,.2);border-left:3px solid #ffaa00;padding:.7rem 1rem;margin-bottom:1.5rem}.scene-lbl{font-size:.5rem;letter-spacing:.18em;color:#ffaa00;margin-bottom:.2rem}.scene-txt{font-size:.72rem;color:#fff;line-height:1.7;font-family:"Inter",sans-serif;font-weight:300}.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(0,180,255,.08);border:1px solid rgba(0,180,255,.08);margin-bottom:2rem}.mc{background:#050c14;padding:.55rem .8rem}.mc-l{font-size:.47rem;letter-spacing:.12em;color:rgba(200,232,255,.3);text-transform:uppercase}.mc-v{font-size:.78rem;font-weight:500;color:#00b4ff;margin-top:.12rem}.body{font-size:.68rem;color:rgba(200,232,255,.5);line-height:1.95}.body strong{color:#fff;font-weight:500}.body br+br{display:block;margin:.25rem 0}.footer{margin-top:2rem;padding-top:1.2rem;border-top:1px solid rgba(0,180,255,.08);display:flex;justify-content:space-between;font-size:.54rem;color:rgba(200,232,255,.2)}@media print{body{background:#fff;color:#000;font-family:Georgia,serif}.doctitle,.mc-v{color:#000}}</style>'
-    +'</head><body><div class="page">'
-    +'<div class="logo">FENRAX-1 // SF BAY AREA AVIATION ASSET RESPONSE SYSTEM</div>'
-    +'<div class="doctitle">Incident Action Plan</div>'
-    +'<div class="sub">'+ds+' &nbsp;&middot;&nbsp; '+ts+' &nbsp;&middot;&nbsp; Real FAA aircraft data &nbsp;&middot;&nbsp; 9-County EOP integrated</div>'
-    +'<div class="scene"><div class="scene-lbl">Incident Scenario</div><div class="scene-txt">'+d.scenario+'</div></div>'
-    +'<div class="meta">'
-    +'<div class="mc"><div class="mc-l">Flight Rules</div><div class="mc-v">'+(d.weather.rules||'VFR')+'</div></div>'
-    +'<div class="mc"><div class="mc-l">Wind KSFO</div><div class="mc-v" style="color:#ffaa00">'+(d.weather.dir||'—')+' @ '+(d.weather.wind||'—')+'</div></div>'
-    +'<div class="mc"><div class="mc-l">Ceiling</div><div class="mc-v">'+(d.weather.ceil||'CLR')+'</div></div>'
-    +'<div class="mc"><div class="mc-l">Condition</div><div class="mc-v">'+(d.weather.cond||'Clear')+'</div></div>'
-    +'</div>'
-    +'<div class="body">'+d.planText.replace(/\n/g,'<br>').replace(/SECTION\s+(\d+)\s*[—\-]+\s*/gi,'<br><br><strong style="color:#00b4ff;letter-spacing:.15em;font-size:.7rem">SECTION $1 — </strong>')+'</div>'
-    +'<div class="footer"><div>FENRAX-1 &middot; fenrax.com &middot; Community Disaster Response, AI Aggregated</div><div>For emergency planning use only &middot; Not for operational use</div></div>'
-    +'</div></body></html>');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>FENRAX-1 IAP</title><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#02040a;color:#c8e8ff;font-family:"DM Mono",monospace}.page{max-width:900px;margin:0 auto;padding:2.5rem 2rem}.logo{font-size:.65rem;letter-spacing:.25em;color:#00b4ff;margin-bottom:.4rem}.doctitle{font-family:"Inter",sans-serif;font-size:1.7rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin:.25rem 0}.sub{font-size:.62rem;color:rgba(200,232,255,.3);margin-bottom:.85rem}.scene{background:#050c14;border:1px solid rgba(255,170,0,.2);border-left:3px solid #ffaa00;padding:.7rem 1rem;margin-bottom:1.5rem}.sl{font-size:.5rem;letter-spacing:.18em;color:#ffaa00;margin-bottom:.2rem}.st{font-size:.72rem;color:#fff;line-height:1.7;font-family:"Inter",sans-serif;font-weight:300}.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(0,180,255,.08);border:1px solid rgba(0,180,255,.08);margin-bottom:2rem}.mc{background:#050c14;padding:.55rem .8rem}.ml{font-size:.47rem;letter-spacing:.12em;color:rgba(200,232,255,.3);text-transform:uppercase}.mv{font-size:.78rem;font-weight:500;color:#00b4ff;margin-top:.12rem}.bd{font-size:.68rem;color:rgba(200,232,255,.5);line-height:1.95}.bd strong{color:#fff;font-weight:500}.ft{margin-top:2rem;padding-top:1.2rem;border-top:1px solid rgba(0,180,255,.08);display:flex;justify-content:space-between;font-size:.54rem;color:rgba(200,232,255,.2)}@media print{body{background:#fff;color:#000}}</style></head><body><div class="page"><div class="logo">FENRAX-1 // SF BAY AREA AVIATION ASSET RESPONSE SYSTEM</div><div class="doctitle">Incident Action Plan</div><div class="sub">'+ds+' &nbsp;·&nbsp; '+ts+' &nbsp;·&nbsp; Real FAA aircraft data &nbsp;·&nbsp; 9-County EOP integrated</div><div class="scene"><div class="sl">Incident Scenario</div><div class="st">'+d.scenario+'</div></div><div class="meta"><div class="mc"><div class="ml">Flight Rules</div><div class="mv">'+(d.weather.rules||'VFR')+'</div></div><div class="mc"><div class="ml">Wind KSFO</div><div class="mv" style="color:#ffaa00">'+(d.weather.dir||'—')+' @ '+(d.weather.wind||'—')+'</div></div><div class="mc"><div class="ml">Ceiling</div><div class="mv">'+(d.weather.ceil||'CLR')+'</div></div><div class="mc"><div class="ml">Condition</div><div class="mv">'+(d.weather.cond||'Clear')+'</div></div></div><div class="bd">'+d.planText.replace(/\n/g,'<br>').replace(/SECTION\s+(\d+)\s*[—\-]+\s*/gi,'<br><br><strong style="color:#00b4ff;letter-spacing:.15em;font-size:.7rem">SECTION $1 — </strong>')+'</div><div class="ft"><div>FENRAX-1 · fenrax.com · Community Disaster Response, AI Aggregated</div><div>For emergency planning use only</div></div></div></body></html>');
   w.document.close();
 }
 
-// ── INIT ───────────────────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────────────────
 async function initialize(){
-  var prog=document.getElementById('lProg')||{style:{}};
   initMap();
-  allAircraft = genFleet();
-  govFleet = buildGovFleet();
+  allAircraft=genFleet();
+  govFleet=buildGovFleet();
   renderList();
+  renderCountyBreakdown();
   drawHospitals();
   drawAirports();
-  weatherData = await fetchWx();
-  var wbar=document.getElementById('wbar');
-  wbar.innerHTML='<span style="color:var(--blue);letter-spacing:.12em">KSFO</span>'
+  weatherData=await fetchWx();
+  document.getElementById('wbar').innerHTML='<span style="color:var(--blue);letter-spacing:.1em">KSFO</span>'
     +'<span class="wv">'+weatherData.temp+'</span>'
     +'<span>Wind <span class="wv">'+weatherData.dir+' @ '+weatherData.wind+'</span></span>'
     +'<span>Vis <span class="wv">'+weatherData.vis+'</span></span>'
     +'<span>Ceil <span class="wv">'+weatherData.ceil+'</span></span>'
-    +'<span style="color:'+weatherData.rc+';font-weight:500">'+weatherData.rules+'</span>'
-    +'<span style="color:var(--faint)">'+weatherData.cond+'</span>';
+    +'<span style="color:'+weatherData.rc+';font-weight:500">'+weatherData.rules+'</span>';
+  // Update stat boxes with real data
+  var helis=allAircraft.filter(function(a){return a.cat==='heli';}).length+govFleet.filter(function(a){return a.cat==='heli';}).length;
+  document.getElementById('sHeli').textContent=helis;
+  document.getElementById('sGov').textContent=govFleet.length;
+  document.getElementById('sTot').textContent=allAircraft.length+govFleet.length;
+  document.getElementById('sFixed').textContent=allAircraft.filter(function(a){return a.cat==='fixed';}).length;
 }
 
 initialize();
