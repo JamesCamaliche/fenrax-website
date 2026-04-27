@@ -207,11 +207,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
 </head>
 <body>
 
-<div id="keyModal" style="display:flex">
-  <div class="kbox">
-    <div class="ktop">FENRAX-1 // Configuration</div>
-    <div class="ktitle">Anthropic API Key</div>
-    <div class="knote">Required to generate AI response plans.<br>Get one at <strong style="color:var(--blue)">console.anthropic.com</strong> &rarr; API Keys<br><br><em style="color:rgba(0,180,255,.42)">Running on fenrax.com — direct API calls enabled.</em></div>
+
     <input id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
     <div id="keyStatus"></div>
     <div class="kbtns">
@@ -229,7 +225,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
       <div class="ttitle">SF Bay Area &middot; Emergency Response Planning System</div>
     </div>
     <div class="tr">
-      <button class="topbtn" id="keyBtn" onclick="showKeyModal()">&#9881; API Key</button>
+      <div style="font-size:.55rem;color:rgba(0,230,118,.7);letter-spacing:.1em">&#9679; LIVE</div>
       <div id="clock">--:--:-- UTC</div>
     </div>
   </div>
@@ -1033,7 +1029,7 @@ var PRESETS = {
 };
 
 // ── STATE ─────────────────────────────────────────────────────────────────
-var ANTHROPIC_API_KEY = sessionStorage.getItem('fnx_key') || '';
+var ANTHROPIC_API_KEY = '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';
 var allAircraft = [], govFleet = [], weatherData = {};
 var activeTypes = new Set(['civ','mil','le','fire']);
 var selected = null, map, useSat = true;
@@ -1046,9 +1042,9 @@ function tick(){var n=new Date();document.getElementById('clock').textContent=St
 setInterval(tick,1000);tick();
 
 // ── API KEY ───────────────────────────────────────────────────────────────
-if(ANTHROPIC_API_KEY){document.getElementById('keyBtn').classList.add('keyset');document.getElementById('keyBtn').textContent='\u2714 API Key';}
-function showKeyModal(){document.getElementById('keyModal').style.display='flex';if(ANTHROPIC_API_KEY)document.getElementById('cancelKeyBtn').style.display='block';setTimeout(function(){document.getElementById('apiKeyInput').focus();},60);}
-function saveKey(){
+document.getElementById('keyBtn').classList.add('keyset');document.getElementById('keyBtn').textContent='\u2714 API Key';
+function showKeyModal(){}
+function saveKey_disabled(){
   var val=document.getElementById('apiKeyInput').value.trim();
   var st=document.getElementById('keyStatus');
   if(!val||val.length<80){st.textContent='Key too short — paste full key from console.anthropic.com';st.style.color='var(--red)';return;}
@@ -1058,7 +1054,7 @@ function saveKey(){
   document.getElementById('cancelKeyBtn').style.display='block';
   setTimeout(function(){document.getElementById('keyModal').style.display='none';},350);
 }
-function hideModal(){document.getElementById('keyModal').style.display='none';}
+function hideModal(){}
 document.getElementById('apiKeyInput').addEventListener('keydown',function(e){if(e.key==='Enter')saveKey();});
 
 // ── MAP ───────────────────────────────────────────────────────────────────
@@ -1265,7 +1261,7 @@ async function fetchWx(){
 
 // ── GENERATE PLAN ─────────────────────────────────────────────────────────
 function generatePlan(){
-  if(!ANTHROPIC_API_KEY){showKeyModal();return;}
+  
   var scenario=document.getElementById('sceneInput').value.trim();
   if(!scenario){alert('Please enter a scenario.');return;}
   var btn=document.getElementById('genBtn');
