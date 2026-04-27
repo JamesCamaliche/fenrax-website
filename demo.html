@@ -208,7 +208,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
 <body>
 
 
-    <input id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
+    <input id="apiKeyInput" type="password" placeholder="API Key" autocomplete="off" spellcheck="false">
     <div id="keyStatus"></div>
     <div class="kbtns">
       <button id="saveKeyBtn" onclick="saveKey()">Save &amp; Continue</button>
@@ -225,7 +225,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
       <div class="ttitle">SF Bay Area &middot; Emergency Response Planning System</div>
     </div>
     <div class="tr">
-      <div style="font-size:.55rem;color:rgba(0,230,118,.7);letter-spacing:.1em">&#9679; LIVE</div>
+      
       <div id="clock">--:--:-- UTC</div>
     </div>
   </div>
@@ -1029,7 +1029,7 @@ var PRESETS = {
 };
 
 // ── STATE ─────────────────────────────────────────────────────────────────
-var ANTHROPIC_API_KEY = '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';
+var ANTHROPIC_API_KEY = '';
 var allAircraft = [], govFleet = [], weatherData = {};
 var activeTypes = new Set(['civ','mil','le','fire']);
 var selected = null, map, useSat = true;
@@ -1042,7 +1042,7 @@ function tick(){var n=new Date();document.getElementById('clock').textContent=St
 setInterval(tick,1000);tick();
 
 // ── API KEY ───────────────────────────────────────────────────────────────
-document.getElementById('keyBtn').classList.add('keyset');document.getElementById('keyBtn').textContent='\u2714 API Key';
+
 function showKeyModal(){}
 function saveKey_disabled(){
   var val=document.getElementById('apiKeyInput').value.trim();
@@ -1050,7 +1050,7 @@ function saveKey_disabled(){
   if(!val||val.length<80){st.textContent='Key too short — paste full key from console.anthropic.com';st.style.color='var(--red)';return;}
   ANTHROPIC_API_KEY=val;sessionStorage.setItem('fnx_key',val);
   st.textContent='\u2714 Saved!';st.style.color='var(--green)';
-  document.getElementById('keyBtn').classList.add('keyset');document.getElementById('keyBtn').textContent='\u2714 API Key';
+  
   document.getElementById('cancelKeyBtn').style.display='block';
   setTimeout(function(){document.getElementById('keyModal').style.display='none';},350);
 }
@@ -1210,7 +1210,11 @@ document.querySelector('.lfilter').addEventListener('click',function(e){
   btn.classList.toggle('on',activeTypes.has(t));renderList();
 });
 document.querySelectorAll('.pb').forEach(function(btn){
-  btn.addEventListener('click',function(){document.getElementById('sceneInput').value=PRESETS[btn.getAttribute('data-p')]||'';});
+  btn.addEventListener('click',function(){
+    var key=btn.getAttribute('data-p');
+    document.getElementById('sceneInput').value=CANNED_RESPONSES[key]?CANNED_RESPONSES[key].scenario:PRESETS[key]||'';
+    setTimeout(function(){generatePlan();},100);
+  });
 });
 
 // ── FACILITY TABLES ───────────────────────────────────────────────────────
@@ -1261,7 +1265,6 @@ async function fetchWx(){
 
 // ── GENERATE PLAN ─────────────────────────────────────────────────────────
 function generatePlan(){
-  
   var scenario=document.getElementById('sceneInput').value.trim();
   if(!scenario){alert('Please enter a scenario.');return;}
   var btn=document.getElementById('genBtn');
@@ -1269,138 +1272,35 @@ function generatePlan(){
   document.getElementById('rStatus').textContent='Generating...';
   document.getElementById('rPh').style.display='none';
   document.getElementById('rContent').style.display='block';
-  document.getElementById('rContent').innerHTML='<div class="thinking"><div class="dots"><span></span><span></span><span></span></div><div class="ttxt">FENRAX-1 analyzing '+allAircraft.length+' civilian + '+govFleet.length+' government assets...<br>Building Incident Action Plan — please allow 30-60 seconds.</div></div>';
+  document.getElementById('rContent').innerHTML='<div class="thinking"><div class="dots"><span></span><span></span><span></span></div><div class="ttxt">FENRAX-1 analyzing '+allAircraft.length+' civilian and '+govFleet.length+' government assets...<br>Building Incident Action Plan...</div></div>';
 
-  var helis=allAircraft.filter(function(a){return a.cat==='heli';});
-  var fixed=allAircraft.filter(function(a){return a.cat==='fixed';});
-  var mil=govFleet.filter(function(a){return a.govColor==='mil';});
-  var le=govFleet.filter(function(a){return a.govColor==='le';});
-  var fire=govFleet.filter(function(a){return a.govColor==='fire';});
+  // Find matching canned response
+  var matchKey = null;
+  var scenarioLower = scenario.toLowerCase();
+  if(scenarioLower.indexOf('earthquake')>=0||scenarioLower.indexOf('hayward')>=0||scenarioLower.indexOf('seismic')>=0) matchKey='eq';
+  else if(scenarioLower.indexOf('wildfire')>=0||scenarioLower.indexOf('fire')>=0||scenarioLower.indexOf('wind')>=0) matchKey='wf';
+  else if(scenarioLower.indexOf('flood')>=0||scenarioLower.indexOf('water')>=0||scenarioLower.indexOf('rain')>=0) matchKey='fl';
+  else if(scenarioLower.indexOf('tsunami')>=0||scenarioLower.indexOf('wave')>=0||scenarioLower.indexOf('cascadia')>=0) matchKey='ts';
+  else if(scenarioLower.indexOf('bridge')>=0||scenarioLower.indexOf('infrastructure')>=0||scenarioLower.indexOf('bay bridge')>=0) matchKey='br';
+  else if(scenarioLower.indexOf('mass casualty')>=0||scenarioLower.indexOf('mci')>=0||scenarioLower.indexOf('casualty')>=0) matchKey='mc';
+  else matchKey='eq'; // default to earthquake
 
-  // Affected counties
-  var affC=['San Francisco','Alameda','Contra Costa','Marin','San Mateo','Santa Clara','Napa','Sonoma','Solano'].filter(function(c){return scenario.toLowerCase().indexOf(c.toLowerCase().split(' ')[0])>=0;});
-  if(affC.length===0)affC=['San Francisco','Alameda','Contra Costa','San Mateo','Santa Clara'];
-
-  var eopCtx=affC.map(function(c){if(!COUNTY_EOP[c])return'';return c+': '+COUNTY_EOP[c].facts.split(' | ').slice(0,2).join('; ');}).filter(Boolean).join('\n');
-
-  // Sample civilian aircraft for the prompt - helis by county, fixed wing cargo capable
-  var sampHelisByCounty={};
-  helis.forEach(function(h){if(!sampHelisByCounty[h.county])sampHelisByCounty[h.county]=[];if(sampHelisByCounty[h.county].length<2)sampHelisByCounty[h.county].push(h);});
-  var sampHelis=[];
-  Object.values(sampHelisByCounty).forEach(function(arr){sampHelis=sampHelis.concat(arr);});
-  sampHelis=sampHelis.slice(0,12);
-
-  var sampFixed=fixed.filter(function(a){return parseInt(a.pax)>=4;}).slice(0,8);
-
-  var ctx='ASSET DATABASE (Real FAA Bay Area, Apr 2026)\n'
-    +'Total: '+allAircraft.length+' civilian + '+govFleet.length+' government\n'
-    +'Civilian helicopters: '+helis.length+' | Civilian fixed-wing: '+fixed.length+'\n'
-    +'Military: '+mil.length+' | Law Enforcement: '+le.length+' | Fire/EMS: '+fire.length+'\n\n'
-    +'CIVILIAN HELICOPTERS (sample from registry — these are real registered aircraft):\n'
-    +sampHelis.map(function(h){return h.reg+' | '+h.type+' | '+h.pax+' pax | Owner: '+h.owner+' | Base: '+h.airportName+' ('+h.county+')';}).join('\n')+'\n\n'
-    +'CIVILIAN FIXED-WING (sample — real registered aircraft):\n'
-    +sampFixed.map(function(f){return f.reg+' | '+f.type+' | '+f.pax+' pax | Owner: '+f.owner+' | Base: '+f.airportName+' ('+f.county+')';}).join('\n')+'\n\n'
-    +'GOVERNMENT / MILITARY:\n'
-    +mil.concat(le).concat(fire).map(function(a){return a.reg+' | '+a.type+' | '+a.owner+' | '+a.pax+' pax';}).join('\n')+'\n\n'
-    +'AIRPORTS (staging available):\n'
-    +AIRPORTS.map(function(a){return a.icao+': '+a.name+', '+a.runways+' rwy, '+a.length.toLocaleString()+'ft, '+a.caps.join('/');}).join('\n')+'\n\n'
-    +'HOSPITAL HELIPADS:\n'
-    +HOSPITALS.filter(function(h){return h.helipad;}).map(function(h){return h.name+' ('+h.county+', Level '+h.trauma+' Trauma, helipad)';}).join('\n')+'\n\n'
-    +'WEATHER KSFO: '+weatherData.temp+' Wind '+weatherData.dir+'@'+weatherData.wind+' Ceil '+weatherData.ceil+' '+weatherData.rules+'\n\n'
-    +'COUNTY EOPs:\n'+eopCtx;
-
-  var prompt='You are FENRAX-1 generating a formal ICS Incident Action Plan (IAP) for Bay Area emergency aviation response.\n\n'
-    +'KEY DOCTRINE:\n'
-    +'- HELICOPTERS handle short-range shuttle missions: pick up from pickup zones (PZs), deliver to hospital helipads or staging airports. High sortie rate, repeat loops.\n'
-    +'- FIXED-WING handles mass movement: outbound evacuation from staging airports to receiving cities/airports, and inbound logistics (responders, medical supplies, equipment).\n'
-    +'- INCLUDE CIVILIAN AIRCRAFT from the FAA registry — this is the core FENRAX value. Use real N-numbers. Show that private community assets multiply response capacity.\n'
-    +'- Use ICS document number format: IAP-2026-[COUNTY/REGION]-[TYPE]-001. No creative operation names.\n\n'
-    +'ASSETS:\n'+ctx+'\n\n'
-    +'INCIDENT:\n'+scenario+'\n\n'
-    +'Write the complete formal IAP using EXACTLY these section headers:\n\n'
-    +'SECTION 1 — INCIDENT OVERVIEW\n'
-    +'Document Number: IAP-2026-[county]-[type]-001\n'
-    +'Incident Type, Operational Period H+0000-H+1200, Incident Commander with specific county EOC location.\n\n'
-    +'SECTION 2 — SITUATION ANALYSIS\n'
-    +'Affected areas with real SF Bay Area population figures. Road/bridge access status. Why aerial assets are required.\n\n'
-    +'SECTION 3 — OPERATIONAL GOALS\n'
-    +'Goal A (Evacuation): Specific number of persons requiring aerial evacuation. Priority populations (mobility impaired, medical, general).\n'
-    +'Goal B (Inbound Logistics): Responders, medical supplies, equipment quantities needed.\n'
-    +'Goal C (Medical): Hospital receiving capacity, trauma center coordination.\n\n'
-    +'SECTION 4 — HELICOPTER OPERATIONS (SHORT-RANGE EVACUATION SHUTTLES)\n'
-    +'List 10-12 helicopters including civilian N-numbers from the registry. For each:\n'
-    +'AIRCRAFT: [N-number]\n'
-    +'Type: [model] | Owner: [operator — include civilian owners] | Base: [ICAO]\n'
-    +'Mission: Shuttle [PZ name] → [Hospital helipad or Staging airport]\n'
-    +'Payload: [X pax per sortie] | Sorties/hr: [N] | Priority: [CRITICAL/HIGH/STANDARD]\n'
-    +'Departure: H+[XX]\n\n'
-    +'SECTION 5 — FIXED-WING OPERATIONS (MASS MOVEMENT & LOGISTICS)\n'
-    +'List 6-8 fixed-wing aircraft including civilian N-numbers. For each:\n'
-    +'AIRCRAFT: [N-number]\n'
-    +'Type: [model] | Owner: [operator] | Base: [ICAO]\n'
-    +'Mission: [OUTBOUND EVAC: staging airport → receiving city/airport] OR [INBOUND LOGISTICS: source → staging airport]\n'
-    +'Payload: [X pax or X lbs cargo] | Priority: [CRITICAL/HIGH/STANDARD]\n'
-    +'Departure: H+[XX]\n\n'
-    +'SECTION 6 — PICKUP ZONES (PZs)\n'
-    +'List 4-5 real Bay Area open spaces suitable for helicopter operations:\n'
-    +'PZ-[N]: [Location name]\n'
-    +'Coordinates: [lat, lng] | Type: [park/field/former airfield]\n'
-    +'Capacity: [X simultaneous helicopters] | Population served: [area + estimated count]\n'
-    +'Ground Coordinator: [agency] | Status: ACTIVE\n\n'
-    +'SECTION 7 — EVACUATION FLOW\n'
-    +'Describe the complete chain:\n'
-    +'Phase 1 (H+0 to H+2): Helicopter extraction from PZs to hospitals/staging\n'
-    +'Phase 2 (H+2 to H+6): Fixed-wing outbound mass evacuation begins from staging airports\n'
-    +'Phase 3 (H+6 to H+12): Sustained operations, inbound logistics, crew rotation\n\n'
-    +'SECTION 8 — INBOUND LOGISTICS\n'
-    +'What is being flown IN. Medical teams, supplies, equipment, mutual aid personnel. Staging airports for inbound.\n\n'
-    +'SECTION 9 — CAPACITY CALCULATIONS\n'
-    +'Show math:\n'
-    +'Helicopter capacity: [N] aircraft × avg [X] pax × [Y] sorties/hr = [Z] pax/hr\n'
-    +'Fixed-wing outbound: [N] aircraft × avg [X] pax × [Y] sorties/day = [Z] pax/day\n'
-    +'Total evacuation rate: [X] persons/hour\n'
-    +'Cargo inbound: [X] tons/12hr\n'
-    +'Estimated completion of priority evacuation: H+[XX]\n\n'
-    +'SECTION 10 — EXECUTION TIMELINE\n'
-    +'H+0000-0030: [immediate activation actions]\n'
-    +'H+0030-0100: [first wave helicopter launches]\n'
-    +'H+0100-0300: [full helicopter tempo, fixed-wing staging]\n'
-    +'H+0300-0600: [fixed-wing outbound evacuation begins, inbound logistics]\n'
-    +'H+0600-1200: [sustained operations, crew rotation, mutual aid]\n\n'
-    +'SECTION 11 — COMMUNICATIONS\n'
-    +'Command freq, helicopter tactical freq, fixed-wing freq, hospital coordination freq, ATIS/AWOS.\n\n'
-    +'SECTION 12 — FENRAX INTEGRATION VALUE\n'
-    +'Quantify the civilian asset multiplier: how many additional persons evacuated per hour by including pre-identified civilian aircraft vs government-only response.\n'
-    +'Compare to ad-hoc mobilization (ref: Operation Helo, Hurricane Helene 2024: 4 days to organize).\n'
-    +'State specific time-to-first-launch advantage.';
-
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4000,messages:[{role:'user',content:prompt}]}),
-    signal:AbortSignal.timeout(90000)
-  }).then(function(r){
-    if(!r.ok)return r.json().then(function(e){throw new Error((e.error&&e.error.message)||'HTTP '+r.status);});
-    return r.json();
-  }).then(function(d){
-    var text=d.content&&d.content[0]&&d.content[0].text||'No response.';
-    var parsed=parsePlanForMap(text);
+  var canned = CANNED_RESPONSES[matchKey];
+  
+  // Simulate generation time for realism
+  setTimeout(function(){
+    var text = canned.planText;
+    var parsed = canned.parsedPlan;
     lastPlanData={scenario:scenario,planText:text,parsedPlan:parsed,weather:weatherData};
     renderPlan(text);
-    renderCharts(text,helis);
+    // Render charts with canned stats
+    renderCannedCharts(canned.charts);
     document.getElementById('openPlanBtn').style.display='block';
     document.getElementById('rStatus').textContent='IAP ready '+new Date().toLocaleTimeString();
     drawPlanOnMap(parsed);
-  }).catch(function(e){
-    var isKey=e.message.indexOf('invalid')>=0||e.message.indexOf('401')>=0||e.message.indexOf('authentication')>=0;
-    var isTimeout=e.message.indexOf('timed out')>=0||e.message.indexOf('timeout')>=0;
-    document.getElementById('rContent').innerHTML='<div class="err-box"><div class="err-title">'+(isKey?'&#10007; Invalid API Key':isTimeout?'&#10007; Request Timed Out':'&#10007; API Error')+'</div><div class="err-body">'
-      +(isKey?'<strong>Key rejected.</strong> Click API Key top-right and re-enter your full key from <code>console.anthropic.com</code>.'
-        :isTimeout?'<strong>Server took too long.</strong> Try again — it usually works on second attempt.'
-        :'<strong>Error:</strong> '+e.message)
-      +'</div></div>';
-    document.getElementById('rStatus').textContent='Error';
-  }).finally(function(){btn.disabled=false;btn.textContent='\u25CA Generate Incident Action Plan';});
+    btn.disabled=false;
+    btn.textContent='\u25CA Generate Incident Action Plan';
+  }, 2500);
 }
 
 // ── RENDER PLAN ───────────────────────────────────────────────────────────
@@ -1583,6 +1483,27 @@ async function initialize(){
   document.getElementById('rdTs').textContent=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   weatherData=await fetchWx();
   document.getElementById('wbar').innerHTML='<span style="color:var(--blue)">KSFO</span><span class="wv">'+weatherData.temp+'</span><span>Wind <span class="wv">'+weatherData.dir+' @ '+weatherData.wind+'</span></span><span>Vis <span class="wv">'+weatherData.vis+'</span></span><span>Ceil <span class="wv">'+weatherData.ceil+'</span></span><span style="color:'+weatherData.rc+';font-weight:500">'+weatherData.rules+'</span>';
+}
+
+
+function renderCannedCharts(stats){
+  document.getElementById('paEvac').textContent=stats.rate.toLocaleString();
+  document.getElementById('paCargo').textContent=stats.cargo;
+  document.getElementById('paAcft').textContent=stats.acft;
+  document.getElementById('paTime').textContent=stats.time;
+  document.getElementById('planAnalytics').style.display='block';
+
+  var ms={Evacuation:5,Medevac:3,Recon:1,Logistics:2,Fire:1,LE:1};
+  var ramp=[.3,.6,.9,1,1,1,1,.95,.9,.85,.8,.75],cum=[],run=0;
+  ramp.forEach(function(f){run+=Math.round(stats.rate*f);cum.push(run);});
+
+  if(chartMInst){chartMInst.destroy();chartMInst=null;}
+  if(chartTInst){chartTInst.destroy();chartTInst=null;}
+  Chart.defaults.color='rgba(200,232,255,.4)';Chart.defaults.font={family:'DM Mono',size:8};
+
+  var active=Object.keys(ms).filter(function(k){return ms[k]>0;});
+  chartMInst=new Chart(document.getElementById('chartM').getContext('2d'),{type:'doughnut',data:{labels:active,datasets:[{data:active.map(function(k){return ms[k];}),backgroundColor:['#00e676','#ff4444','#00b4ff','#ffaa00','#ff6b35','#9b59b6'],borderColor:'rgba(2,4,10,.8)',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'right',labels:{boxWidth:7,padding:4,font:{size:8}}},tooltip:{callbacks:{label:function(c){return c.label+': '+c.raw;}}}}}});
+  chartTInst=new Chart(document.getElementById('chartT').getContext('2d'),{type:'line',data:{labels:['H1','H2','H3','H4','H5','H6','H7','H8','H9','H10','H11','H12'],datasets:[{data:cum,borderColor:'#00e676',backgroundColor:'rgba(0,230,118,.07)',borderWidth:1.5,fill:true,tension:.3,pointRadius:2,pointBackgroundColor:'#00e676'}]},options:{responsive:true,maintainAspectRatio:true,scales:{x:{grid:{color:'rgba(0,180,255,.05)'}},y:{grid:{color:'rgba(0,180,255,.05)'},ticks:{callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw.toLocaleString()+' evacuated';}}}}}}); 
 }
 
 initialize();
